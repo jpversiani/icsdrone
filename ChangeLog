@@ -70,6 +70,6 @@ and zlib).
 0.21
 - Option added (default true) to give only feedback before move.
 0.22
-- Do not join variant tourney.
+- Do not join variant tourneys.
 
 	

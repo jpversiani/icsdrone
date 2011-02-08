@@ -195,7 +195,7 @@ CONSOLE AND TELL COMMANDS, SCRIPTS
        If you use a login script the first two lines should be the username
        and password.
 
-       The following commands can be used
+       The following commands are interpreted by icsdroneng.
 
            help       Give some rudimentary help
            set        Set an option (see below)
@@ -206,6 +206,10 @@ CONSOLE AND TELL COMMANDS, SCRIPTS
            coptions   List all options including those not settable at runtime.
            daemonize  Go into background
            load       Execute a script (for security reasons the name should end with .icsdrone)
+
+       Other commands (e.g. "draw", "seek", "match") will be forwarded to
+       FICS.  Unless they are prefixed by * in which case they will be sent to
+       the engine.
 
        With the "set" command you can change some command line options at
        runtime.  This applies to the following options.
@@ -282,4 +286,4 @@ SEE ALSO
 
 
 
-                                  2010-12-15                     ICSDRONENG(6)
+                                  2011-02-08                     ICSDRONENG(6)
