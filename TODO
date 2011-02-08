@@ -1,0 +1,25 @@
+Important:
+
+(-) At end of game in tourney do
+
+td playgame #tourney
+
+It could be that we have manually joined a tourney while playing a game.
+Apparently then autostarting of games does not work.
+
+(-) Avoid joining non chess tourney's.
+
+(-) Indicate resume of adjourned game in log. 
+
+(-) Type of tourney in log.
+
+(-) The fact that mamer turns your tourney variable to off apparently does
+not always mean the tourney has ended....
+
+Look for ":mamer TOURNEY #24 UPDATE: The tourney has ended."
+It seems to occur always in this form.
+
+(*) More compact standings.
+(*) Wild support.
+(*) Make pgn compliant (lines < 80 chars).
+

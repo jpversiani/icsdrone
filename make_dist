@@ -1,0 +1,33 @@
+VERSION=0.22
+NAME=icsdroneng
+# VERSION appears in
+# configure.ac
+# Changelog
+# debian/changelog
+RELEASE=1
+
+CC=/usr/bin/i586-mingw32msvc-g++
+SRCDIR=`pwd`
+BUILDDIR=$SRCDIR/${NAME}-${VERSION}
+DISTDIR=$SRCDIR/${NAME}-release
+TARNAME=$SRCDIR/${NAME}-${VERSION}.tar.gz
+RPMNAME=/usr/src/rpm/RPMS/*/${NAME}-${VERSION}-${RELEASE}.*.rpm
+DEBNAME=$SRCDIR/${NAME}_${VERSION}_*.deb
+
+mkdir $DISTDIR
+rm -rf $BUILDDIR
+make dist
+tar xvzf $TARNAME
+cp $TARNAME $DISTDIR
+cd $BUILDDIR
+autoreconf
+./configure
+make deb
+cp $DEBNAME $DISTDIR
+sudo make rpm
+cp $RPMNAME $DISTDIR
+sed s/henrik.gram@gmail.com/henrik\(dot\)gram\(at\)gmail\(dot\)com/ < README > README_sanitized1
+sed s/michel.vandenbergh@uhasselt.be/michel\(dot\)vandenbergh\(at\)uhasselt\(dot\)be/ < README_sanitized1 > README_sanitized2
+cp README_sanitized2 $DISTDIR/OVERVIEW.txt
+cp ChangeLog $DISTDIR
+rsync -bauv $DISTDIR lucg5281@alpha.uhasselt.be:/var/www/html/Research/Algebra/Toga/

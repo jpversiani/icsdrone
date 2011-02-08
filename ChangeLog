@@ -1,0 +1,75 @@
+0.03	
+- Initial public release of icsdroneng.
+0.04	
+- Slight modification of configure.ac (better detection of libreadline 
+and zlib).
+- Cygwin support.
+0.05
+- Correction of some typos.
+- Short logging. 
+- More feedback in console (draw & abort requests)
+0.06
+- Noplay option. 
+- The scheduling mechanism no longer uses the alarm signal. 
+0.08
+- New options: autoJoin, sendLogin, hardLimit, acceptDraw, autoReconnect.
+0.09
+- Some cleanups.
+0.10
+- Bugfix: End of "standings" was incorrectly detected for knockout tourney.
+0.11
+- Bugfix: Shortlog of fedora was mangled. 
+- The use of setjmp/longjmp is now compatible with the specification. 
+- Courtesy adjourn time reduced to 45 seconds. 
+- Fixed segfault which occurred when sendTimeout was set. 
+- AutoJoin is now true by default. 
+- More elaborate interface string. 
+0.12
+- Added option "ownerQuiet" to suppress owner tells about game progress. 
+- Moved up the processing of sendGameStart so that tells in it
+  do not get queued and arrive after the opponent has moved (this is mainly a 
+  problem for computers running as guests). A tell in sendGameStart is often 
+  used to inform the opponent that the player is a computer. Thus it should 
+  arrive as quickly as possible (noticed by Eric Mullins). 
+0.14 
+- When running as an unregistered user feedback tells are now throttled. 
+  Of course they will arrive very slowly (just as they did before) but at least 
+  they don't get lost due to communications quota overload. 
+- Do not forward draw CLAIMS to FICS. It is useless since FICS has its own 
+  means to detect legal draws. Furthermore it is actually harmful since the 
+  draw claim will likely arrive after the end of the game as far as FICS is
+  concerned. In a tourney where the games succeed each other very
+  quickly the draw claim may be interpreted as a draw OFFER for the
+  next game (this really happens).
+- Added option: feedbackCommand. Default "whisper". 
+- Bugfix: registered/unregistered detection was not correct. 
+- Added option: engineQuiet. Suppress most engine actions. Some
+  engines are too noisy. 
+- delete_timer now sets the timer to NULL.
+0.15
+- Timers have now millisecond precision.
+- No rematch after an adjourned or aborted game as it is directed to the wrong player.
+- Elimination of a number of explicit malloc's. 
+0.16
+- Small bugfix in timer code (confusion between msec and usec). 
+- Do not send standings in current form to owner (too many tells).
+0.17
+- Revert change of not sending draw claims to FICS. Contrary to what 
+  I believed FICS does not adjudicate draws by threefold repetition.
+  But the race condition still remains since the opponent may claim draw
+  before our own draw claim arrives at FICS. 
+0.18
+- WIN32 portability fixes by Eric Mullins. 
+0.19
+- There is a small possibility that icsdroneng accepts a match request
+  after attempting to join a tourney. In this version icsdroneng detects
+  this and tries to withdraw from the tourney.
+0.20
+- FICS nowrap setting (Eric Mullins)
+- Correction of some memset's that had their parameters reversed. 
+0.21
+- Option added (default true) to give only feedback before move.
+0.22
+- Do not join variant tourney.
+
+	
