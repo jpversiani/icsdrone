@@ -1,0 +1,15 @@
+Source: icsdroneng
+Section: games
+Priority: extra
+Maintainer: Michel Van den Bergh <michel.vandenbergh@uhasselt.be>
+Build-Depends: debhelper (>= 5), autotools-dev
+Standards-Version: 3.7.2
+
+Package: icsdroneng
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Interface between FICS and a chess engine.
+ icsdroneng acts as an interface between FICS (the Free Internet 
+ Chess Server) and a chess engine supporting the XBoard/WinBoard 
+ protocol. Unlike XBoard/WinBoard it does not use a graphical 
+ interface so it is suitable for use on embedded systems.

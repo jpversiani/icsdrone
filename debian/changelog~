@@ -1,0 +1,134 @@
+icsdroneng (0.22) unstable; urgency=low
+
+  * Do not join variant tourney.
+
+ -- Michel Van den Bergh <michel.vandenbergh@uhasselt.be>  Jan, 31 Dec 2011 19:00:00 +0200
+	
+icsdroneng (0.21) unstable; urgency=low
+
+  * Option added (default true) to give only feedback before move.	
+
+ -- Michel Van den Bergh <michel.vandenbergh@uhasselt.be>  Wed, 15 Dec 2010 19:00:00 +0200
+	
+icsdroneng (0.20) unstable; urgency=low
+
+  * FICS nowrap setting (Eric Mullins)
+	
+  * Correction of some memset's that had their parameters reversed. 
+
+ -- Michel Van den Bergh <michel.vandenbergh@uhasselt.be>  Tue, 24 Nov 2009 19:48:23 +0200
+
+icsdroneng (0.19) unstable; urgency=low
+
+  * There is a small possibility that icsdroneng accepts a match request after attempting to join a tourney. In this version icsdroneng detects this and tries to withdraw from the tourney.
+
+ -- Michel Van den Bergh <michel.vandenbergh@uhasselt.be>  Tue, 24 Nov 2009 19:48:23 +0200
+
+icsdroneng (0.18) unstable; urgency=low
+
+  * WIN32 portability fixes by Eric Mullins.
+
+ -- Michel Van den Bergh <michel.vandenbergh@uhasselt.be>  Tue, 18 Aug 2009 19:48:23 +0200
+
+icsdroneng (0.17) unstable; urgency=low
+
+  * Send draw claims to FICS again. 
+	
+ -- Michel Van den Bergh <michel.vandenbergh@uhasselt.be>  Tue, 18 Aug 2009 19:48:23 +0200
+
+icsdroneng (0.16) unstable; urgency=low
+
+  * Small bugfix in timer code (confusion between msec and usec).
+
+  * Do not send standings in current form to owner (too many tells).
+	
+ -- Michel Van den Bergh <michel.vandenbergh@uhasselt.be>  Mon, 1 July 2009 19:48:23 +0200
+
+icsdroneng (0.15) unstable; urgency=low
+
+  * Timers have now millisecond precision. 
+
+  * No rematch after an adjourned or aborted game as it directed to the wrong player.
+  * Elimination of a number of explicit malloc's.
+	
+ -- Michel Van den Bergh <michel.vandenbergh@uhasselt.be>  Mon, 1 July 2009 19:48:23 +0200
+
+icsdroneng (0.14) unstable; urgency=low
+
+  * When running as an unregistered user feedback tells are now throttled. Of course they will arrive very slowly (just as they did before) but at least they don't get lost due to communications quota overload.
+
+  * Do not forward draw CLAIMS to FICS. It is useless since FICS has its own means to detect legal draws. Furthermore it is actually harmful since the draw claim will likely arrive after the end of the game as far as FICS is concerned. In a tourney where the games succeed each other very quickly the draw claim may be interpreted as a draw OFFER for the next game (this really happens).
+
+  * Bugfix: registered/unregistered detection was not correct.
+
+  * Added option: engineQuiet. Suppress most engine actions. Some engines are too noisy.
+	
+ -- Michel Van den Bergh <michel.vandenbergh@uhasselt.be>  Mon, 23 June 2009 19:48:23 +0200
+
+icsdroneng (0.12) unstable; urgency=low
+
+  * Added option "ownerQuiet" to suppress owner tells about game progress. 
+  * Moved up the processing of sendGameStart so that tells in it do not get queued and arrive after the opponent has moved (this is mainly a problem for computers running as guests). A tell in sendGameStart is often used to inform the opponent that the player is a computer. Thus it should arrive as quickly as possible (noticed by Eric Mullins). 
+	
+ -- Michel Van den Bergh <michel.vandenbergh@uhasselt.be>  Mon, 23 June 2009 19:48:23 +0200
+
+icsdroneng (0.11) unstable; urgency=low
+
+  * Bugfix: Shortlog of fedora was mangled. 
+  * The use of setjmp/longjmp is now compatible with the specification. 
+  * Courtesy adjourn time reduced to 45 seconds. 
+  * Fixed segfault which occurred when sendTimeout was set. 
+  * AutoJoin is now true by default. 
+  * More elaborate interface string.	
+	
+ -- Michel Van den Bergh <michel.vandenbergh@uhasselt.be>  Mon, 19 June 2009 19:48:23 +0200
+
+icsdroneng (0.10) unstable; urgency=low
+
+  * Bug fix: end of "standings" was incorrectly detected for knockout tourney.
+
+ -- Michel Van den Bergh <michel.vandenbergh@uhasselt.be>  Mon, 16 June 2009 19:48:23 +0200
+
+icsdroneng (0.09) unstable; urgency=low
+
+  * Some cleanups.
+
+ -- Michel Van den Bergh <michel.vandenbergh@uhasselt.be>  Mon, 15 June 2009 15:24:42 +0200
+
+icsdroneng (0.08) unstable; urgency=low
+
+  * New options: autoJoin, sendLogin, hardLimit, acceptDraw, autoReconnect.
+
+ -- Michel Van den Bergh <michel.vandenbergh@uhasselt.be>  Mon, 14 June 2009 15:24:42 +0200
+	
+icsdroneng (0.06) unstable; urgency=low
+
+  * Noplay option.
+
+  * The scheduling mechanism no longer uses the alarm signal. 
+
+ -- Michel Van den Bergh <michel.vandenbergh@uhasselt.be>  Mon, 29 May 2009 15:23:39 +0200
+	
+icsdroneng (0.05) unstable; urgency=low
+
+  * Some typos corrected.
+
+  * Short logging. 
+
+  * More feedback in console (draw and abort requests).
+
+ -- Michel Van den Bergh <michel.vandenbergh@uhasselt.be>  Mon, 25 May 2009 15:23:39 +0200
+	
+icsdroneng (0.04) unstable; urgency=low
+
+  * Small change in configure.ac. Better detection of zlib and libreadline.
+
+  * Cygwin support. 
+
+ -- Michel Van den Bergh <michel.vandenbergh@uhasselt.be>  Sun, 24 May 2009 15:23:39 +0200
+	
+icsdroneng (0.03) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Michel Van den Bergh <michel.vandenbergh@uhasselt.be>  Sat, 23 May 2009 15:23:39 +0200
