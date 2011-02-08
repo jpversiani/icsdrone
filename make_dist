@@ -30,4 +30,3 @@ sed s/henrik.gram@gmail.com/henrik\(dot\)gram\(at\)gmail\(dot\)com/ < README > R
 sed s/michel.vandenbergh@uhasselt.be/michel\(dot\)vandenbergh\(at\)uhasselt\(dot\)be/ < README_sanitized1 > README_sanitized2
 cp README_sanitized2 $DISTDIR/OVERVIEW.txt
 cp ChangeLog $DISTDIR
-rsync -bauv $DISTDIR lucg5281@alpha.uhasselt.be:/var/www/html/Research/Algebra/Toga/

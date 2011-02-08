@@ -1,0 +1,4 @@
+SRCDIR=`pwd`
+DISTDIR=$SRCDIR/${NAME}-release
+
+rsync -bauv $DISTDIR lucg5281@alpha.uhasselt.be:/var/www/html/Research/Algebra/Toga/
