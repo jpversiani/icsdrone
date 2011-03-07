@@ -1,3 +1,21 @@
+icsdroneng (0.23) unstable; urgency=low
+
+* Avoid accepting a new game when quitting. If the engine is playing with 
+  noescape this would otherwise result in a lost game due to disconnection.
+	
+* Accept sigint=1 from engine. Needed for Rookie. 
+	
+* Default "This is <engine-name>" message wasn't going anywhere on FICS, 
+  because "This" is not a command. Prefix it with whatever is set as 
+  `feedbackCommand'.
+	
+* Function SetTimeZone() doesn't compile on FreeBSD. `timezone' is a function, 
+  not a variable. Use `tm_gmtoff' instead.
+	
+* Fix bug setting timezone for UTC=0.
+
+ -- Michel Van den Bergh <michel.vandenbergh@uhasselt.be>  Mon, 7 Mar 2011 19:00:00 +0200
+	
 icsdroneng (0.22) unstable; urgency=low
 
   * Do not join variant tourneys.

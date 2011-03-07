@@ -71,5 +71,20 @@ and zlib).
 - Option added (default true) to give only feedback before move.
 0.22
 - Do not join variant tourneys.
+0.23
+(this release incorporates a number of patch by Marcel Kervinck)
+- Avoid accepting a new game when quitting. If the engine is playing with 
+  noescape this would otherwise result in a lost game due to disconnection.
+- Accept sigint=1 from engine. Needed for Rookie. 
+- Default "This is <engine-name>" message wasn't going anywhere on FICS, 
+  because "This" is not a command. Prefix it with whatever is set as 
+  `feedbackCommand'.
+- Function SetTimeZone() doesn't compile on FreeBSD. `timezone' is a function, 
+  not a variable. Use `tm_gmtoff' instead.
+- Fix bug setting timezone for UTC=0.
+
+
+
+
 
 	
