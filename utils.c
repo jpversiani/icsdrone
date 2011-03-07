@@ -98,9 +98,11 @@ void SetTimeZone(){
   r=localtime(&t);
   dst=r->tm_isdst;
   tzset();
+#ifndef __FreeBSD__
   if(!timezone){
     return;
   }
+#endif
 //  if(dst && tzname[1] && tzname[1][0]){
 //    SendToIcs("set tzone %s\n",tzname[1]); 
 //    return;
@@ -112,7 +114,11 @@ void SetTimeZone(){
   /* Sorry: no timezones with fractions. They don't seem to work, despite
    * what the helpfile says.
    */
+#ifdef __FreeBSD__
+  tz=r->tm_gmtoff/3600;
+#else
   tz=-(timezone/3600);
+#endif
   if(dst>0){
       tz++;
   }
@@ -120,6 +126,10 @@ void SetTimeZone(){
     SendToIcs("set tzone -%d\n",-tz); 
     return;
   }    
+  if(tz==0){
+    SendToIcs("set tzone %d\n",tz); 
+    return;
+  }
   if(tz>0){
     SendToIcs("set tzone +%d\n",tz); 
     return;
