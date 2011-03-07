@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT([icsdroneng], [0.22], [michel.vandenbergh@uhasselt.be])
+AC_INIT([icsdroneng], [0.23], [michel.vandenbergh@uhasselt.be])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([fics.c])
 AC_CONFIG_HEADER([config.h])
