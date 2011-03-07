@@ -1009,6 +1009,11 @@ Bool ProcessIncomingMatches(char *line){
       SendToIcs("decline %s\n", name);
       return TRUE;
     }
+    if (runData.quitPending) {
+      SendToIcs("tell %s Sorry I have to go.\n", name);
+      SendToIcs("decline %s\n", name);
+      return TRUE;
+    }
     if (!runData.inTourney && appData.hardLimit && 
 	(runData.numGamesInSeries >= appData.hardLimit) && 
 	!strcasecmp(runData.lastPlayer,name)){
