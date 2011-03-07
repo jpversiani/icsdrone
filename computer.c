@@ -402,6 +402,10 @@ void ProcessComputerLine(char *line)
       logme(LOG_DEBUG,"Setting runData.sigint = FALSE");
       runData.sigint = FALSE; 
     }
+    if (strstr(line, " sigint=1")) {
+      logme(LOG_DEBUG,"Setting runData.sigint = TRUE");
+      runData.sigint = TRUE; 
+    }
     /* ping command */
     if (strstr(line, " ping=1")) {
       logme(LOG_DEBUG,"Setting appData.haveCmdPing = TRUE");
@@ -430,7 +434,7 @@ void ProcessComputerLine(char *line)
 	SetScoreForWhite();
 	if(persistentData.firsttime){
 	  if(!appData.sendGameStart){
-        SetOption("sendGameStart",LOGIN,0,"This is %s",runData.myname);
+        SetOption("sendGameStart",LOGIN,0,"%s This is %s", appData.feedbackCommand, runData.myname);
 	  }
 	}
       }
