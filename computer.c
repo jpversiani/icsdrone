@@ -153,7 +153,6 @@ void PingComputer()
 void StartComputer()
 {
   int fdin[2], fdout[2], argc = 0;
-  int fd;
   char buf[1024];
   char *argv[80], *p; /* XXX Buffer overflow alert */
   logme(LOG_DEBUG,"Restarting computer.");
@@ -198,10 +197,7 @@ void StartComputer()
     if(setsid()<0){
       ExitOn(EXIT_HARDQUIT,"Could not put engine in its own session.");
     }
-    if ((fd = open ("/dev/null", O_RDWR, 0)) >= 0) {
-      if (isatty (STDERR_FILENO)) dup2(fd,STDERR_FILENO);
-      if (fd > 2) close (fd);
-    }
+    dup2(fileno(stdout),STDERR_FILENO); /* Redirect stderr to stdout, like '2>&1' in sh */
     UnblockSignals();
     if(execvp(argv[0], argv)==-1){
       ExitOn(EXIT_HARDQUIT,"Unable to execute chess program!  (have you supplied the correct path/filename?)\n");
