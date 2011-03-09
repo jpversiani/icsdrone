@@ -14,6 +14,8 @@ icsdroneng (0.23) unstable; urgency=low
 	
 * Fix bug setting timezone for UTC=0.
 
+* Send engine stderr to engine stdout instead to /dev/null.
+
  -- Michel Van den Bergh <michel.vandenbergh@uhasselt.be>  Mon, 7 Mar 2011 19:00:00 +0200
 	
 icsdroneng (0.22) unstable; urgency=low

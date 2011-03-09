@@ -82,7 +82,7 @@ and zlib).
 - Function SetTimeZone() doesn't compile on FreeBSD. `timezone' is a function, 
   not a variable. Use `tm_gmtoff' instead.
 - Fix bug setting timezone for UTC=0.
-
+- Send engine stderr to engine stdout instead to /dev/null.
 
 
 
