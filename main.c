@@ -68,6 +68,7 @@ void InitRunData(){
   runData.loggedIn=FALSE;
   runData.registered=TRUE;
   runData.usermove=FALSE;
+  runData.engineDrawFeature=TRUE;
   runData.sigint=FALSE;
   runData.computerReady=FALSE;
   runData.lastPlayer[0]='\0';

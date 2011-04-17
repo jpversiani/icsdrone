@@ -419,6 +419,10 @@ void ProcessComputerLine(char *line)
       logme(LOG_DEBUG,"Prefixing moves with \"usermove\"");
       runData.usermove=TRUE;  /* zippy v2 */
     }
+    if (strstr(line, " draw=0")) {
+      logme(LOG_DEBUG,"draw offers will not be passed to engine");
+      runData.engineDrawFeature=FALSE;  /* zippy v2 */
+    }
     if (strstr(line, " done=1")) {
       logme(LOG_DEBUG,"Computer is ready");
       runData.computerReady=TRUE;  /* zippy v2 */

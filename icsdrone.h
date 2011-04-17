@@ -179,6 +179,7 @@ typedef struct {
   Bool loggedIn;
   Bool registered;
   Bool usermove; 
+  Bool engineDrawFeature;
   Bool sigint;
   Bool computerReady;
   char lastPlayer[30+1];

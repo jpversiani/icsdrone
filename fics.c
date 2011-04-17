@@ -832,7 +832,11 @@ Bool ProcessOffers(char *line){
   if (sscanf(line, "%30s offers you a draw%c", name, &dummy) == 2) {
     Feedback(mask,"%s offers a draw.",name);
     if(!appData.acceptDraw){
-      SendToComputer("draw\n");
+      if(runData.engineDrawFeature){
+        SendToComputer("draw\n");
+      }else{
+        SendToIcs("say Sorry, this computer does not handle draw offers.\n");
+      }
     }else{
       logme(LOG_DEBUG,"Saving draw offer for later examination.");
       runData.registeredDrawOffer=TRUE;
