@@ -595,7 +595,7 @@ void HandleBoard(IcsBoard * icsBoard, char *moveList){
     if(strcmp(bmove.move,"none")){
       logme(LOG_INFO,"Bookmove: %s score=%d\n",bmove.move,bmove.score);
       SendToIcs("%s\n",bmove.move);
-      if(appData.feedbackCommand){
+      if(appData.feedback && appData.feedbackCommand){
 	  SendToIcs("%s Bookmove: %s score=%d\n",appData.feedbackCommand,bmove.move,bmove.score); 
       }
       SendMoveToComputer(bmove.move);
