@@ -83,7 +83,7 @@ and zlib).
 - Fix bug setting timezone for UTC=0 (MK).
 - Send engine stderr to engine stdout instead to /dev/null (MK).
 - Process feature draw=0 (Werner Mühlpfordt).
-
+- Do not give feedback on bookmoves if feedback option is not set.
 
 
 

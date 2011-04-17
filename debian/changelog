@@ -1,5 +1,7 @@
 icsdroneng (0.23) unstable; urgency=low
 
+* Do not give feedback on bookmoves if feedback option is not set.
+	
 * Process feature draw=0.
 
 * Avoid accepting a new game when quitting. If the engine is playing with 
