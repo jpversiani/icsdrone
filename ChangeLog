@@ -84,7 +84,7 @@ and zlib).
 - Send engine stderr to engine stdout instead to /dev/null (MK).
 - Process feature draw=0 (Werner Mühlpfordt).
 - Do not give feedback on bookmoves if feedback option is not set.
-
+- Make processing of draw offers and resigns from engine stricter.
 
 
 	
