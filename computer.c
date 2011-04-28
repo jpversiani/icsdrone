@@ -443,9 +443,9 @@ void ProcessComputerLine(char *line)
           // probably we should send "draw <move>" but this requires cooperation
           // from the engine...
       SendToIcs("draw\n");
-  } else if (!strncmp(line,"draw ",5)) {
+  } else if (!strncmp(line,"draw",4)) {
       SendToIcs("draw\n");
-  } else if (!strncmp(line, "resign ",7)) {
+  } else if (!strncmp(line, "resign",6)) {
     SendToIcs("resign\n");
   } else if (!appData.engineQuiet && !strncmp(line, "tellics ", 8)) {
       SendToIcs("%s\n", line + 8);
