@@ -238,6 +238,7 @@ void KillComputer()
 {
   logme(LOG_INFO, "Killing computer");
   /* this does not hurt */
+  if (runData.sigint) InterruptComputer();
   SendToComputer("quit\nexit\n");
   if(runData.killEngine){
     sleep(1);
