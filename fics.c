@@ -546,7 +546,7 @@ void HandleBoard(IcsBoard * icsBoard, char *moveList){
   book_move_t bmove;
   int whitetime,blacktime;
   int flagtime;
-  if (runData.sigint) InterruptComputer();
+  if (runData.sigint && (icsBoard->status != -1)) InterruptComputer();
   if(!EngineToMove(icsBoard) && (icsBoard->nextMoveNum==1)){
     logme(LOG_INFO,"Setting up automatic abort in 60 seconds.");
     CancelTimers();
