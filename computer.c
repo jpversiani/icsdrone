@@ -444,7 +444,7 @@ void ProcessComputerLine(char *line)
           // probably we should send "draw <move>" but this requires cooperation
           // from the engine...
       SendToIcs("draw\n");
-  } else if (!strncmp(line,"draw",4)) {
+  } else if (!strncmp(line,"offer draw",10)) {
       SendToIcs("draw\n");
   } else if (!strncmp(line, "resign",6)) {
     SendToIcs("resign\n");
