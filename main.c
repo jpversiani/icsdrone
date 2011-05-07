@@ -91,7 +91,6 @@ void InitRunData(){
   runData.color=-1;
   runData.longAlgMoves=TRUE;
   runData.haveCmdResult=TRUE;
-  runData.killEngine=FALSE;
   runData.calculatedTime=0;
   runData.timeOfLastMove=0;
   runData.idleTimeoutTimer=NULL;
@@ -453,7 +452,6 @@ void ExitOn(int exitValue, char *errmsg)
   SaveHistory();
   book_close();
   if (runData.computerActive) {
-    runData.killEngine=TRUE;
     KillComputer();
   }
   CloseIcs();

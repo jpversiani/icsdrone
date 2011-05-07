@@ -202,7 +202,6 @@ typedef struct {
   int color;
   Bool longAlgMoves;
   Bool haveCmdResult;
-  Bool killEngine;
   int calculatedTime;
   long long timeOfLastMove;
   event_t idleTimeoutTimer;
