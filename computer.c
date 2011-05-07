@@ -236,32 +236,74 @@ void ResetComputer(){
 
 void KillComputer()
 {
-  logme(LOG_INFO, "Killing computer");
-  /* this does not hurt */
-  if (runData.sigint) InterruptComputer();
-  SendToComputer("quit\nexit\n");
-  if(runData.killEngine){
-    sleep(1);
-    if(kill(runData.computerPid, SIGKILL)){
-      logme(LOG_DEBUG,"Sent SIGKILL, but engine was already dead.");
+    int status;
+    int elapsed_time;
+    int exited;
+    int ret;
+    logme(LOG_INFO, "Killing computer");
+    if (runData.sigint) InterruptComputer();
+    SendToComputer("quit\nexit\n");
+    elapsed_time=0;
+    exited=FALSE;
+    ret=0;
+    
+    while(elapsed_time<KILLTIMEOUT){
+	ret=waitpid(runData.computerPid,&status,WNOHANG);
+	if(ret==0){
+	    logme(LOG_DEBUG,"Computer has not exited yet. Sleeping %dms.\n", KILLGRANULARITY);
+	    my_sleep(KILLGRANULARITY);
+	    elapsed_time+=KILLGRANULARITY;
+	}else{
+	    exited=TRUE;
+	    break;
+	}
     }
-  }
-  /*  
-   *  The behaviour of this seems to differ from system to system.
-   *  If it fails, comment it out, but watch out what happens to those
-   *  child processes - I tried running it on Solaris 2.5.1 without the
-   *  wait() which resulted in over 2000 gnuchess zombies :)
-   */
-  logme(LOG_DEBUG,"Waiting for computer to quit.");
-  if (wait(NULL) == -1 && errno != ECHILD) {
-    ExitOn(EXIT_HARDQUIT,"wait() failed!");
-  }
-  logme(LOG_DEBUG,"Computer has exited.");
-  runData.waitingForPingID = 0;
-  runData.computerActive = FALSE;
-  close(runData.computerReadFd);
-  close(runData.computerWriteFd);
+    if(!exited){
+	logme(LOG_DEBUG,"Computer wouldn't exit by itself. Terminating it.\n");
+	kill(runData.computerPid,SIGKILL);
+	waitpid(runData.computerPid,&status,0);    
+    }
+
+    if(WIFEXITED(status)){
+	logme(LOG_DEBUG, "Computer exited with status %d.\n",WEXITSTATUS(status));
+    }else{
+	logme(LOG_DEBUG, "Computer terminated with signal %d.\n",WTERMSIG(status));
+    }
+    runData.waitingForPingID = 0;
+    runData.computerActive = FALSE;
+    close(runData.computerReadFd);
+    close(runData.computerWriteFd);
 }
+
+
+//void KillComputer()
+//{
+//  logme(LOG_INFO, "Killing computer");
+//  /* this does not hurt */
+//  if (runData.sigint) InterruptComputer();
+//  SendToComputer("quit\nexit\n");
+//  if(runData.killEngine){
+//    sleep(1);
+//    if(kill(runData.computerPid, SIGKILL)){
+//      logme(LOG_DEBUG,"Sent SIGKILL, but engine was already dead.");
+//    }
+//  }
+//  /*  
+//   *  The behaviour of this seems to differ from system to system.
+//   *  If it fails, comment it out, but watch out what happens to those
+//   *  child processes - I tried running it on Solaris 2.5.1 without the
+//   *  wait() which resulted in over 2000 gnuchess zombies :)
+//   */
+//  logme(LOG_DEBUG,"Waiting for computer to quit.");
+//  if (wait(NULL) == -1 && errno != ECHILD) {
+//    ExitOn(EXIT_HARDQUIT,"wait() failed!");
+//  }
+//  logme(LOG_DEBUG,"Computer has exited.");
+//  runData.waitingForPingID = 0;
+//  runData.computerActive = FALSE;
+//  close(runData.computerReadFd);
+//  close(runData.computerWriteFd);
+//}
 
 void InterruptComputer()
 {

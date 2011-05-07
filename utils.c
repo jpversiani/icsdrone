@@ -444,3 +444,12 @@ void strip_nts(char *s, char *strip)
         if (strchr(strip, s[i]))
             j--;
 }
+
+void my_sleep(int msec){
+    struct timespec tm;
+    tm.tv_sec=msec/1000;
+    tm.tv_nsec=1000000*(msec%1000);
+    nanosleep(&tm,NULL);
+
+}
+

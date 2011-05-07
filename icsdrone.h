@@ -359,6 +359,8 @@ extern Bool EvalDraw P((int));
 #define DRAW_SCORE2 40
 #define DRAW_DEPTH2 60
 
+#define KILLTIMEOUT 1000
+#define KILLGRANULARITY 200
 
 /*
  * Interaction with FICS
@@ -418,7 +420,7 @@ extern struct timeval time_diff P((struct timeval,struct timeval));
 extern Bool time_ge P((struct timeval,struct timeval));
 extern Bool time_gt P((struct timeval,struct timeval));
 extern struct timeval time_add P((struct timeval tv, int t));
-
+extern void my_sleep P((int msec));
 /*
  * Logging
  */
