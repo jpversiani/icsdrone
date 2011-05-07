@@ -276,35 +276,6 @@ void KillComputer()
 }
 
 
-//void KillComputer()
-//{
-//  logme(LOG_INFO, "Killing computer");
-//  /* this does not hurt */
-//  if (runData.sigint) InterruptComputer();
-//  SendToComputer("quit\nexit\n");
-//  if(runData.killEngine){
-//    sleep(1);
-//    if(kill(runData.computerPid, SIGKILL)){
-//      logme(LOG_DEBUG,"Sent SIGKILL, but engine was already dead.");
-//    }
-//  }
-//  /*  
-//   *  The behaviour of this seems to differ from system to system.
-//   *  If it fails, comment it out, but watch out what happens to those
-//   *  child processes - I tried running it on Solaris 2.5.1 without the
-//   *  wait() which resulted in over 2000 gnuchess zombies :)
-//   */
-//  logme(LOG_DEBUG,"Waiting for computer to quit.");
-//  if (wait(NULL) == -1 && errno != ECHILD) {
-//    ExitOn(EXIT_HARDQUIT,"wait() failed!");
-//  }
-//  logme(LOG_DEBUG,"Computer has exited.");
-//  runData.waitingForPingID = 0;
-//  runData.computerActive = FALSE;
-//  close(runData.computerReadFd);
-//  close(runData.computerWriteFd);
-//}
-
 void InterruptComputer()
 {
   logme(LOG_DEBUG, "Interrupting computer");
