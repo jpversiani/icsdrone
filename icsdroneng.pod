@@ -136,6 +136,10 @@ Specifies if the engine reports the score of white (like Crafty). If
 the engine is Crafty then icsdroneng will turn this on automatically. 
 This is important to handle resigns and draw offers correctly. 
 
+=item B<-dontReuseEngine> (default: "on")
+
+If true then icsdroneng will restart the engine after each game.
+
 =item B<-book> 
     
 Path to an opening book in polyglot format. 
