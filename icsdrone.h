@@ -335,6 +335,7 @@ extern void NewGame P(());
 extern void StartComputer P(());
 extern void KillComputer P(());
 extern void InterruptComputer P(());
+extern void EnsureComputerReady P(());
 extern void ProcessComputerLine P((char *line)); 
 extern void Force P(());
 extern void Go P(());
@@ -360,6 +361,7 @@ extern Bool EvalDraw P((int));
 
 #define KILLTIMEOUT 1000
 #define KILLGRANULARITY 200
+#define ENGINEREADYDELAY 3
 
 /*
  * Interaction with FICS

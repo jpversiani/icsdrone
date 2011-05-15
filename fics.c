@@ -614,16 +614,7 @@ void SetupEngineOptions(IcsBoard *icsBoard){
    *  Setup chessprogram with the right options.
    *  I think I finally got this right
    */
-  if(!runData.computerReady || runData.waitingForPingID){
-    logme(LOG_WARNING,"Engine might not be ready. Delaying.");
-    logme(LOG_WARNING,"computerReady=%d",
-	  runData.computerReady);
-    logme(LOG_WARNING,"waitingForPingID=%d",
-	  runData.waitingForPingID);
-    sleep(3);
-    runData.computerReady=TRUE;
-    runData.waitingForPingID=FALSE;
-  }
+  EnsureComputerReady();
   if (!appData.secPerMove && !appData.searchDepth) {
     Level(icsBoard->basetime,icsBoard->inctime);
   } 

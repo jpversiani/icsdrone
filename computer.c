@@ -98,6 +98,26 @@ void Result(char * result){
   SendToComputer("result %s\n", result);
 }
 
+void EnsureComputerReady(){
+  /**********************************************************
+   *
+   *  There are some exceptional circumstances where the
+   *  engine may fail to initialize in time. In that
+   *  case we insert a delay and hope for the best.
+   *
+   *********************************************************/
+  if(!runData.computerReady || runData.waitingForPingID){
+    logme(LOG_WARNING,"Engine might not be ready. Delaying.");
+    logme(LOG_WARNING,"computerReady=%d",
+	  runData.computerReady);
+    logme(LOG_WARNING,"waitingForPingID=%d",
+	  runData.waitingForPingID);
+    sleep(ENGINEREADYDELAY);
+    runData.computerReady=TRUE;
+    runData.waitingForPingID=FALSE;
+  }
+}
+
 void SendMovesToComputer(char *moveList){
   char *p;
   move_t move;
@@ -279,6 +299,7 @@ void KillComputer()
 void InterruptComputer()
 {
   logme(LOG_DEBUG, "Interrupting computer");
+  EnsureComputerReady();
   kill(runData.computerPid, SIGINT);
 }
 
