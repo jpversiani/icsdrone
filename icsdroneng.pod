@@ -162,6 +162,10 @@ on an embedded system you probably want to disable this.
 
 Log games to this file.
 
+Optionally redirect the game through a shell command by beginning the
+file name with a '|'-character (pipe).
+For example: -pgnFile "|process-game.py Data/games.db"
+
 =item B<-pgnLogging> (default: "on")
 
 Specifies if logging of games is enabled. 
