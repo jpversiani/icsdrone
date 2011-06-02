@@ -1302,6 +1302,15 @@ Bool ProcessStartOfGame(char *line){
       SendToIcs("moves l\n");
     else
       SendToIcs("moves\n");
+    /* send opponent name and ratings to computer */
+    if (!strcmp(name, runData.handle)) {
+       SendToComputer("name %s\n", name2);
+       SendToComputer("rating %d %d\n", atoi(rating), atoi(rating2));
+    }
+    if (!strcmp(name2, runData.handle)) {
+       SendToComputer("name %s\n", name);
+       SendToComputer("rating %d %d\n", atoi(rating2), atoi(rating));
+    }
     /* update our state */
     runData.waitingForMoveList =TRUE;
     runData.waitingForFirstBoard = TRUE;
@@ -1612,10 +1621,14 @@ Bool ProcessCreatePGN(char *line){
     state=0;
     logme(LOG_DEBUG,"[ResultString=%s] [Result=%s]",resultString,result);
     processingLastMoves=FALSE;
-    pgnFile=fopen(appData.pgnFile,"a");
+    if (appData.pgnFile[0] == '|') {
+      pgnFile=popen(appData.pgnFile+1,"w");
+    } else {
+      pgnFile=fopen(appData.pgnFile,"a");
+    }
     fprintf(pgnFile,"[Event \"FICS %s %s game\"]\n",rated,variant);
     fprintf(pgnFile,"[Site \"FICS, San Jose, California USA\"]\n");
-    fprintf(pgnFile,"[Date \"%s.%d.%d\"]\n",year,MonthNumber(month), day);
+    fprintf(pgnFile,"[Date \"%s.%02d.%02d\"]\n",year,MonthNumber(month), day);
     fprintf(pgnFile,"[Time \"%s:00\"]\n",hoursSecs);
     fprintf(pgnFile,"[Round \"-\"]\n");
     fprintf(pgnFile,"[White \"%s\"]\n",nameWhite);
@@ -1639,7 +1652,11 @@ Bool ProcessCreatePGN(char *line){
     fprintf(pgnFile,"%s",pgnDesc);
     fprintf(pgnFile,"{%s} %s",resultString,result);
     fprintf(pgnFile,"\n\n");
-    fclose(pgnFile);
+    if (appData.pgnFile[0] == '|') {
+      pclose(pgnFile);
+    } else {
+      fclose(pgnFile);
+    }
     pgnDesc[0]='\0';
     return TRUE;
   }
