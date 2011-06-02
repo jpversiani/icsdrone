@@ -21,6 +21,14 @@ icsdroneng (0.23) unstable; urgency=low
 * Send engine stderr to engine stdout instead to /dev/null.
 
 * Make processing of draw offers and resigns from engine stricter.
+
+* In PGN output give month and day with 2 digits to comply with standard (MK).
+
+* Send opponent name and ratings to engine (MK).
+
+* Allow PGN output to be piped through a command (MK).
+
+* Look for engine's 1/2-1/2 only at the start of the line (MK).
 	
  -- Michel Van den Bergh <michel.vandenbergh@uhasselt.be>  Mon, 7 Mar 2011 19:00:00 +0200
 	
