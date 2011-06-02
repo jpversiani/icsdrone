@@ -474,7 +474,7 @@ void ProcessComputerLine(char *line)
 	}
       }
     }
-  } else if (strstr(line,"1/2-1/2")) {
+  } else if (!strncmp(line,"1/2-1/2",7)) {
           // probably we should send "draw <move>" but this requires cooperation
           // from the engine...
       SendToIcs("draw\n");
