@@ -671,6 +671,7 @@ Bool ProcessLogin(char *line){
    */
   char name[30+1];
   char dummy;
+  Bool onFICS;
   if(runData.loggedIn) return FALSE;
   if (strstr(line,"Invalid password")){
     ExitOn(EXIT_HARDQUIT,"Invalid password!");
@@ -688,20 +689,20 @@ Bool ProcessLogin(char *line){
       return TRUE;
     }
   }
-  if (!runData.loggedIn &&
-      sscanf(line, "interface set to %c", &dummy) == 1) {
-    /* ICC detected */
-    SendToIcs("finger\n"); /* Send finger to receive our login name */
-    if (runData.longAlgMoves) {
-       logme(LOG_WARNING,"Server doesn't support long algebraic move lists. Changing to short mode.\n");
-       runData.longAlgMoves = FALSE;
-    }
-    return TRUE;
-  }
+
+  onFICS=FALSE;
   if (!runData.loggedIn &&
       (sscanf(line, "Statistics for %30[^( ]", name) == 1 ||
-       sscanf(line, "**** Starting FICS session as %30[^( ]", name) == 1) &&
+       (onFICS=   (sscanf(line, "Finger of %30[^: ]",name)==1)   ))&&
       !strncasecmp(runData.handle, name, strlen(runData.handle))) {
+
+      if(!onFICS){ // only FICS has the (undocumented) command "moves l"
+	  if (runData.longAlgMoves) {
+	      logme(LOG_WARNING,"Server doesn't support long algebraic move lists. Changing to short mode.\n");
+	      runData.longAlgMoves = FALSE;
+	  }
+      }
+
     runData.loggedIn=1;
     persistentData.wasLoggedIn=TRUE;
     if (strcmp(runData.handle, name)) {
