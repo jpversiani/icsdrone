@@ -41,6 +41,10 @@ Bool ParseBoard(IcsBoard *icsBoard, char *line){
         ConvIcsSpecialToComp(icsBoard->onMove=='W'?'B':'W',icsBoard->lanMove);
         ConvIcsSanToComp(icsBoard->sanMove); 
       }
+      // temporary fix for HGM's ICS
+      if(icsBoard->epFile<-1 || icsBoard->epFile>7){
+	  icsBoard->epFile=1;
+      }
       for(f=0;f<=7;f++){
 	for(r=0;r<=7;r++){
 	  (icsBoard->board)[f][r]=tmp[(7-r)*9+f];
