@@ -577,6 +577,8 @@ int main(int argc, char *argv[])
                     strncpy(buf,appData.handle,sizeof(buf));
                 }else if(getenv("FICSHANDLE")){
                     strncpy(buf,getenv("FICSHANDLE"),sizeof(buf));
+                }else if(getenv("ICSHANDLE")){
+                    strncpy(buf,getenv("ICSHANDLE"),sizeof(buf));
                 }else {
                     if (!fp || !myfgets(buf, sizeof(buf), fp)) {
                         if(appData.console){
@@ -596,6 +598,8 @@ int main(int argc, char *argv[])
                     strncpy(buf,appData.passwd,sizeof(buf));
                 }else if(getenv("FICSPASSWD")){
                     strncpy(buf,getenv("FICSPASSWD"),sizeof(buf));
+                }else if(getenv("ICSPASSWD")){
+                    strncpy(buf,getenv("ICSPASSWD"),sizeof(buf));
                 }else {
                     if (!fp || !myfgets(buf, sizeof(buf), fp)) {
                         if(appData.console){
