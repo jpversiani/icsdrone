@@ -43,6 +43,7 @@ Bool ParseBoard(IcsBoard *icsBoard, char *line){
       }
       // temporary fix for HGM's ICS
       if(icsBoard->epFile<-1 || icsBoard->epFile>7){
+	  logme(LOG_ERROR,"Invalid ep file. Correcting it.");
 	  icsBoard->epFile=1;
       }
       for(f=0;f<=7;f++){
