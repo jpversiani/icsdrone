@@ -997,9 +997,15 @@ Bool ProcessIncomingMatches(char *line){
       (sscanf(line,"Challenge: %30s (%30[^)]) [%30[^]]] %30s (%30[^)])%30s%30s",
               name,rating,color,name2,rating2,rated,variant)==7)
   ) {
+      // ICC and FICS have different variant names; we need a more generic
+      // solution for this...
     if(strcmp(variant,"lightning") && 
        strcmp(variant,"blitz") && 
-       strcmp(variant,"standard")){
+       strcmp(variant,"standard") &&
+       strcmp(variant,"Bullet") && 
+       strcmp(variant,"Blitz") && 
+       strcmp(variant,"Standard") 
+       ){
       logme(LOG_INFO,"Rejected variant %s", variant);
       SendToIcs("tell %s Sorry I only play regular chess.\n",name);
       SendToIcs("decline %s\n", name);    
