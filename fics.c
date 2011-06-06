@@ -626,7 +626,8 @@ void SetupEngineOptions(IcsBoard *icsBoard){
 
 char * KillPrompts(char *line){
   /*  Get rid of those damn prompts  -- might be more on the same line even */
-  while (!strncmp(line, "fics% ", 6)) 
+  /*  Eat both "fics%" and "aics%". */
+  while (isalpha(line[0])&&!strncmp(line+1, "ics% ", 5))
     line += 6;
   logme(LOG_DEBUG, "ics->icsdrone: %s", line);
   return line;
@@ -684,8 +685,20 @@ Bool ProcessLogin(char *line){
       return TRUE;
     }
   }
-  if (sscanf(line, "**** Starting FICS session as %30[^\( ]s", name) == 1 &&
-      !strncasecmp(runData.handle, name, strlen(runData.handle)) && !runData.loggedIn) {
+  if (!runData.loggedIn &&
+      sscanf(line, "interface set to %c", &dummy) == 1) {
+    /* ICC detected */
+    SendToIcs("finger\n"); /* Send finger to receive our login name */
+    if (runData.longAlgMoves) {
+       logme(LOG_WARNING,"Server doesn't support long algebraic move lists. Changing to short mode.\n");
+       runData.longAlgMoves = FALSE;
+    }
+    return TRUE;
+  }
+  if (!runData.loggedIn &&
+      (sscanf(line, "Statistics for %30[^( ]", name) == 1 ||
+       sscanf(line, "**** Starting FICS session as %30[^( ]", name) == 1) &&
+      !strncasecmp(runData.handle, name, strlen(runData.handle))) {
     runData.loggedIn=1;
     persistentData.wasLoggedIn=TRUE;
     if (strcmp(runData.handle, name)) {
@@ -1346,6 +1359,7 @@ void ProcessFeedback(char *line){
 Bool ProcessMoveList(char *line){
     static Bool parsingMoveList;
     move_t move,move2;
+    char dummy;
     if(!runData.loggedIn) return FALSE;
     if(!runData.waitingForMoveList) return FALSE;
     if(IsMarker(ASKSTARTMOVES,line)){
@@ -1379,7 +1393,7 @@ Bool ProcessMoveList(char *line){
             /*
              *  Write movelist to program and prepare it to play
              */
-        if (!strncmp(line, "      {Still in progress} *", 25)) {
+        if (sscanf(line, " {%*s in progress} %c", &dummy) == 1) {
             logme(LOG_INFO, "Found end of movelist; %c on move", 
                   runData.icsBoard.onMove);
             SetupEngineOptions(&(runData.icsBoard));
@@ -1533,6 +1547,8 @@ Bool ProcessCreatePGN(char *line){
   static char ratingBlack[30+1]="";
   int eloWhite;
   int eloBlack;
+  static char pgnDate[11]="";
+  static char pgnTime[9]="";
   static char dayOfTheWeek[30+1]="";
   static char month[30+1]="";
   static int day=0;
@@ -1626,10 +1642,10 @@ Bool ProcessCreatePGN(char *line){
     } else {
       pgnFile=fopen(appData.pgnFile,"a");
     }
-    fprintf(pgnFile,"[Event \"FICS %s %s game\"]\n",rated,variant);
-    fprintf(pgnFile,"[Site \"FICS, San Jose, California USA\"]\n");
-    fprintf(pgnFile,"[Date \"%s.%02d.%02d\"]\n",year,MonthNumber(month), day);
-    fprintf(pgnFile,"[Time \"%s:00\"]\n",hoursSecs);
+    fprintf(pgnFile,"[Event \"ICS %s %s game\"]\n",rated,variant);
+    fprintf(pgnFile,"[Site \"%s %d\"]\n", appData.icsHost, appData.icsPort);
+    fprintf(pgnFile,"[Date \"%s\"]\n",pgnDate);
+    fprintf(pgnFile,"[Time \"%s\"]\n",pgnTime);
     fprintf(pgnFile,"[Round \"-\"]\n");
     fprintf(pgnFile,"[White \"%s\"]\n",nameWhite);
     fprintf(pgnFile,"[Black \"%s\"]\n",nameBlack);
