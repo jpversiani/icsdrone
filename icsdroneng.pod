@@ -1,6 +1,6 @@
 =head1 NAME
 
-icsdroneng -  Interface between an xboard chess engine and FICS
+icsdroneng -  Interface between an xboard chess engine and an ICS
 
 =head1 SYNOPSIS
 
@@ -10,12 +10,16 @@ icsdrone [options]
 
 icsdroneng is a fork of icsdrone. 
 
-    icsdroneng acts as an interface between FICS (the Free Internet Chess Server) and
+    icsdroneng acts as an interface between an ICS (Internet Chess Server) and
     a chess engine supporting the XBoard/WinBoard protocol. Unlike XBoard/WinBoard
     it does not use a graphical interface so it is suitable for use on
-    embedded systems. 
+    embedded systems.
 
     UCI engines may be used through the polyglot adapter. 
+
+    icsdroneng was originally developed for FICS (the Free Internet
+    Chess Server) but currently ICC (the Internet Chess Club) works as
+    well.
 
 icsdroneng has the following new features.
 
@@ -40,11 +44,11 @@ All options take an argument. In the case of boolean options this is on/off.
 
 =item B<-icsHost> (default: "freechess.org")
 
-Hostname of the FICS server.
+Hostname of the ICS server.
 
 =item B<-icsPort> (default: 23)
 
-Port of the FICS server.
+Port of the ICS server.
 
 =item B<-timeseal>
 
@@ -56,7 +60,7 @@ Login handle.
 
 =item B<-password> 
 
-FICS password
+ICS password
 
 =item B<-loginScript> 
 
@@ -64,11 +68,11 @@ Script with login data and commands.
 
 =item B<-owner>
     
-Specifies a FICS handle of a user which can send tell commands to icsdroneng.
+Specifies a ICS handle of a user which can send tell commands to icsdroneng.
 
 =item B<-autoReconnect> (default: "on")
 
-Autoreconnect to FICS on network failures.
+Autoreconnect to ICS on network failures.
 
 =item B<-console> (default: "on")
     
@@ -98,7 +102,7 @@ Send no tells to the owner about starting and finishing games.
 
 =item B<-engineQuiet> (default: "off")
 
-Do no pass on most engine commands to FICS. Some engines are just
+Do no pass on most engine commands to the ICS. Some engines are just
 too noisy.
 
 =item B<-program> (default: "gnuchess")
@@ -215,7 +219,7 @@ Accept only challenges from this user.
 =item B<-noplay>
 
 Comma separated list of players to auto decline offers from (case 
-sensitive). Note this is not the same as the FICS "noplay" list. 
+sensitive). Note this is not the same as the ICS "noplay" list. 
 
 =item B<-autoJoin> (default: "on")
 
@@ -253,7 +257,7 @@ The following commands are interpreted by icsdroneng.
     daemonize  Go into background
     load       Execute a script (for security reasons the name should end with .icsdrone)
 
-Other commands (e.g. "draw", "seek", "match") will be forwarded to FICS.
+Other commands (e.g. "draw", "seek", "match") will be forwarded to the ICS.
 Unless they are prefixed by * in which case they will be sent to the engine. 
 
 With the "set" command you can change some command line options at runtime.
@@ -292,7 +296,7 @@ In contrast to command line options, these options are not case sensitive.
 It is important to always issue manual seeks. E.g. seek 1 0 m.  In
 that way icsdroneng can perform checks before accepting an opponent
 (like verifying the noplay option). This is especially important when
-playing as a guest since in that case FICS does not know you are a
+playing as a guest on FICS since in that case FICS does not know you are a
 computer and will auto match seeks (annoying the hell out of people
 who do not expect to get a computer opponent).  icsdroneng defends
 against this but this will only work if you issue manual seeks. 
