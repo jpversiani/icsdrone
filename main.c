@@ -580,7 +580,7 @@ int main(int argc, char *argv[])
                 }else {
                     if (!fp || !myfgets(buf, sizeof(buf), fp)) {
                         if(appData.console){
-                            PromptInput(buf,sizeof(buf),"Fics handle: ",1);
+                            PromptInput(buf,sizeof(buf),"ICS handle: ",1);
                         }else{
                             ExitOn(EXIT_HARDQUIT,"You must specify the handle. "
                                    "See README file for help.");
@@ -599,7 +599,7 @@ int main(int argc, char *argv[])
                 }else {
                     if (!fp || !myfgets(buf, sizeof(buf), fp)) {
                         if(appData.console){
-                            PromptInput(buf,sizeof(buf),"Fics password: ",0);
+                            PromptInput(buf,sizeof(buf),"ICS password: ",0);
                         }else{
                             ExitOn(EXIT_HARDQUIT,"You must specify the password. See README file for help.");
                         }
