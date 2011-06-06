@@ -223,7 +223,7 @@ sensitive). Note this is not the same as the ICS "noplay" list.
 
 =item B<-autoJoin> (default: "on")
 
-Autojoin tourneys.
+Autojoin tourneys. Currently this does not work on ICC.
 
 =item B<-colorTell>
 
