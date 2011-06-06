@@ -675,6 +675,9 @@ Bool ProcessLogin(char *line){
   if (strstr(line,"Invalid password")){
     ExitOn(EXIT_HARDQUIT,"Invalid password!");
   }
+  if (strstr(line,"No such username")){
+    ExitOn(EXIT_HARDQUIT,"Invalid username!");
+  }
   if (strstr(line,"Sorry, names may be at most 17 characters long.")){
     ExitOn(EXIT_HARDQUIT,"Names can be at most 17 characters!");
   }
