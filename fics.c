@@ -1617,7 +1617,7 @@ Bool ProcessCreatePGN(char *line){
       return TRUE;
   }
   
-  if(state==1 && sscanf(line,"%30s%30s match, initial time: %d minutes, increment: %d",
+  if(state==1 && sscanf(line,"%30s%30s match, initial time: %d minute%*2s increment: %d",
 			rated,
 			variant,
 			&initial,
