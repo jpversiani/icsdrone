@@ -463,7 +463,7 @@ void ExecCommand(char * command, int mask){
     if(mask & CONSOLE){
       runData.inhibitPrompt=TRUE;
     }
-    Feedback(mask,"===> This is FICS help. Use \"help icsdroneng\" for general icsdroneng help.");
+    Feedback(mask,"===> This is ICS help. Use \"help icsdroneng\" for general icsdroneng help.");
     SendToIcs("%s\n",command);
     StopForwarding(mask);
   }else 
