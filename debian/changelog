@@ -29,6 +29,8 @@ icsdroneng (0.23) unstable; urgency=low
 * Allow PGN output to be piped through a command (MK).
 
 * Look for engine's 1/2-1/2 only at the start of the line (MK).
+
+* ICC port by Marcel van Kervinck!! There may be still a few glitches and tournaments do not work but playing games seems to be ok! 
 	
  -- Michel Van den Bergh <michel.vandenbergh@uhasselt.be>  Mon, 7 Mar 2011 19:00:00 +0200
 	
