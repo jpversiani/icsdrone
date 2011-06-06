@@ -672,7 +672,7 @@ Bool ProcessLogin(char *line){
   char name[30+1];
   char dummy;
   if(runData.loggedIn) return FALSE;
-  if (strstr(line,"**** Invalid password! ****")){
+  if (strstr(line,"Invalid password")){
     ExitOn(EXIT_HARDQUIT,"Invalid password!");
   }
   if (strstr(line,"Sorry, names may be at most 17 characters long.")){
