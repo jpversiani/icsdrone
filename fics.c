@@ -1577,6 +1577,7 @@ Bool ProcessCreatePGN(char *line){
   }
   memset(ratingWhite,0,sizeof(ratingWhite));
   memset(ratingWhite,0,sizeof(ratingBlack));
+  // FICS start of movelist
   if(state==0 && sscanf(line,"%30s (%[^)]) vs. %30s (%[^)]) --- %30s %30s %d, %30s %30s %30s",
 			nameWhite,
 			ratingWhite,
@@ -1588,33 +1589,47 @@ Bool ProcessCreatePGN(char *line){
 			hoursSecs,
 			timezone,
 			year)==10){
-    state=1;
-    logme(LOG_DEBUG,"[nameWhite=%s]  [ratingWhite=%s] [nameBlack=%s] [ratingBlack=%s] [dayOfTheWeek=%s] [month=%s] [day=%d] [hoursSecs=%s] [timezone=%s] [year=%s]",
-	  nameWhite,
-	  ratingWhite,
-	  nameBlack,
-	  ratingBlack,
-	  dayOfTheWeek,
-	  month,
-	  day,
-	  hoursSecs,
-	  timezone,
-	  year);
-    return TRUE;
+    snprintf(pgnDate, sizeof(pgnDate), "%s.%02d.%02d", year, MonthNumber(month), day);
+    snprintf(pgnTime, sizeof(pgnTime), "%s:00", hoursSecs);
+    state=-1;
   }
+  
+  // ICS start of movelist
+  if(state==0 && sscanf(line,"%30s (%[^)]) vs. %30s (%[^)]) --- %10s %8s",
+			nameWhite,
+			ratingWhite,
+			nameBlack,
+			ratingBlack,
+			pgnDate,
+			pgnTime)==6 && pgnDate[4]=='.' && pgnTime[2]==':') {
+      state=-1; // slight abuse of state
+  }
+  
+  if (state==-1) {
+      logme(LOG_DEBUG,"[nameWhite=%s]  [ratingWhite=%s] [nameBlack=%s] [ratingBlack=%s] [pgnDate=%s] [pgnTime=%s]",
+	    nameWhite,
+	    ratingWhite,
+	    nameBlack,
+	    ratingBlack,
+	    pgnDate,
+	    pgnTime);
+      state=1;
+      return TRUE;
+  }
+  
   if(state==1 && sscanf(line,"%30s%30s match, initial time: %d minutes, increment: %d",
+			rated,
+			variant,
+			&initial,
+			&increment)==4){
+      state=2;
+      rated[0]=tolower(rated[0]);
+      logme(LOG_DEBUG,"[rated=%s]  [variant=%s] [initial=%d] [increment=%d]",
 	    rated,
 	    variant,
-	    &initial,
-	    &increment)==4){
-    state=2;
-    rated[0]=tolower(rated[0]);
-    logme(LOG_DEBUG,"[rated=%s]  [variant=%s] [initial=%d] [increment=%d]",
-	  rated,
-	  variant,
-	  initial,
-	  increment);
-    return TRUE;
+	    initial,
+	    increment);
+      return TRUE;
   }
   if (state==2 && sscanf(line, "%3d. %15s (%*s %15s (%*s", &moveNumber, move, move2) == 3) {
     ConvIcsSanToComp(move);
