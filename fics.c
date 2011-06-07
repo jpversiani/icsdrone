@@ -1585,8 +1585,8 @@ Bool ProcessCreatePGN(char *line){
     processingLastMoves=FALSE;
     return TRUE;
   }
-  memset(ratingWhite,0,sizeof(ratingWhite));
-  memset(ratingWhite,0,sizeof(ratingBlack));
+  //  memset(ratingWhite,0,sizeof(ratingWhite));
+  // memset(ratingWhite,0,sizeof(ratingBlack));
   // FICS start of movelist
   if(state==0 && sscanf(line,"%30s (%[^)]) vs. %30s (%[^)]) --- %30s %30s %d, %30s %30s %30s",
 			nameWhite,
