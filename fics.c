@@ -693,7 +693,7 @@ Bool ProcessLogin(char *line){
   onFICS=FALSE;
   if (!runData.loggedIn &&
       (sscanf(line, "Statistics for %30[^( ]", name) == 1 ||
-       (onFICS=   (sscanf(line, "Finger of %30[^: ]",name)==1)   ))&&
+       (onFICS=   (sscanf(line, "Finger of %30[^:( ]",name)==1)   ))&&
       !strncasecmp(runData.handle, name, strlen(runData.handle))) {
 
       if(!onFICS){ // only FICS has the (undocumented) command "moves l"
