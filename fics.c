@@ -837,8 +837,13 @@ Bool ProcessOffers(char *line){
   if(!appData.ownerQuiet){
       mask|=OWNER;
   }
-  if (sscanf(line, "%30s offers you a draw%c", name, &dummy) == 2) {
-    Feedback(mask,"%s offers a draw.",name);
+  if ((sscanf(line, "%30s offers you a draw%c", name, &dummy) == 2)  // FICS
+      ||
+      (sscanf(line, "Your opponent offers you a draw%c", &dummy) == 1) //ICC
+  ) {
+      //    Feedback(mask,"%s offers a draw.",name);
+      Feedback(mask,"Your opponent offers a draw.");
+      
     if(!appData.acceptDraw){
       if(runData.engineDrawFeature){
         SendToComputer("draw\n");
