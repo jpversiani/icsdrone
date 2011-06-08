@@ -218,6 +218,7 @@ void ProcessConsoleLine(char *line)
 void SetInterface(){
   char *uptime=strdup(asctime(gmtime(&persistentData.startTime)));
   uptime=strtok(uptime,"\r\n");
+  logme(LOG_DEBUG,"Setting interface. runData.onFICS=%d\n",runData.onFICS);
   if(runData.onFICS){
       if(runData.myname[0]){
 	  SendToIcs("set interface %s-%s + %s. Online since %s GMT (%d games played).\n",PACKAGE_NAME,VERSION,runData.myname,uptime,persistentData.games);
