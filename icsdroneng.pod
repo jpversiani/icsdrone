@@ -8,18 +8,16 @@ icsdrone [options]
 
 =head1 DESCRIPTION
 
-icsdroneng is a fork of icsdrone. 
+icsdroneng acts as an interface between an ICS (Internet Chess Server) and
+a chess engine supporting the XBoard/WinBoard protocol. Unlike XBoard/WinBoard
+it does not use a graphical interface so it is suitable for use on
+embedded systems.
 
-    icsdroneng acts as an interface between an ICS (Internet Chess Server) and
-    a chess engine supporting the XBoard/WinBoard protocol. Unlike XBoard/WinBoard
-    it does not use a graphical interface so it is suitable for use on
-    embedded systems.
+UCI engines may be used through the polyglot adapter. 
 
-    UCI engines may be used through the polyglot adapter. 
-
-    icsdroneng was originally developed for FICS (the Free Internet
-    Chess Server) but currently ICC (the Internet Chess Club) works as
-    well.
+icsdroneng started its life a fork of icsdrone by Henrik Gram.  It was 
+originally developed for FICS (the Free Internet Chess Server) but 
+currently ICC (the Internet Chess Club) works as well.
 
 icsdroneng has the following new features.
 
