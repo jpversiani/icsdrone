@@ -1,2 +1,8 @@
-Herik Gram            (original icsdrone)
-Michel Van den Bergh  (icsdroneng)
+Herik Gram             original icsdrone
+Michel Van den Bergh   icsdroneng
+
+Contributions by
+
+Eric Mullins           WIN32 portability, patches
+Marcel Van Kervinck    ICC port, patches
+Werner Mühlpfordt      patches
