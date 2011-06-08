@@ -114,6 +114,7 @@ void InitRunData(){
   runData.tellTimer=NULL;
   runData.tellQueue[0]='\0';
   runData.lastGameWasAbortOrAdjourn=FALSE;
+  runData.onFICS=FALSE;
 }
 
 PersistentData persistentData;

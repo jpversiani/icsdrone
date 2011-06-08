@@ -226,6 +226,7 @@ typedef struct {
   char tellQueue[TELLQUEUESIZE];
   event_t tellTimer;
   Bool lastGameWasAbortOrAdjourn;
+  Bool onFICS;
 } RunData;
 
 /* AppData */
