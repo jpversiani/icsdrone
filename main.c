@@ -681,7 +681,11 @@ int main(int argc, char *argv[])
                 if(appData.owner){
                     SendToIcs("+notify %s\n",appData.owner);
                 }
-                SetInterface();
+		/* ICC does not allow to set the interface variable
+		 * multiple times.
+		 * The interfaces variable will be set in computer.c
+		 * one we now the "myname" option.
+		 *                SetInterface();  */
                 SetTimeZone();
                 SetScoreForWhite();
                     /*
