@@ -711,6 +711,7 @@ Bool ProcessLogin(char *line){
   }
   if(!runData.loggedIn && IsMarker(ENDLOGIN,line)){
     logme(LOG_INFO,"It seems we are succesfully logged in!");
+    StartComputer();
     runData.loggedIn=1;
     persistentData.wasLoggedIn=TRUE;
 

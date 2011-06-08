@@ -218,10 +218,18 @@ void ProcessConsoleLine(char *line)
 void SetInterface(){
   char *uptime=strdup(asctime(gmtime(&persistentData.startTime)));
   uptime=strtok(uptime,"\r\n");
-  if(runData.myname[0]){
-    SendToIcs("set interface %s-%s + %s. Online since %s GMT (%d games played).\n",PACKAGE_NAME,VERSION,runData.myname,uptime,persistentData.games);
+  if(runData.onFICS){
+      if(runData.myname[0]){
+	  SendToIcs("set interface %s-%s + %s. Online since %s GMT (%d games played).\n",PACKAGE_NAME,VERSION,runData.myname,uptime,persistentData.games);
+      }else{
+	  SendToIcs("set interface %s-%s. Online since: %s GMT (%d games played).\n",PACKAGE_NAME,VERSION,uptime,persistentData.games);
+      }
   }else{
-    SendToIcs("set interface %s-%s. Online since: %s GMT (%d games played).\n",PACKAGE_NAME,VERSION,uptime,persistentData.games);
+      if(runData.myname[0]){
+	  SendToIcs("set interface %s-%s + %s. Online since %s GMT.\n",PACKAGE_NAME,VERSION,runData.myname,uptime);
+      }else{
+	  SendToIcs("set interface %s-%s. Online since: %s GMT.\n",PACKAGE_NAME,VERSION,uptime);
+      }
   }
   free(uptime);
 }
@@ -655,7 +663,7 @@ int main(int argc, char *argv[])
                 if(appData.daemonize){
                     Daemonize();
                 }
-                StartComputer();
+		//                StartComputer();
                 SendToIcs("set style 12\n"
                           "set shout 0\n"
                           "set cshout 0\n"
