@@ -676,6 +676,7 @@ int main(int argc, char *argv[])
                           "resume\n"
 			  "finger\n"
 			  );
+		SendMarker(ENDLOGIN);
                 if(appData.owner){
                     SendToIcs("+notify %s\n",appData.owner);
                 }

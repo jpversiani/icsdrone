@@ -703,14 +703,19 @@ Bool ProcessLogin(char *line){
 	  }
       }
 
+      if (strcmp(runData.handle, name)) {
+	  logme(LOG_WARNING, "Nickname was corrected to: %s", name);
+	  strncpy(runData.handle,name,sizeof(runData.handle));
+	  runData.handle[sizeof(runData.handle)-1]='\0';
+	  snprintf(runData.prompt,30,"%s> ",runData.handle);
+      }
+      return TRUE;
+  }
+  if(!runData.loggedIn && IsMarker(ENDLOGIN,line)){
+    logme(LOG_INFO,"It seems we are succesfully logged in!");
     runData.loggedIn=1;
     persistentData.wasLoggedIn=TRUE;
-    if (strcmp(runData.handle, name)) {
-      logme(LOG_WARNING, "Nickname was corrected to: %s", name);
-      strncpy(runData.handle,name,sizeof(runData.handle));
-      runData.handle[sizeof(runData.handle)-1]='\0';
-      snprintf(runData.prompt,30,"%s> ",runData.handle);
-    }
+
     if(!appData.pgnFile){
       SetOption("pgnFile",LOGIN,0,"%s.pgn",runData.handle);
     }
@@ -737,10 +742,12 @@ Bool ProcessLogin(char *line){
     }
     return TRUE;
   }
-  if((sscanf(line,"%30s is not a registered name%c",name,&dummy)==2 || 
-     sscanf(line,"Logging you in as \"Guest%c",&dummy)==1)
+  if(!runData.loggedIn && (
+	sscanf(line,"%*30s is not a registered name%c",&dummy)==1 || 
+        sscanf(line,"Logging you in as \"Guest%c",&dummy)==1 ||
+        sscanf(line,"%*30s is NOT a registered player%c",&dummy)==1)
      ){
-    logme(LOG_DEBUG,"We are not registered.");
+    logme(LOG_INFO,"We are not registered.");
     runData.registered=FALSE;
     return TRUE;
   }

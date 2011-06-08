@@ -503,6 +503,7 @@ Bool IsMarker P((char *, char*));
 #define DOCLEANUPS "clean"
 #define ASKSTARTMOVES "asks"
 #define PING "ping"
+#define ENDLOGIN "endlogin"
 
 
 /*
