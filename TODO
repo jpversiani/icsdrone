@@ -1,25 +1,11 @@
-Important:
-
-(-) At end of game in tourney do
-
-td playgame #tourney
-
-It could be that we have manually joined a tourney while playing a game.
-Apparently then autostarting of games does not work.
-
-(-) Avoid joining non chess tourney's.
-
-(-) Indicate resume of adjourned game in log. 
-
-(-) Type of tourney in log.
-
-(-) The fact that mamer turns your tourney variable to off apparently does
-not always mean the tourney has ended....
-
-Look for ":mamer TOURNEY #24 UPDATE: The tourney has ended."
-It seems to occur always in this form.
-
-(*) More compact standings.
-(*) Wild support.
-(*) Make pgn compliant (lines < 80 chars).
+- Indicate resume of adjourned game in log. 
+- Wild support (at least FRC).
+- Make pgn standard compliant (lines < 80 chars).
+- ICC does not allow setting the "interface" variable multiple times. 
+  So icsdroneng cannot use this to communicate things to the user.
+  Duplicate this with a finger note (this is somewhat tricky).
+- Implement a version of marker.c using tells (the current version works
+  well for unregistered users on FICS where tells sometimes get lost).
+- Print warning if longAlgebraicMoves is false and the engine
+  has not indicated it understands san ("feature san=1").
 
