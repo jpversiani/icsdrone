@@ -1,38 +1,39 @@
 icsdroneng (0.23) unstable; urgency=low
 
-* Do not give feedback on bookmoves if feedback option is not set.
+  * Do not give feedback on bookmoves if feedback option is not set.
 	
-* Process feature draw=0.
+  * Process feature draw=0.
 
-* Avoid accepting a new game when quitting. If the engine is playing with 
+  * Avoid accepting a new game when quitting. If the engine is playing with 
   noescape this would otherwise result in a lost game due to disconnection.
 	
-* Accept sigint=1 from engine. Needed for Rookie. 
+  * Accept sigint=1 from engine. Needed for Rookie. 
 	
-* Default "This is <engine-name>" message wasn't going anywhere on FICS, 
+  * Default "This is <engine-name>" message wasn't going anywhere on FICS, 
   because "This" is not a command. Prefix it with whatever is set as 
   `feedbackCommand'.
 	
-* Function SetTimeZone() doesn't compile on FreeBSD. `timezone' is a function, 
-  not a variable. Use `tm_gmtoff' instead.
+  * Function SetTimeZone() doesn't compile on FreeBSD. `timezone' is a 
+  function, not a variable. Use `tm_gmtoff' instead.
 	
-* Fix bug setting timezone for UTC=0.
+  * Fix bug setting timezone for UTC=0.
 
-* Send engine stderr to engine stdout instead to /dev/null.
+  * Send engine stderr to engine stdout instead to /dev/null.
 
-* Make processing of draw offers and resigns from engine stricter.
+  * Make processing of draw offers and resigns from engine stricter.
 
-* In PGN output give month and day with 2 digits to comply with standard (MK).
+  * In PGN output give month and day with 2 digits to comply with standard (MK).
 
-* Send opponent name and ratings to engine (MK).
+  * Send opponent name and ratings to engine (MK).
 
-* Allow PGN output to be piped through a command (MK).
+  * Allow PGN output to be piped through a command (MK).
 
-* Look for engine's 1/2-1/2 only at the start of the line (MK).
+  * Look for engine's 1/2-1/2 only at the start of the line (MK).
 
-* ICC port by Marcel van Kervinck!! There may be still a few glitches and tournaments do not work but playing games seems to be ok! 
+  * ICC port by Marcel van Kervinck!! There may be still a few glitches and 
+  tournaments do not work but playing games seems to be ok! 
 	
- -- Michel Van den Bergh <michel.vandenbergh@uhasselt.be>  Mon, 7 Mar 2011 19:00:00 +0200
+ -- Michel Van den Bergh <michel.vandenbergh@uhasselt.be>  Thu, 9 Jun 2011 19:00:00 +0200
 	
 icsdroneng (0.22) unstable; urgency=low
 
