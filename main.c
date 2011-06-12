@@ -352,6 +352,13 @@ void MainLoop()
     if (runData.computerActive) {
       FD_SET(runData.computerReadFd, &readfds);
     }
+    if (runData.proxyListenFd!=-1 && runData.proxyFd==-1){
+	FD_SET(runData.proxyListenFd, &readfds);
+    }
+    if (runData.proxyFd!=-1){
+	FD_SET(runData.proxyFd, &readfds);
+    }
+
     timeout = sched_idle_time();
     time_add(timeout,1);  /* add 1 msec for safety */
     UnblockSignals();
