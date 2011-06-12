@@ -56,7 +56,6 @@ void InitRunData(){
   runData.icsWriteFd=-1;
   runData.proxyListenFd=-1;
   runData.proxyFd=-1;
-  runData.proxyConnected=FALSE;
   runData.handle[0]='\0';
   runData.passwd[0]='\0';
   runData.quitPending=FALSE;

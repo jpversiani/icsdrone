@@ -22,7 +22,6 @@ int StartProxy(){
 	logme(LOG_ERROR,"Unable to bind proxy socket.");
 	return FALSE;
     }
-    runData.proxyConnected=TRUE;
     return TRUE;
 }
 
