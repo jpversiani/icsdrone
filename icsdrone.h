@@ -167,6 +167,7 @@ typedef struct {
   int   icsWriteFd;
   int   proxyListenFd;
   int   proxyFd;
+  int   proxyConnected;
   char  handle[30];
   char  passwd[30];
   Bool  quitPending;

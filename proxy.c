@@ -22,5 +22,16 @@ int StartProxy(){
 	logme(LOG_ERROR,"Unable to bind proxy socket.");
 	return FALSE;
     }
+    runData.proxyConnected=TRUE;
     return TRUE;
+}
+
+void CloseProxy(){
+    logme(LOG_DEBUG,"Closing proxy.");
+    if(runData.proxyListenFd!=-1){
+	close(runData.proxyListenFd);
+    }
+    if(runData.proxyFd!=-1){
+	close(runData.proxyFd);
+    }
 }
