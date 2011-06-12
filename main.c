@@ -569,6 +569,7 @@ int main(int argc, char *argv[])
     signal(SIGTERM, TerminateProc);
     signal(SIGHUP, TerminateProc);
     signal(SIGPIPE, BrokenPipe);
+    
     while(exitValue==EXIT_RESTART){
         switch(setjmp(stackPointer)){
             case 0:
@@ -636,6 +637,11 @@ int main(int argc, char *argv[])
                     SetOption("logFile",LOGIN,0,"%s.log",runData.handle);
                 }
                 StartLogging();
+		// Temporary 
+		if(StartProxy()){
+		    logme(LOG_INFO,"Proxy started.");
+		}
+
                 if(!persistentData.firsttime){
                     UnblockSignals();
                     sleep(RECONNECTINTERVAL);
