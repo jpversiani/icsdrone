@@ -165,6 +165,7 @@ typedef struct {
   pid_t computerPid;
   int   icsReadFd;
   int   icsWriteFd;
+  int   proxyFd;
   char  handle[30];
   char  passwd[30];
   Bool  quitPending;

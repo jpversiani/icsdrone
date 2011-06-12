@@ -54,6 +54,7 @@ void InitRunData(){
   runData.computerPid=(pid_t) 0;
   runData.icsReadFd=-1;
   runData.icsWriteFd=-1;
+  runData.proxyFd=-1;
   runData.handle[0]='\0';
   runData.passwd[0]='\0';
   runData.quitPending=FALSE;
