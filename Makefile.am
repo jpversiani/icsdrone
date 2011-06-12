@@ -1,6 +1,6 @@
 AM_CFLAGS=-Wall
 bin_PROGRAMS = icsdrone
-icsdrone_SOURCES = argparser.c computer.c main.c net.c sched.c board.c fics.c marker.c polyglot.c utils.c icsdrone.h
+icsdrone_SOURCES = argparser.c computer.c main.c net.c sched.c board.c fics.c marker.c polyglot.c utils.c proxy.c icsdrone.h
 dist_doc_DATA=README README_old THANKS_old ChangeLog_old 
 
 man6_MANS = icsdrone.man
