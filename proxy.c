@@ -58,7 +58,7 @@ void SendToProxy(char *format, ... )
       sighandler_org=signal(SIGPIPE,SIG_IGN);
       // The signal should be delivered right here.
       UnblockSignals();
-      if(write(runData.proxyFd,buf,strlen(buf)+1)==-1){
+      if(write(runData.proxyFd,buf,strlen(buf))==-1){
 	  logme(LOG_DEBUG,"Unable to write to proxy.");
       };
       BlockSignals();
