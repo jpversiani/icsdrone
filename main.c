@@ -683,15 +683,15 @@ int main(int argc, char *argv[])
                 }
                 StartLogging();
 
-		if(appData.proxy && StartProxy()){
-		    logme(LOG_INFO,"Proxy started.");
-		}
-
                 if(!persistentData.firsttime){
                     UnblockSignals();
                     sleep(RECONNECTINTERVAL);
                     BlockSignals();
                 }
+		if(appData.proxy && StartProxy()){
+		    logme(LOG_INFO,"Proxy started.");
+		}
+
                     /* for polyglot board support */
                 if(appData.book){
                     book_open(appData.book);
