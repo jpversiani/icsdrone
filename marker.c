@@ -25,9 +25,26 @@ void SendMarker(char * marker){
 Bool IsMarker(char* marker, char *line){
   char command[63+1];
   char dummy;
+  if(!cookie){
+      return FALSE;
+  }
   if (2==sscanf(line, "%63[^:]: Command not found%c", command, &dummy) // FICS
    || 2==sscanf(line, "No such command (%63[^)])%c", command, &dummy)) { // ICC
     return !strncmp(command,marker,strlen(marker)) && strstr(command,cookie);
+  } else {
+    return FALSE;
+  }
+}
+
+Bool IsAMarker(char *line){
+  char command[63+1];
+  char dummy;
+  if(!cookie){
+      return FALSE;
+  }
+  if (2==sscanf(line, "%63[^:]: Command not found%c", command, &dummy) // FICS
+   || 2==sscanf(line, "No such command (%63[^)])%c", command, &dummy)) { // ICC
+    return strstr(command,cookie)!=NULL;
   } else {
     return FALSE;
   }
