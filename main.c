@@ -362,10 +362,10 @@ void MainLoop()
 	FD_SET(runData.proxyListenFd, &readfds);
 	maxfd=MAX(maxfd,runData.proxyListenFd);
     }
-    if (runData.proxyFd!=-1){
-	FD_SET(runData.proxyFd, &readfds);
-	maxfd=MAX(maxfd,runData.proxyFd);
-    }
+    //if (runData.proxyFd!=-1){
+    //	FD_SET(runData.proxyFd, &readfds);
+    //	maxfd=MAX(maxfd,runData.proxyFd);
+    //}
 
 
     timeout = sched_idle_time();

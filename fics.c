@@ -1790,7 +1790,10 @@ void ProcessIcsLine(char *line){
       void (*sighandler_org)(int);
       int dummy;  // make compiler happy
       sighandler_org=signal(SIGPIPE,SIG_IGN);
+      // The signal should be delivered right here.
+      UnblockSignals();
       dummy=write(runData.proxyFd,line,strlen(line)+1);
+      BlockSignals();
       signal(SIGPIPE,sighandler_org);
   }
   line=KillPrompts(line);
