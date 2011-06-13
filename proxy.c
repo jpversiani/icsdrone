@@ -18,7 +18,7 @@ int StartProxy(){
 	logme(LOG_ERROR,"Unable to bind proxy socket.");
 	return FALSE;
     }
-    if (listen(runData.proxyListenFd, 1) == -1) {
+    if (listen(runData.proxyListenFd, 2) == -1) {
 	logme(LOG_ERROR,"Unable to bind proxy socket.");
 	return FALSE;
     }

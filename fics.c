@@ -1786,7 +1786,12 @@ Bool ProcessCleanUps(char *line){
 
 void ProcessIcsLine(char *line){
   if(runData.proxyFd!=-1){
-      write(runData.proxyFd,line,strlen(line)+1);
+      // HACK
+      void (*sighandler_org)(int);
+      int dummy;  // make compiler happy
+      sighandler_org=signal(SIGPIPE,SIG_IGN);
+      dummy=write(runData.proxyFd,line,strlen(line)+1);
+      signal(SIGPIPE,sighandler_org);
   }
   line=KillPrompts(line);
   if(ProcessForwardingMarkers(line))return;

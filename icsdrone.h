@@ -386,6 +386,13 @@ void CancelTimers P(());
 #define FINDCHALLENGETIMEOUT 60*1000
 
 /*
+ * Proxy
+ */
+
+extern int StartProxy P((void));
+extern void CloseProxy P((void));
+
+/*
  * Error handling
  */
  

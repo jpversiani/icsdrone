@@ -358,7 +358,7 @@ void MainLoop()
       FD_SET(runData.computerReadFd, &readfds);
       maxfd=MAX(maxfd,runData.computerReadFd);
     }
-    if (runData.proxyListenFd!=-1 && runData.proxyFd==-1){
+    if (runData.proxyListenFd!=-1){
 	FD_SET(runData.proxyListenFd, &readfds);
 	maxfd=MAX(maxfd,runData.proxyListenFd);
     }
@@ -409,13 +409,17 @@ void MainLoop()
     }
     if (runData.proxyListenFd!=-1 && FD_ISSET(runData.proxyListenFd, &readfds)) {
 	sin_size=sizeof(struct sockaddr_in);
+	if(runData.proxyFd!=-1){
+	    logme(LOG_WARNING,"New proxy connection. Closing prior one.\n");
+	    close(runData.proxyFd);
+	    runData.proxyFd=-1;
+	}
 	if((runData.proxyFd=accept(runData.proxyListenFd, 
 			       (struct sockaddr *)&client_addr,
 				   &sin_size))==-1){
 	    logme(LOG_ERROR,"Unable to accept proxy connection.");
 	}else{
-	    char * message="Welcome to the icsdrone proxy\n";
-	    write(runData.proxyFd,message,strlen(message)+1);
+	    logme(LOG_INFO,"Proxy connected.");
 	}
 
     }
