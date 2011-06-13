@@ -51,10 +51,10 @@ void SendToProxy(char *format, ... )
   va_start(ap, format);
   vsnprintf(buf, sizeof(buf), format, ap);
   buf[sizeof(buf)-1]='\0';
-  logme(LOG_DEBUG, "icsdrone->proxy: %s", buf);
   if(runData.proxyFd!=-1){
       // HACK
       void (*sighandler_org)(int);
+      logme(LOG_DEBUG, "icsdrone->proxy: %s", buf);
       sighandler_org=signal(SIGPIPE,SIG_IGN);
       // The signal should be delivered right here.
       UnblockSignals();
