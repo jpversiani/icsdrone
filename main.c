@@ -364,10 +364,10 @@ void MainLoop()
 	FD_SET(runData.proxyListenFd, &readfds);
 	maxfd=MAX(maxfd,runData.proxyListenFd);
     }
-    //if (runData.proxyFd!=-1){
-    //	FD_SET(runData.proxyFd, &readfds);
-    //	maxfd=MAX(maxfd,runData.proxyFd);
-    //}
+    if (runData.proxyFd!=-1){
+    	FD_SET(runData.proxyFd, &readfds);
+    	maxfd=MAX(maxfd,runData.proxyFd);
+    }
 
 
     timeout = sched_idle_time();
@@ -401,6 +401,12 @@ void MainLoop()
       if (ProcessRawInput(runData.computerReadFd, cBuf, sizeof(cBuf), 
 			  ProcessComputerLine) == ERROR){
 	ExitOn(EXIT_HARDQUIT,"Lost contact with computer.");
+      }
+    }
+    if (runData.proxyFd!=-1 && FD_ISSET(runData.proxyFd, &readfds)){
+      if (ProcessRawInput(runData.proxyFd, cBuf, sizeof(cBuf), 
+			  ProcessProxyLine) == ERROR){
+	ExitOn(EXIT_HARDQUIT,"Cannot read from proxy.");
       }
     }
     if (FD_ISSET(runData.icsReadFd, &readfds)) {
