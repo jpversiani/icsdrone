@@ -406,7 +406,9 @@ void MainLoop()
     if (runData.proxyFd!=-1 && FD_ISSET(runData.proxyFd, &readfds)){
       if (ProcessRawInput(runData.proxyFd, cBuf, sizeof(cBuf), 
 			  ProcessProxyLine) == ERROR){
-	ExitOn(EXIT_HARDQUIT,"Cannot read from proxy.");
+	  logme(LOG_DEBUG,"EOF on proxy.");
+	  close(runData.proxyFd);
+	  runData.proxyFd=-1;
       }
     }
     if (FD_ISSET(runData.icsReadFd, &readfds)) {
