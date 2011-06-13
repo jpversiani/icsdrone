@@ -391,6 +391,7 @@ void CancelTimers P(());
 
 extern int StartProxy P((void));
 extern void CloseProxy P((void));
+extern void SendToProxy P((char *format, ... ));
 
 /*
  * Error handling

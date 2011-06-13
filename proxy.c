@@ -34,3 +34,27 @@ void CloseProxy(){
 	close(runData.proxyFd);
     }
 }
+
+void SendToProxy(char *format, ... )
+{
+  char buf[16384] = "";
+  va_list ap;
+  
+  va_start(ap, format);
+  vsnprintf(buf, sizeof(buf), format, ap);
+  buf[sizeof(buf)-1]='\0';
+  logme(LOG_DEBUG, "icsdrone->proxy: %s", buf);
+  if(runData.proxyFd!=-1){
+      // HACK
+      void (*sighandler_org)(int);
+      sighandler_org=signal(SIGPIPE,SIG_IGN);
+      // The signal should be delivered right here.
+      UnblockSignals();
+      if(write(runData.proxyFd,buf,strlen(buf)+1)==-1){
+	  logme(LOG_DEBUG,"Unable to write to proxy.");
+      };
+      BlockSignals();
+      signal(SIGPIPE,sighandler_org);
+  }
+  va_end(ap);
+}

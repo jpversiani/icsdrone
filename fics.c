@@ -1785,17 +1785,7 @@ Bool ProcessCleanUps(char *line){
 
 
 void ProcessIcsLine(char *line){
-  if(runData.proxyFd!=-1){
-      // HACK
-      void (*sighandler_org)(int);
-      int dummy;  // make compiler happy
-      sighandler_org=signal(SIGPIPE,SIG_IGN);
-      // The signal should be delivered right here.
-      UnblockSignals();
-      dummy=write(runData.proxyFd,line,strlen(line)+1);
-      BlockSignals();
-      signal(SIGPIPE,sighandler_org);
-  }
+  SendToProxy("%s",line);
   line=KillPrompts(line);
   if(ProcessForwardingMarkers(line))return;
   if(ProcessPings(line))return;
