@@ -338,6 +338,8 @@ void MainLoop()
   char conBuf[2*BUF_SIZE];
   int selectVal;
   int events;
+  struct sockaddr_in client_addr;  
+  unsigned int sin_size;
   //  InitRunData();
   BlockSignals();
   sBuf[0] = '\0';
@@ -404,6 +406,15 @@ void MainLoop()
 			  ProcessIcsLine) == ERROR){
 	  ExitOn(EXIT_QUITRESTART,"Disconnected from ics.");
       }
+    }
+    if (runData.proxyListenFd!=-1 && FD_ISSET(runData.proxyListenFd, &readfds)) {
+	sin_size=sizeof(struct sockaddr_in);
+	runData.proxyFd=accept(runData.proxyListenFd, 
+			       (struct sockaddr *)&client_addr,
+			       &sin_size);
+	char * message="Hello world\n";
+	write(runData.proxyFd,message,strlen(message)+1);
+
     }
   }
 }
