@@ -505,8 +505,9 @@ void SetFeedbackColor P((int));
  * Markers
  */
 
-void SendMarker P((char *));
-Bool IsMarker P((char *, char*));
+extern void SendMarker P((char *));
+extern Bool IsMarker P((char *, char*));
+extern Bool IsAMarker P((char *));
 #define STARTFORWARDING "start"
 #define STOPFORWARDING "stop"
 #define ENDTELL   "endt"

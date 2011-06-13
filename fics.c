@@ -1786,7 +1786,7 @@ Bool ProcessCleanUps(char *line){
 
 void ProcessIcsLine(char *line){
   char *old_line;
-  old_line=line;
+  old_line=strdup(line);
   line=KillPrompts(line);
   if(ProcessForwardingMarkers(line))goto finish;
   if(ProcessPings(line))goto finish;
@@ -1812,10 +1812,12 @@ void ProcessIcsLine(char *line){
   if(ProcessMiscFilters(line))goto finish;
   ProcessFeedback(line);
 
- finish:
-  
-  SendToProxy(old_line);
+finish:
 
+  if(!runData.forwarding && !IsAMarker(line)){
+      SendToProxy("%s",old_line);
+  }
+  free(old_line);
 }
 
 
