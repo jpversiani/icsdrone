@@ -332,6 +332,7 @@ void UpdateTimeString(){
 void MainLoop()
 {
   fd_set readfds;
+  int maxfd;
   struct timeval timeout;
   char cBuf[2*BUF_SIZE], sBuf[2*BUF_SIZE];
   char conBuf[2*BUF_SIZE];
@@ -344,26 +345,31 @@ void MainLoop()
   conBuf[0]='\0';
   while (1) {
     UpdateTimeString();
+    maxfd=-1;
     FD_ZERO(&readfds);
     FD_SET(runData.icsReadFd, &readfds);
+    maxfd=runData.icsReadFd;
     if (appData.console && !runData.blockConsole){
       FD_SET(0, &readfds);
     }
     if (runData.computerActive) {
       FD_SET(runData.computerReadFd, &readfds);
+      maxfd=MAX(maxfd,runData.computerReadFd);
     }
     if (runData.proxyListenFd!=-1 && runData.proxyFd==-1){
 	FD_SET(runData.proxyListenFd, &readfds);
+	maxfd=MAX(maxfd,runData.proxyListenFd);
     }
     if (runData.proxyFd!=-1){
 	FD_SET(runData.proxyFd, &readfds);
+	maxfd=MAX(maxfd,runData.proxyFd);
     }
+
 
     timeout = sched_idle_time();
     time_add(timeout,1);  /* add 1 msec for safety */
     UnblockSignals();
-    selectVal=select(MAX(runData.icsReadFd, runData.computerReadFd) + 1,
-		     &readfds, NULL, NULL, &timeout);
+    selectVal=select(maxfd+1,&readfds, NULL, NULL, &timeout);
     BlockSignals();  
     if (selectVal < 0 && errno == EINTR){
       logme(LOG_DEBUG,"Select call interrupted by alarm.");
