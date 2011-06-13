@@ -1386,17 +1386,16 @@ void ProcessFeedback(char *line){
 }
 
 Bool ProcessMoveList(char *line){
-    static Bool parsingMoveList;
     move_t move,move2;
     char dummy;
     if(!runData.loggedIn) return FALSE;
     if(!runData.waitingForMoveList) return FALSE;
     if(IsMarker(ASKSTARTMOVES,line)){
         logme(LOG_DEBUG,"Start of move list detected.");
-        parsingMoveList=TRUE;
+        runData.parsingMoveList=TRUE;
         return TRUE;
     }    
-    if(parsingMoveList){
+    if(runData.parsingMoveList){
             /*
              *  Retrieve the movelist
              */
@@ -1427,7 +1426,7 @@ Bool ProcessMoveList(char *line){
                   runData.icsBoard.onMove);
             SetupEngineOptions(&(runData.icsBoard));
             HandleBoard(&(runData.icsBoard),runData.moveList);
-            parsingMoveList=FALSE;
+            runData.parsingMoveList=FALSE;
             runData.waitingForMoveList=FALSE;
             return TRUE;
         }

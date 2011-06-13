@@ -229,6 +229,7 @@ typedef struct {
   event_t tellTimer;
   Bool lastGameWasAbortOrAdjourn;
   Bool onFICS;
+  Bool parsingMoveList;
 } RunData;
 
 /* AppData */
