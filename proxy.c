@@ -2,11 +2,19 @@
 
 int StartProxy(){
     struct sockaddr_in server_addr;
+    int optval;
     logme(LOG_DEBUG,"Starting proxy");
     if((runData.proxyListenFd=socket(AF_INET,SOCK_STREAM,0))==-1){
 	logme(LOG_ERROR,"Could not create proxy socket.");
 	return FALSE;
     }
+    optval=1;
+    setsockopt(runData.proxyListenFd, 
+	       SOL_SOCKET, 
+	       SO_REUSEADDR, 
+	       &optval,
+	       sizeof(optval));
+    
     server_addr.sin_family = AF_INET;         
     server_addr.sin_port = htons(5000);     
     server_addr.sin_addr.s_addr = INADDR_ANY; 
