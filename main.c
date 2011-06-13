@@ -135,6 +135,7 @@ AppData appData = {
     NULL,            /* icsHost */
     23,              /* icsPort */
     5000,            /* proxyPort */
+    1,               /* proxy */
     0,               /* searchDepth */
     0,               /* secPerMove */
     255,             /* logLevel */
@@ -681,8 +682,8 @@ int main(int argc, char *argv[])
                     SetOption("logFile",LOGIN,0,"%s.log",runData.handle);
                 }
                 StartLogging();
-		// Temporary 
-		if(StartProxy()){
+
+		if(appData.proxy && StartProxy()){
 		    logme(LOG_INFO,"Proxy started.");
 		}
 
