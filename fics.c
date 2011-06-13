@@ -1785,31 +1785,37 @@ Bool ProcessCleanUps(char *line){
 
 
 void ProcessIcsLine(char *line){
-  SendToProxy("%s",line);
+  char *old_line;
+  old_line=line;
   line=KillPrompts(line);
-  if(ProcessForwardingMarkers(line))return;
-  if(ProcessPings(line))return;
-  if(ProcessLogin(line))return;
-  if(ProcessTells(line))return;
-  if(ProcessNext(line))return;
-  if(ProcessPending(line))return;
-  if(ProcessOffers(line))return;
-  if(ProcessAutoMatches(line))return;
-  if(ProcessNotifications(line))return;
-  if(ProcessOwnerNotify(line))return;
-  if(ProcessIncomingMatches(line))return;
-  if(ProcessTourneyNotifications(line)) return;
-  if(ProcessStandings(line)) return;
-  if(ProcessFlaggedOpponent(line))return;
-  if(ProcessStartOfGame(line))return;
-  if(ProcessMoreTime(line))return;
-  if(ProcessMoveList(line))return;
-  if(ProcessBoard(line))return;
-  if(ProcessGameEnd(line))return;
-  if(ProcessCreatePGN(line))return;
-  if(ProcessCleanUps(line))return;
-  if(ProcessMiscFilters(line))return;
+  if(ProcessForwardingMarkers(line))goto finish;
+  if(ProcessPings(line))goto finish;
+  if(ProcessLogin(line))goto finish;
+  if(ProcessTells(line))goto finish;
+  if(ProcessNext(line))goto finish;
+  if(ProcessPending(line))goto finish;
+  if(ProcessOffers(line))goto finish;
+  if(ProcessAutoMatches(line))goto finish;
+  if(ProcessNotifications(line))goto finish;
+  if(ProcessOwnerNotify(line))goto finish;
+  if(ProcessIncomingMatches(line))goto finish;
+  if(ProcessTourneyNotifications(line)) goto finish;
+  if(ProcessStandings(line)) goto finish;
+  if(ProcessFlaggedOpponent(line))goto finish;
+  if(ProcessStartOfGame(line))goto finish;
+  if(ProcessMoreTime(line))goto finish;
+  if(ProcessMoveList(line))goto finish;
+  if(ProcessBoard(line))goto finish;
+  if(ProcessGameEnd(line))goto finish;
+  if(ProcessCreatePGN(line))goto finish;
+  if(ProcessCleanUps(line))goto finish;
+  if(ProcessMiscFilters(line))goto finish;
   ProcessFeedback(line);
+
+ finish:
+  
+  SendToProxy(old_line);
+
 }
 
 
