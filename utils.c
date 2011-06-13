@@ -453,3 +453,12 @@ void my_sleep(int msec){
 
 }
 
+Bool IsWhiteSpace(char *s){
+     int i;
+     for(i=0;i<strlen(s);i++){
+	 if(!strchr(" \r\n",s[i])){
+	     return FALSE;
+	 }
+     }
+     return TRUE;
+ }

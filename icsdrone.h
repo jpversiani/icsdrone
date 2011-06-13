@@ -435,6 +435,7 @@ extern Bool time_ge P((struct timeval,struct timeval));
 extern Bool time_gt P((struct timeval,struct timeval));
 extern struct timeval time_add P((struct timeval tv, int t));
 extern void my_sleep P((int msec));
+extern Bool IsWhiteSpace P((char *s));
 /*
  * Logging
  */
@@ -518,7 +519,7 @@ extern Bool IsAMarker P((char *));
 #define ASKSTARTMOVES "asks"
 #define PING "ping"
 #define ENDLOGIN "endlogin"
-
+#define PROXYPROMPT "prompt"
 
 /*
  * Miscellaneous definitions

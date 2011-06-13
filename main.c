@@ -429,6 +429,7 @@ void MainLoop()
 				   &sin_size))==-1){
 	    logme(LOG_ERROR,"Unable to accept proxy connection.");
 	}else{
+	    SendToProxy("%s","Welcome to the icsdroneng proxy.\r\nicsdroneng% ");
 	    logme(LOG_INFO,"Proxy connected.");
 	}
 

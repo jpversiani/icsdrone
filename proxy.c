@@ -69,6 +69,7 @@ void SendToProxy(char *format, ... )
 
 void ProcessProxyLine(char * line){
   logme(LOG_DEBUG, "proxy->icdrone: %s", line);
-  SendToIcs("%s\n",line);
+  SendToIcs("%s\n",line);			
+  SendMarker(PROXYPROMPT);
   return;
 }
