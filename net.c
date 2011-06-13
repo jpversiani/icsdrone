@@ -86,7 +86,7 @@ int OpenTCP(const char *host, int port)
 }
 
 /* I really should use buffers for writing but what the heck */
-#define WRITE(a,b) { if (write(a,b,strlen(b)) == -1) ExitOn(EXIT_HARDQUIT,"Write failed."); }
+#define WRITE(a,b) { if (write(a,b,strlen(b)+1) == -1) ExitOn(EXIT_HARDQUIT,"Write failed."); }
 
 void SendToIcs(char *format, ... )
 {
