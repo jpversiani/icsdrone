@@ -1785,6 +1785,9 @@ Bool ProcessCleanUps(char *line){
 
 
 void ProcessIcsLine(char *line){
+  if(runData.proxyFd!=-1){
+      write(runData.proxyFd,line,strlen(line)+1);
+  }
   line=KillPrompts(line);
   if(ProcessForwardingMarkers(line))return;
   if(ProcessPings(line))return;

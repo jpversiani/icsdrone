@@ -409,11 +409,14 @@ void MainLoop()
     }
     if (runData.proxyListenFd!=-1 && FD_ISSET(runData.proxyListenFd, &readfds)) {
 	sin_size=sizeof(struct sockaddr_in);
-	runData.proxyFd=accept(runData.proxyListenFd, 
+	if((runData.proxyFd=accept(runData.proxyListenFd, 
 			       (struct sockaddr *)&client_addr,
-			       &sin_size);
-	char * message="Hello world\n";
-	write(runData.proxyFd,message,strlen(message)+1);
+				   &sin_size))==-1){
+	    logme(LOG_ERROR,"Unable to accept proxy connection.");
+	}else{
+	    char * message="Welcome to the icsdrone proxy\n";
+	    write(runData.proxyFd,message,strlen(message)+1);
+	}
 
     }
   }
