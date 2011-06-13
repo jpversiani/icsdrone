@@ -134,6 +134,7 @@ void InitPersistentData(){
 AppData appData = {
     NULL,            /* icsHost */
     23,              /* icsPort */
+    5000,            /* proxyPort */
     0,               /* searchDepth */
     0,               /* secPerMove */
     255,             /* logLevel */

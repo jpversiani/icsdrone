@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ArgList argList = { 
     {"-icsHost",              ArgString, &appData.icsHost           , 0 }, 
     {"-icsPort",              ArgInt,    &appData.icsPort           , 0 },
+    {"-proxyPort",            ArgInt,    &appData.proxyPort         , 0 },
     {"-searchDepth",          ArgInt,    &appData.searchDepth       , 1 },
     {"-secPerMove",           ArgInt,    &appData.secPerMove        , 1 }, 
     {"-logLevel",             ArgInt,    &appData.logLevel          , 0 },
