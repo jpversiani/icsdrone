@@ -230,6 +230,7 @@ typedef struct {
   Bool lastGameWasAbortOrAdjourn;
   Bool onFICS;
   Bool parsingMoveList;
+  Bool processingLastMoves;
 } RunData;
 
 /* AppData */

@@ -118,6 +118,7 @@ void InitRunData(){
   runData.lastGameWasAbortOrAdjourn=FALSE;
   runData.onFICS=FALSE;
   runData.parsingMoveList=FALSE;
+  runData.processingLastMoves=FALSE;
 }
 
 PersistentData persistentData;

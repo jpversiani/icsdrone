@@ -1561,7 +1561,6 @@ Bool ProcessMoreTime(char *line){
 }
 
 Bool ProcessCreatePGN(char *line){
-  static Bool processingLastMoves=FALSE;
   static int moveNumber=1;
   static char pgnDesc[BUF_SIZE]="";
   /*  static char *lastPgnDesc=NULL;*/
@@ -1593,14 +1592,14 @@ Bool ProcessCreatePGN(char *line){
   if(!runData.loggedIn) return FALSE;  
   if(IsMarker(ASKLASTMOVES,line)){
     logme(LOG_DEBUG,"Start of last move list detected.");
-    processingLastMoves=TRUE;
+    runData.processingLastMoves=TRUE;
     state=0;
     return TRUE;
   }
-  if(!processingLastMoves) return FALSE;
+  if(!runData.processingLastMoves) return FALSE;
   if(sscanf(line,"%*s has no history games%c",&dummy)==1){
     logme(LOG_DEBUG,"No history.");
-    processingLastMoves=FALSE;
+    runData.processingLastMoves=FALSE;
     return TRUE;
   }
   //  memset(ratingWhite,0,sizeof(ratingWhite));
@@ -1679,7 +1678,7 @@ Bool ProcessCreatePGN(char *line){
   if(state==2 && sscanf(line,"%*[ ]{%60[^}]}%*[ ]%30[^ \r\n]",resultString,result)){
     state=0;
     logme(LOG_DEBUG,"[ResultString=%s] [Result=%s]",resultString,result);
-    processingLastMoves=FALSE;
+    runData.processingLastMoves=FALSE;
     if (appData.pgnFile[0] == '|') {
       pgnFile=popen(appData.pgnFile+1,"w");
     } else {
@@ -1719,11 +1718,11 @@ Bool ProcessCreatePGN(char *line){
     pgnDesc[0]='\0';
     return TRUE;
   }
-  if(processingLastMoves && IsMarker(DOCLEANUPS,line)){
-    logme(LOG_ERROR,"processingLastMoves=TRUE while receiving \
+  if(runData.processingLastMoves && IsMarker(DOCLEANUPS,line)){
+    logme(LOG_ERROR,"runData.processingLastMoves=TRUE while receiving \
 DOCLEANUPS marker.");
-    logme(LOG_INFO,"Putting processingLastMoves=FALSE.");
-    processingLastMoves=FALSE;
+    logme(LOG_INFO,"Putting runData.processingLastMoves=FALSE.");
+    runData.processingLastMoves=FALSE;
     pgnDesc[0]='\0';
     state=0;
   }
@@ -1813,7 +1812,10 @@ void ProcessIcsLine(char *line){
 
 finish:
 
-  if(!runData.forwarding && !IsAMarker(line)){
+  if(!runData.forwarding && 
+     !IsAMarker(line) && 
+     !runData.parsingMoveList &&
+     !runData.processingLastMoves){
       SendToProxy("%s",old_line);
   }
   free(old_line);
