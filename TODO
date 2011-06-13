@@ -9,3 +9,13 @@
 - Print warning if longAlgebraicMoves is false and the engine
   has not indicated it understands san ("feature san=1").
 
+
+Proxy
+=====
+
+Create SendToProxy.
+Make command line argument 
+-proxy (default:on/off) 
+-proxyPort (default:5000)
+-proxyHost (how to listen to all hosts?) (default:localhost)
+Create ProcessProxyLine (initially:just read and discard). 
