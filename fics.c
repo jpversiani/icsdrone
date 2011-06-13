@@ -1812,7 +1812,7 @@ void ProcessIcsLine(char *line){
 
 finish:
 
-  if(//!runData.forwarding && 
+  if(!runData.forwarding && 
      !IsAMarker(line) && 
      !runData.parsingMoveList &&
      !runData.processingLastMoves){
