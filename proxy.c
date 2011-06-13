@@ -14,11 +14,11 @@ int StartProxy(){
 	       SO_REUSEADDR, 
 	       &optval,
 	       sizeof(optval));
-    
+    memset(&server_addr,0,sizeof(struct sockaddr_in));
     server_addr.sin_family = AF_INET;         
     server_addr.sin_port = htons(appData.proxyPort);     
     //     server_addr.sin_addr.s_addr = INADDR_ANY
-    server_addr.sin_addr.s_addr = INADDR_LOOPBACK; 
+    server_addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK); 
     memset(&server_addr.sin_zero,0,sizeof(server_addr.sin_zero));
     if (bind(runData.proxyListenFd, 
 	     (struct sockaddr *)&server_addr, 
