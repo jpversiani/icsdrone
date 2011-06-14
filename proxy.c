@@ -70,6 +70,10 @@ void SendToProxy(char *format, ... )
 
 void ProcessProxyLine(char * line){
   logme(LOG_DEBUG, "proxy->icdrone: %s", line);
+  // Do not allow xboard to set things.
+  if(!strncmp("$set",line,4) || !strncmp("$iset",line,5)){
+      return;
+  }
   // Unfortunately the $ wizardry works only on FICS.
   if(line[0]=='$'){
       line++;
