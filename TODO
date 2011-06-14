@@ -13,9 +13,7 @@
 Proxy
 =====
 
-Create SendToProxy.
-Make command line argument 
--proxy (default:on/off) 
--proxyPort (default:5000)
--proxyHost (how to listen to all hosts?) (default:localhost)
-Create ProcessProxyLine (initially:just read and discard). 
+Filter out moves sent by xboard.
+Create banner.
+Implement login dialog.
+Create "runData.garbage" variable to filter out more stuff.
