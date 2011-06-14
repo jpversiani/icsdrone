@@ -1820,7 +1820,11 @@ void ProcessIcsLine(char *line){
 finish:
 
   if(IsMarker(PROXYPROMPT,line)){
-      SendToProxy("%s","icsdroneng% ");
+      SendToProxy("%s", "icsdroneng% ");
+  }else if(!strncmp(line,"<12> ",5)){
+      // Very weird. A board seems to need extra padding or xboard
+      // get's confused.
+      SendToProxy("\r\n%s\r\n",line);
   }else if(!runData.forwarding && 
      !IsAMarker(line) && 
      !runData.parsingMoveList &&
