@@ -81,6 +81,10 @@ void ProcessProxyLine(char * line){
   if(!strncmp("$set",line,4) || !strncmp("$iset",line,5)){
       return;
   }
+  // Resetting the style resends the board. Confusing icsdrone.
+  if(!strncmp("$style",line,5)){
+      return;
+  }
   // Unfortunately the $ wizardry works only on FICS.
   if(line[0]=='$'){
       line++;
