@@ -70,6 +70,13 @@ void SendToProxy(char *format, ... )
 
 void ProcessProxyLine(char * line){
   logme(LOG_DEBUG, "proxy->icdrone: %s", line);
+  // Make sure "quit" does not kill icsdrone.
+  if(!strncmp("quit",line,4)){
+      SendToProxy("Bye!\r\n");
+      close(runData.proxyFd);
+      runData.proxyFd=-1;
+      return;
+  }
   // Do not allow xboard to set things.
   if(!strncmp("$set",line,4) || !strncmp("$iset",line,5)){
       return;
