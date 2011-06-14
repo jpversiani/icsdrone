@@ -1445,6 +1445,8 @@ Bool ProcessBoard(char *line){
   char *oppname;
   if(!runData.loggedIn) return FALSE;
   if(!ParseBoard(&(runData.icsBoard),line)) return FALSE;
+  strncpy(runData.lineBoard, line, sizeof(runData.lineBoard)-1);
+  runData.lineBoard[sizeof(runData.lineBoard)-1]='\0';
   if(runData.waitingForFirstBoard){
     runData.waitingForFirstBoard = FALSE;
     if (!strcmp(runData.icsBoard.nameOfWhite, runData.handle)) {

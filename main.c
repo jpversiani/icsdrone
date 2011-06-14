@@ -80,6 +80,7 @@ void InitRunData(){
   runData.moveList[0]='\0';
   runData.last_talked_to[0]='\0';
   memset(&runData.icsBoard,0,sizeof(runData.icsBoard));
+  runData.lineBoard[0]='\0';
   runData.waitingForMoveList=FALSE;
   runData.promptOnLine=FALSE;
   runData.multiFeedbackDepth=0;
@@ -431,7 +432,11 @@ void MainLoop()
 				   &sin_size))==-1){
 	    logme(LOG_ERROR,"Unable to accept proxy connection.");
 	}else{
-	    SendToProxy("%s","Welcome to the icsdroneng proxy.\r\nicsdroneng% ");
+	    SendToProxy("%s\r\n","Welcome to the icsdroneng proxy.");
+	    if(runData.inGame){
+		SendToProxy("%s\r\n",runData.lineBoard);
+	    }
+	    SendToProxy("%s\r\n","icsdroneng% ");
 	    logme(LOG_INFO,"Proxy connected.");
 	}
 
