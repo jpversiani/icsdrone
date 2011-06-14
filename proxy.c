@@ -70,6 +70,10 @@ void SendToProxy(char *format, ... )
 
 void ProcessProxyLine(char * line){
   logme(LOG_DEBUG, "proxy->icdrone: %s", line);
+  // Unfortunately the $ wizardry works only on FICS.
+  if(line[0]=='$'){
+      line++;
+  }
   SendToIcs("%s\n",line);			
   SendMarker(PROXYPROMPT);
   return;
