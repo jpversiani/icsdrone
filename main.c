@@ -204,8 +204,8 @@ void BlockConsole(){
 
 void ProcessConsoleLine(char *line) 
 {
+  logcomm("console","icsdrone",line);
   line=strtok(line,"\r\n");
-  logme(LOG_DEBUG,"console->icsdrone: %s",line);
   if(line!=NULL && line[0]!='\0'){
     runData.promptOnLine=0;
     runData.inReadline=FALSE;

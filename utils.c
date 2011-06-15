@@ -40,6 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "icsdrone.h"
 
+const char* logtypestr[] = { "", "ERROR", "WARNING", "INFO", "CHAT", "DEBUG" };
+
+
 int MonthNumber(char *month){
   int i;
   static char * months[]={"jan",
@@ -335,9 +338,49 @@ void StopLogging()
     }
 }
 
+ void logcomm(char *source, char *dest, char *line){
+    char out[2048] = "";
+    char convert[2048]="";
+    time_t t = time(0);
+    char *timestring = ctime(&t);
+    char c;
+    char *p, *q, *last_q;
+    if(!appData.logging) return;
+    p=line;
+    q=convert;
+    last_q=convert+sizeof(convert)-5 ;
+                           /* 5=backslash, 3 octal digits and null */
+    while((c=*(p++)) && q<=last_q){
+	if(isprint(c)){
+	    *q++=c;
+	}else{
+	    *q+++='\\';
+	    snprintf(q,4,"%03o",c);
+	    q+=4;
+	}
+    }
+    convert[sizeof(convert)-1]='\0';
+    timestring[strlen(timestring)-1] = '\0';
+    snprintf(out, sizeof(out),"%s:%s:%s->%s: %s\n", 
+	     timestring, 
+	     logtypestr[LOG_DEBUG],
+	     source,
+	     dest,
+	     convert
+	     );
+    out[sizeof(out)-1]='\0';
+    if (logfile){
+	fprintf(logfile, "%s", out);
+	fflush(logfile);
+    }
+#ifdef HAVE_LIBZ
+    else if (gzlogfile)
+	gzputs(gzlogfile, out);
+#endif
+ }
+
 void logme(LogType type, const char *format, ... )
 {
-    static const char* logtypestr[] = { "", "ERROR", "WARNING", "INFO", "CHAT", "DEBUG" };
     char buf[8196] = "";
     char out[2048] = "";
     char *p;

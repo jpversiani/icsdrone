@@ -628,6 +628,7 @@ char * KillPrompts(char *line){
   /*  Get rid of those damn prompts  -- might be more on the same line even */
   /*  Eat both "fics%" and "aics%". */
   char *eol;
+  logcomm("ics","icsdrone",line);
   while (isalpha(line[0])&&!strncmp(line+1, "ics% ", 5))
     line += 6;
   if((eol=strchr(line,'\n'))){
@@ -636,7 +637,6 @@ char * KillPrompts(char *line){
   if((eol=strchr(line,'\r'))){
       *eol='\0';
   }
-  logme(LOG_DEBUG, "ics->icsdrone: %s", line);
   return line;
 }
 

@@ -96,7 +96,7 @@ void SendToIcs(char *format, ... )
   va_start(ap, format);
   vsnprintf(buf, sizeof(buf), format, ap);
   buf[sizeof(buf)-1]='\0';
-  logme(LOG_DEBUG, "icsdrone->ics: %s", buf);
+  logcomm("icsdrone","ics", buf);
   WRITE(runData.icsWriteFd, buf); 
   va_end(ap);
 }
@@ -109,7 +109,7 @@ void SendToComputer(char *format, ... )
     if (runData.computerActive) {
 	va_start(ap, format);
 	vsprintf(buf, format, ap);
-	logme(LOG_DEBUG, "icsdrone->engine: %s", buf);
+	logcomm("icsdrone","engine", buf);
 	WRITE(runData.computerWriteFd, buf);
 	va_end(ap);
     }
