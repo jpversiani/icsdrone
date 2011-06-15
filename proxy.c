@@ -55,7 +55,7 @@ void SendToProxy(char *format, ... )
   if(runData.proxyFd!=-1){
       // HACK
       void (*sighandler_org)(int);
-      logme(LOG_DEBUG, "icsdrone->proxy: %s", buf);
+      logcomm("icsdrone","proxy", buf);
       sighandler_org=signal(SIGPIPE,SIG_IGN);
       // The signal should be delivered right here.
       UnblockSignals();
@@ -69,7 +69,7 @@ void SendToProxy(char *format, ... )
 }
 
 void ProcessProxyLine(char * line){
-  logme(LOG_DEBUG, "proxy->icdrone: %s", line);
+    logcomm("proxy","icsdrone", line);
   // Make sure "quit" does not kill icsdrone.
   if(!strncmp("quit",line,4)){
       SendToProxy("Bye!\r\n");
