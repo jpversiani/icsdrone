@@ -152,13 +152,21 @@ int ProcessRawInput(int fd, char *buf, int sizeofbuf, void (*LineFunc)(char *lin
 		} else if ((c == '\n') || (c == '\r')) {
 		    /* scan the input */
 		    /*stringcopy(tmp, buf, i-1);*/
-                    strncpy(tmp,buf,i-1);
-                    tmp[i-1]='\0';
+		    int u;
+		    strncpy(tmp,buf,i);
+		    tmp[i]='\0';
+		    u=i; // strlen[tmp]
 		    /*stringcat(tmp, NEWLINE, strlen(NEWLINE));*/
-                    strcat(tmp,NETNEWLINE);
+                    //strcat(tmp,NETNEWLINE);
+		    while (buf[i] == '\n' || buf[i] == '\r') {
+			if(u<sizeof(tmp)){
+			    tmp[u]=buf[i];
+			    tmp[u+1]='\0';
+			    i++;
+			    u++;
+			}
+		    }
 		    LineFunc(tmp);
-		    while (buf[i] == '\n' || buf[i] == '\r') 
-			i++;
 		    /*bytecopy(buf, buf + i, pos+1 - i);*/
 		    memmove(buf, buf + i, pos+1 - i);
 		    i = 0;

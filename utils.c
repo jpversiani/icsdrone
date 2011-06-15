@@ -352,13 +352,14 @@ void StopLogging()
                            /* 5=backslash, 3 octal digits and null */
     while((c=*(p++)) && q<=last_q){
 	if(isprint(c)){
-	    *q++=c;
+	    *(q++)=c;
 	}else{
-	    *q+++='\\';
+	    *(q++)='\\';
 	    snprintf(q,4,"%03o",c);
-	    q+=4;
+	    q+=3;
 	}
     }
+    *q='\0';
     convert[sizeof(convert)-1]='\0';
     timestring[strlen(timestring)-1] = '\0';
     snprintf(out, sizeof(out),"%s:%s:%s->%s: %s\n", 
