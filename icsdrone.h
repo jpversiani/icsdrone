@@ -232,6 +232,8 @@ typedef struct {
   Bool onFICS;
   Bool parsingMoveList;
   Bool processingLastMoves;
+  Bool garbage;
+  char lastIcsPrompt[10];
 } RunData;
 
 /* AppData */

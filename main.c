@@ -120,6 +120,8 @@ void InitRunData(){
   runData.onFICS=FALSE;
   runData.parsingMoveList=FALSE;
   runData.processingLastMoves=FALSE;
+  runData.garbage=FALSE;
+  runData.lastIcsPrompt[0]='\0';
 }
 
 PersistentData persistentData;
@@ -436,7 +438,7 @@ void MainLoop()
 	    if(runData.inGame){
 		SendToProxy("%s\r\n",runData.lineBoard);
 	    }
-	    SendToProxy("%s\r\n","icsdroneng% ");
+	    SendMarker(PROXYPROMPT);
 	    logme(LOG_INFO,"Proxy connected.");
 	}
 

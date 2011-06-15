@@ -346,6 +346,7 @@ void StopLogging()
     char c;
     char *p, *q, *last_q;
     if(!appData.logging) return;
+    if(!line) return;
     p=line;
     q=convert;
     last_q=convert+sizeof(convert)-5 ;

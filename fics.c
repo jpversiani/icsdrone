@@ -627,16 +627,20 @@ void SetupEngineOptions(IcsBoard *icsBoard){
 char * KillPrompts(char *line){
   /*  Get rid of those damn prompts  -- might be more on the same line even */
   /*  Eat both "fics%" and "aics%". */
-  char *eol;
   logcomm("ics","icsdrone",line);
-  while (isalpha(line[0])&&!strncmp(line+1, "ics% ", 5))
+  while (isalpha(line[0])&&!strncmp(line+1, "ics% ", 5)){
+    if(runData.lastIcsPrompt[0]=='\0'){
+	  strncpy(runData.lastIcsPrompt,line,6);
+	  logme(LOG_DEBUG,"Saving prompt \"%s\"",runData.lastIcsPrompt);
+    }
     line += 6;
-  if((eol=strchr(line,'\n'))){
-      *eol='\0';
   }
-  if((eol=strchr(line,'\r'))){
-      *eol='\0';
-  }
+  //  if((eol=strchr(line,'\n'))){
+  //    *eol='\0';
+  //}
+  //if((eol=strchr(line,'\r'))){
+  //    *eol='\0';
+  //}
   return line;
 }
 
@@ -1371,7 +1375,7 @@ Bool ProcessStartOfGame(char *line){
   if (!strncmp(line, "{Game ", 6) &&
       strstr(line, runData.handle) &&
       (strstr(line, ") Creating ") || strstr(line, ") Continuing "))) {
-    
+    runData.garbage=TRUE;
     sscanf(line, "{Game %d", &runData.gameID);
     logme(LOG_INFO, "Current game has ID: %d", runData.gameID);
     return TRUE;
@@ -1435,6 +1439,7 @@ Bool ProcessMoveList(char *line){
             HandleBoard(&(runData.icsBoard),runData.moveList);
             runData.parsingMoveList=FALSE;
             runData.waitingForMoveList=FALSE;
+	    runData.garbage=TRUE;
             return TRUE;
         }
     }
@@ -1494,6 +1499,7 @@ Bool ProcessGameEnd(char *line){
   if(sscanf(line,"{Game %*d %*s vs. %*s%*[ ]%100[^}]} %30s",
 	    resultString,
 	    result)==2){
+    runData.garbage=TRUE;
     resultString[sizeof(resultString)-1]='\0';
     logme(LOG_DEBUG, "[resultString=%s] [result=%s]",resultString,result);
     logme(LOG_INFO, "Detected end of game: %s", line);
@@ -1684,9 +1690,10 @@ Bool ProcessCreatePGN(char *line){
   }  
   memset(result,0,30+1);
   memset(resultString,0,60+1);
-  if(state==2 && sscanf(line,"%*[ ]{%60[^}]}%*[ ]%30[^ \r\n]",resultString,result)){
+  if(state==2 && sscanf(line,"%*[ ]{%60[^}]}%*[ ]%30[^ \r\n]",resultString,result) ==2){
     state=0;
     logme(LOG_DEBUG,"[ResultString=%s] [Result=%s]",resultString,result);
+    runData.garbage=TRUE;
     runData.processingLastMoves=FALSE;
     if (appData.pgnFile[0] == '|') {
       pgnFile=popen(appData.pgnFile+1,"w");
@@ -1792,7 +1799,11 @@ Bool ProcessCleanUps(char *line){
 
 
 void ProcessIcsLine(char *line){
+  char *old_line;
+  old_line=strdup(line);
+  runData.garbage=FALSE;
   line=KillPrompts(line);
+  
   if(ProcessForwardingMarkers(line))goto finish;
   if(ProcessPings(line))goto finish;
   if(ProcessLogin(line))goto finish;
@@ -1818,20 +1829,18 @@ void ProcessIcsLine(char *line){
   ProcessFeedback(line);
 
 finish:
-
+  
   if(IsMarker(PROXYPROMPT,line)){
-      SendToProxy("%s", "icsdroneng% ");
-  }else if(!strncmp(line,"<12> ",5)){
-      // Very weird. A board seems to need extra padding or xboard
-      // get's confused.
-      SendToProxy("\r\n%s\r\n",line);
-  }else if(!runData.forwarding && 
-     !IsAMarker(line) && 
-     !runData.parsingMoveList &&
-     !runData.processingLastMoves &&
-     !IsWhiteSpace(line)){
-      SendToProxy("%s\r\n",line);
+      SendToProxy("%s", runData.lastIcsPrompt);
+  }else  if(!runData.forwarding && 
+	    !IsAMarker(line) && 
+	    !runData.parsingMoveList &&
+	    !runData.processingLastMoves &&
+	    !runData.garbage){
+      SendToProxy("%s",old_line);
   }
+
+  free(old_line);
 }
 
 

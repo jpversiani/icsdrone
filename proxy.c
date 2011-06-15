@@ -89,7 +89,7 @@ void ProcessProxyLine(char * line){
   if(line[0]=='$'){
       line++;
   }
-  SendToIcs("%s\n",line);			
+  SendToIcs("%s",line);			
   SendMarker(PROXYPROMPT);
   return;
 }
