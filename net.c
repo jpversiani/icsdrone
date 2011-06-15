@@ -158,7 +158,7 @@ int ProcessRawInput(int fd, char *buf, int sizeofbuf, void (*LineFunc)(char *lin
 		    u=i; // strlen[tmp]
 		    /*stringcat(tmp, NEWLINE, strlen(NEWLINE));*/
                     //strcat(tmp,NETNEWLINE);
-		    while (buf[i] == '\n' || buf[i] == '\r') {
+		    while ((buf[i] == '\n' || buf[i] == '\r') && buf[i]!=c) {
 			if(u<sizeof(tmp)){
 			    tmp[u]=buf[i];
 			    tmp[u+1]='\0';
