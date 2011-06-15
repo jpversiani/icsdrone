@@ -428,7 +428,8 @@ extern void my_sleep P((int msec));
  */
 
 typedef enum { LOG_ERROR = 1, LOG_WARNING, LOG_INFO, LOG_CHAT, LOG_DEBUG } LogType;
-extern void logme P((LogType type, const char* format, ...));
+extern void logme   P((LogType type, const char* format, ...));
+extern void logcomm P((char * source, char * dest, char * line));
 
 extern void StartLogging P(());
 extern void StopLogging P(());

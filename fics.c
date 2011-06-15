@@ -627,9 +627,9 @@ void SetupEngineOptions(IcsBoard *icsBoard){
 char * KillPrompts(char *line){
   /*  Get rid of those damn prompts  -- might be more on the same line even */
   /*  Eat both "fics%" and "aics%". */
+    logcomm("ics","icsdrone",line);
   while (isalpha(line[0])&&!strncmp(line+1, "ics% ", 5))
     line += 6;
-  logme(LOG_DEBUG, "ics->icsdrone: %s", line);
   return line;
 }
 

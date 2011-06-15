@@ -354,7 +354,7 @@ void ProcessComputerLine(char *line)
 {
   move_t move;
   char *tmp;
-  logme(LOG_DEBUG, "engine->icdrone: %s", line);
+  logcomm("engine","icsdrone", line);
   
   if (sscanf(line, "%*s ... %15s", move) == 1 ||
       sscanf(line, "move %15s", move) == 1) {
