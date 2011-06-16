@@ -149,7 +149,7 @@ AppData appData = {
     NULL,            /* icsHost */
     23,              /* icsPort */
     5000,            /* proxyPort */
-    1,               /* proxy */
+    0,               /* proxy */
     0,               /* searchDepth */
     0,               /* secPerMove */
     255,             /* logLevel */
