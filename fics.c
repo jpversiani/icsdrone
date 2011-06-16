@@ -420,7 +420,7 @@ void ExecCommand(char * command, int mask){
       runData.exitValue=EXIT_RESTART;
     } else {
       runData.prompt[0]='\0';
-      Feedback(CONSOLE|OWNER|SHORTLOG,"%s logged out.",runData.handle);
+      Feedback(CONSOLE|OWNER|SHORTLOG|PROXY,"%s logged out.",runData.handle);
       ExitOn(EXIT_RESTART,"Restart command executed.");
     }
   } else if (!strcmp(command, "softquit")) {
@@ -429,12 +429,12 @@ void ExecCommand(char * command, int mask){
       runData.quitPending = TRUE;
     } else {
       runData.prompt[0]='\0';
-      Feedback(CONSOLE|OWNER|SHORTLOG,"%s logged out.",runData.handle);
+      Feedback(CONSOLE|OWNER|SHORTLOG|PROXY,"%s logged out.",runData.handle);
       ExitOn(EXIT_HARDQUIT,"SoftQuit command executed.");
     }
   } else if (!strcmp(command, "hardquit")||!strcmp(command, "quit") ) {
       runData.prompt[0]='\0';
-    Feedback(CONSOLE|OWNER|SHORTLOG,"%s logged out.",runData.handle);
+    Feedback(CONSOLE|OWNER|SHORTLOG|PROXY,"%s logged out.",runData.handle);
     ExitOn(EXIT_HARDQUIT,"HardQuit command executed.");
   } else if(!strcmp(command,"options")){
     SendOptions(0,mask);
@@ -780,7 +780,7 @@ Bool ProcessLogin(char *line){
     if(appData.shortLogging){
       printf("Short logging to \"%s\".\n",appData.shortLogFile);    
     }
-    Feedback(CONSOLE|OWNER|SHORTLOG,"%s logged in.",runData.handle);
+    Feedback(CONSOLE|OWNER|SHORTLOG|PROXY,"%s logged in.",runData.handle);
     CancelTimers();
     if (appData.sendTimeout) {
       create_timer(&(runData.idleTimeoutTimer),
@@ -828,7 +828,7 @@ Bool ProcessOwnerNotify(char *line){
     if(!appData.owner) return FALSE;
     if(sscanf(line,"Notification: %s has arrived%c",name,&dummy)==2 &&
        !strcasecmp(name,appData.owner)){
-      Feedback(OWNER|CONSOLE,"%s welcomes his owner %s!",runData.handle,appData.owner);
+      Feedback(OWNER|CONSOLE|PROXY,"%s welcomes his owner %s!",runData.handle,appData.owner);
         return TRUE;
     }
     return FALSE;
@@ -1014,7 +1014,7 @@ Bool ProcessTells(char *line){
 #endif
       }
       SetFeedbackColor(appData.colorTell);
-      Feedback(CONSOLE|OWNER|SHORTLOG,"%s: %s",name,tmp);
+      Feedback(CONSOLE|OWNER|SHORTLOG|PROXY,"%s: %s",name,tmp);
       UnsetFeedbackColor();
       if (strcmp(runData.last_talked_to, name)) {
 	/*  SendToIcs("tell %s (auto-response) Hi, I'm an automated computer.  I forwarded your comment to my owner.\n", name); */
@@ -1133,9 +1133,9 @@ Bool ProcessStandings(char *line){
     if(processEndOfTourney &&
        sscanf(line,":Tourney #%d's standings%1[:]",&tournamentId,c)==2){
         parsingStandings=TRUE;
-        StartMultiFeedback(CONSOLE|OWNER|SHORTLOG);
+        StartMultiFeedback(CONSOLE|OWNER|SHORTLOG|PROXY);
         logme(LOG_DEBUG,"Detected start of standings of #%d",tournamentId);
-        Feedback(CONSOLE|SHORTLOG,"Tourney #%d standings:",tournamentId);
+        Feedback(CONSOLE|SHORTLOG|PROXY,"Tourney #%d standings:",tournamentId);
         return TRUE;
     }
     if(parsingStandings && (
@@ -1146,7 +1146,7 @@ Bool ProcessStandings(char *line){
         logme(LOG_DEBUG,"Detected end of standings");
         parsingStandings=FALSE;
         processEndOfTourney=FALSE;
-        StopMultiFeedback(CONSOLE|OWNER|SHORTLOG);
+        StopMultiFeedback(CONSOLE|OWNER|SHORTLOG|PROXY);
         return TRUE;
     }
     if(parsingStandings &&
@@ -1161,7 +1161,7 @@ Bool ProcessStandings(char *line){
 	 *  due to the limited possibilities of tells.
 	 *  Later we will make the standings more compact.
 	 */
-        Feedback(CONSOLE|SHORTLOG,line);
+        Feedback(CONSOLE|SHORTLOG|PROXY,line);
         return TRUE;
     }
     return FALSE;
@@ -1196,7 +1196,7 @@ Bool ProcessTourneyNotifications(char *line){
       SendToIcs("td WithdrawFromTourney %d\n",tournamentId);
     }else{
       logme(LOG_DEBUG,"Yippee! We have joined tourney #%d",tournamentId);
-      Feedback(OWNER|CONSOLE|SHORTLOG,"%s has joined tourney #%d.",
+      Feedback(OWNER|CONSOLE|SHORTLOG|PROXY,"%s has joined tourney #%d.",
 	runData.handle,tournamentId);
       runData.currentTourney=tournamentId;
       strcpy(runData.tournamentOppName,"");
@@ -1210,7 +1210,7 @@ Bool ProcessTourneyNotifications(char *line){
 	    &tournamentId,c)==2 &&
      tournamentId==runData.currentTourney){
     logme(LOG_DEBUG,"Tourney #%d has been aborted.",tournamentId);
-    Feedback(OWNER|CONSOLE|SHORTLOG,
+    Feedback(OWNER|CONSOLE|SHORTLOG|PROXY,
 	     "Tourney #%d has been aborted.",
 	     tournamentId);
     endOfTournament=TRUE;
@@ -1221,7 +1221,7 @@ Bool ProcessTourneyNotifications(char *line){
     logme(LOG_DEBUG,"%s has been forfeited from tourney #%d.",
 	  runData.handle,
 	  tournamentId);
-    Feedback(OWNER|CONSOLE|SHORTLOG,"%s has been forfeited from tourney #%d.",
+    Feedback(OWNER|CONSOLE|SHORTLOG|PROXY,"%s has been forfeited from tourney #%d.",
 	  runData.handle,
 	  tournamentId);
     endOfTournament=TRUE;
@@ -1230,7 +1230,7 @@ Bool ProcessTourneyNotifications(char *line){
     logme(LOG_DEBUG,
 	  "%s has played its last game in tourney #%d.",
 	  runData.handle, runData.currentTourney);
-    Feedback(OWNER|CONSOLE|SHORTLOG,
+    Feedback(OWNER|CONSOLE|SHORTLOG|PROXY,
 	     "%s has played its last game in tourney #%d.",
 	     runData.handle,runData.currentTourney);
     endOfTournament=TRUE;
@@ -1366,7 +1366,7 @@ Bool ProcessStartOfGame(char *line){
         ExecCommandList(appData.sendGameStart,0);
     }
     {
-        int mask=CONSOLE|SHORTLOG;
+        int mask=CONSOLE|SHORTLOG|PROXY;
         if(!appData.ownerQuiet){
             mask|=OWNER;
         }
@@ -1535,7 +1535,7 @@ Bool ProcessGameEnd(char *line){
     logme(LOG_DEBUG, "[resultString=%s] [result=%s]",resultString,result);
     logme(LOG_INFO, "Detected end of game: %s", line);
     {
-        int mask=CONSOLE|SHORTLOG;
+        int mask=CONSOLE|SHORTLOG|PROXY;
         if(!appData.ownerQuiet){
             mask|=OWNER;
         }
@@ -1783,7 +1783,7 @@ Bool ProcessCleanUps(char *line){
   if(IsMarker(DOCLEANUPS,line)){
     logme(LOG_DEBUG,"Start of extra cleanups at end of game.");
     if (runData.quitPending) {
-      Feedback(CONSOLE|OWNER|SHORTLOG,"%s logged out.",runData.handle);
+      Feedback(CONSOLE|OWNER|SHORTLOG|PROXY,"%s logged out.",runData.handle);
       if (runData.exitValue == EXIT_RESTART)
 	ExitOn(EXIT_RESTART,"Restart command executed (part of cleanups).");
       else		
