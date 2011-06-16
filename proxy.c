@@ -69,14 +69,7 @@ void SendToProxy(char *format, ... )
 }
 
 void ProcessProxyLine(char * line){
-    logcomm("proxy","icsdrone", line);
-  // Make sure "quit" does not kill icsdrone.
-  if(!strncmp("quit",line,4)){
-      SendToProxy("Bye!\r\n");
-      close(runData.proxyFd);
-      runData.proxyFd=-1;
-      return;
-  }
+  logcomm("proxy","icsdrone", line);
   // Do not allow xboard to set things.
   if(!strncmp("$set",line,4) || !strncmp("$iset",line,5)){
       return;
@@ -89,7 +82,7 @@ void ProcessProxyLine(char * line){
   if(line[0]=='$'){
       line++;
   }
-  SendToIcs("%s",line);			
+  ExecCommand(line,PROXY);
   SendMarker(PROXYPROMPT);
   return;
 }

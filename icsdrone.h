@@ -460,11 +460,12 @@ extern void StopLogging P(());
 
 #define OWNER 0x1
 #define CONSOLE 0x2
+#define PROXY 0x4
 /* 
  *  The shortlog is a compact log of things you might be interested in later.
  *  It is not meant as a debug log. Use the standard logfile for that. 
  */
-#define SHORTLOG 0x4
+#define SHORTLOG 0x8
 
 /*
  * Board

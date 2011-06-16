@@ -216,6 +216,15 @@ void Feedback(int mask,char *format,...){
     }
     va_end(ap);
   }
+  if((mask & PROXY)){
+       va_start(ap,format); 
+       if(vsnprintf(buf,BUF_SIZE,format,ap)<BUF_SIZE){
+	   SendToProxy("%s\n",buf);
+       } else {
+	   logme(LOG_WARNING,"Feedback: feedback buffer too small");
+       }
+       va_end(ap);
+  }
   if((mask & SHORTLOG) && appData.shortLogging){
     if((preamble=snprintf(buf,BUF_SIZE,"%s: ",runData.timestring))>=BUF_SIZE){
       logme(LOG_WARNING,"Feedback: feedback buffer too small");
@@ -396,6 +405,7 @@ void ExecCommand(char * command, int mask){
   while(*command==' '){
       command++;
   }
+  command=strtok(command,"\r\n");
   if (!strcmp(command, "restart")) {
     if (runData.gameID != -1) {
       Feedback(mask,"Ok, I will restart as soon as this game is over.");
