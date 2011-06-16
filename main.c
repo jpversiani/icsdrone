@@ -40,6 +40,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "icsdrone.h"
 
+char *welcome=
+"   _              _                                  \n"
+"  (_)            | |                                 \n"
+"   _  ___ ___  __| |_ __ ___  _ __   ___ _ __   __ _ \n"
+"  | |/ __/ __|/ _` | '__/ _ \\| '_ \\ / _ \\ '_ \\ / _` |\n"
+"  | | (__\\__ \\ (_| | | | (_) | | | |  __/ | | | (_| |\n"
+"  |_|\\___|___/\\__,_|_|  \\___/|_| |_|\\___|_| |_|\\__, |\n"
+"                                               |___/ \n"
+;
+
 extern int h_errno;
 
 jmp_buf stackPointer;
@@ -434,7 +444,7 @@ void MainLoop()
 				   &sin_size))==-1){
 	    logme(LOG_ERROR,"Unable to accept proxy connection.");
 	}else{
-	    SendToProxy("%s\r\n","Welcome to the icsdroneng proxy.");
+	    SendToProxy("%s",welcome);
 	    if(runData.inGame){
 		SendToProxy("%s\r\n",runData.lineBoard);
 	    }
