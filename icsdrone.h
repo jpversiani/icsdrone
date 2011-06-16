@@ -242,6 +242,7 @@ typedef struct {
     char* icsHost;
     int   icsPort;
     int   proxyPort;
+    char* proxyHost;
     Bool  proxy;
     int   searchDepth;
     int   secPerMove;

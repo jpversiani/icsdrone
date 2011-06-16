@@ -2,6 +2,7 @@
 
 int StartProxy(){
     struct sockaddr_in server_addr;
+    struct hostent *hp;
     int optval;
     logme(LOG_DEBUG,"Starting proxy");
     if((runData.proxyListenFd=socket(AF_INET,SOCK_STREAM,0))==-1){
@@ -18,7 +19,11 @@ int StartProxy(){
     server_addr.sin_family = AF_INET;         
     server_addr.sin_port = htons(appData.proxyPort);     
     //     server_addr.sin_addr.s_addr = INADDR_ANY
-    server_addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK); 
+    if(appData.proxyHost){
+	server_addr.sin_addr.s_addr = inet_addr(appData.proxyHost); 
+    }else{
+	server_addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK); 
+    }
     memset(&server_addr.sin_zero,0,sizeof(server_addr.sin_zero));
     if (bind(runData.proxyListenFd, 
 	     (struct sockaddr *)&server_addr, 
