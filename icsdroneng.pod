@@ -249,10 +249,10 @@ The port to listen on.
 
 The interface to listen on. This must be the numeric ip
 address of the interface. The default insures
-that only connections form localhost are possible. 
+that only connections from localhost are possible. 
 To allow connections from anywhere use "0.0.0.0".
 This is only recommended if you are behind a firewall
-as icsdrone is not designed for security. 
+as icsdroneng is not designed for security. 
 
 =item B<-colorTell>
 
@@ -334,7 +334,7 @@ against this but this will only work if you issue manual seeks.
 
 An example command line 
 
-    icsdrone -owner RoboOwner -program "polyglot engine.ini"  -loginScript engine.script -timeseal ./timeseal.Linux -book performance.bin -daemonize on
+    icsdrone -owner RoboOwner -program "polyglot engine.ini"  -loginScript engine.script -timeseal ./timeseal.Linux -book performance.bin -daemonize on -proxy on
 
 Here is an example login script
 
@@ -345,11 +345,11 @@ Here is an example login script
 
 A command line to make crafty play blitz without further intervention
 
-   icsdrone -handle RoboUser -password xxx -program crafty -sendLogin "seek 2 12 m" -sendGameEnd "seek 2 12 m"
+   icsdrone -handle RoboUser -password xxx -program crafty -sendLogin "seek 2 12 m" -sendGameEnd "seek 2 12 m" -proxy on
 
 an equivalent version
 
-   icsdrone -handle RoboUser -password xxx -program crafty -sendLogin "seek 2 12 m\n set sendgameend seek 2 12 m"
+   icsdrone -handle RoboUser -password xxx -program crafty -sendLogin "seek 2 12 m\n set sendgameend seek 2 12 m" -proxy on
 
 =head1 EXIT STATUS
 
