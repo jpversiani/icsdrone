@@ -254,6 +254,12 @@ To allow connections from anywhere use "0.0.0.0".
 This is only recommended if you are behind a firewall
 as icsdroneng is not designed for security. 
 
+=item B <-proxyLogin> (default "on")
+
+If this is true, icsdroneng will display a login prompt
+on the proxy. User/password are derived from
+the -handle and -password arguments.
+
 =item B<-colorTell>
 
 =item B<-colorAlert>
