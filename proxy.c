@@ -2,7 +2,6 @@
 
 int StartProxy(){
     struct sockaddr_in server_addr;
-    struct hostent *hp;
     int optval;
     logme(LOG_DEBUG,"Starting proxy");
     if((runData.proxyListenFd=socket(AF_INET,SOCK_STREAM,0))==-1){
