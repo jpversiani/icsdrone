@@ -1,3 +1,9 @@
+icsdroneng (0.24) unstable; urgency=low
+
+  * Act as a proxy for the remote ICS.
+	
+ -- Michel Van den Bergh <michel.vandenbergh@uhasselt.be>  Thu, 16 Jun 2011 19:00:00 +0200
+	
 icsdroneng (0.23) unstable; urgency=low
 
   * Do not give feedback on bookmoves if feedback option is not set.
