@@ -33,6 +33,20 @@ icsdroneng has the following new features.
     - Builtin support for using timeseal.
     - Optional "shortlog". E.g. for consulting via a webbrowser.
     - Interactive console with readline support and colors.
+    - An ICS proxy.
+
+When instructed to do so, icsdroneng will serve as a proxy for the ICS
+it is connected to. This proxy works fairly well with xboard. 
+
+In this case the setup is
+
+     xboard--->icsdroneng--->ics
+
+This is very similar to xboard with zippy except that now the engine remains
+connected to the ICS even when xboard is disconnected. Furthermore
+connecting xboard to icsdroneng is much faster than connecting it
+directly to the ics as the login procedure is no longer necessary.
+
 
 =head1 OPTIONS
 
@@ -222,6 +236,23 @@ sensitive). Note this is not the same as the ICS "noplay" list.
 =item B<-autoJoin> (default: "on")
 
 Autojoin tourneys. Currently this does not work on ICC.
+
+=item B<-proxy> (default: "off")
+
+Proxy the ICS.
+
+=item B<-proxyPort> (default: 5000)
+
+The port to listen on.
+
+=item B<-proxyHost> (default: "127.0.0.1")
+
+The interface to listen on. This must be the numeric ip
+address of the interface. The default insures
+that only connections form localhost are possible. 
+To allow connections from anywhere use "0.0.0.0".
+This is only recommended if you are behind a firewall
+as icsdrone is not designed for security. 
 
 =item B<-colorTell>
 
