@@ -47,6 +47,7 @@ ArgList argList = {
     {"-proxyPort",            ArgInt,    &appData.proxyPort         , 0 },
     {"-proxyHost",            ArgString, &appData.proxyHost         , 0 },
     {"-proxy",                ArgBool,   &appData.proxy             , 0 },
+    {"-proxyLogin",           ArgBool,   &appData.proxyLogin        , 0 },
     {"-searchDepth",          ArgInt,    &appData.searchDepth       , 1 },
     {"-secPerMove",           ArgInt,    &appData.secPerMove        , 1 }, 
     {"-logLevel",             ArgInt,    &appData.logLevel          , 0 },

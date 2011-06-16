@@ -40,6 +40,7 @@ int StartProxy(){
 
 void CloseProxy(){
     logme(LOG_DEBUG,"Closing proxy.");
+    runData.proxyLoginState=PROXY_LOGIN_INIT;
     if(runData.proxyListenFd!=-1){
 	close(runData.proxyListenFd);
     }
@@ -73,11 +74,53 @@ void SendToProxy(char *format, ... )
 }
 
 void ProcessProxyLine(char * line){
+  char* strip_line;
+  static char saved_handle[20];
+  static char saved_password[20];
   logcomm("proxy","icsdrone", line);
- // Make sure "quit" does not kill icsdrone.
+  
+  // login handling
+  if(runData.proxyLoginState!=PROXY_LOGGED_IN){
+      strip_line=strtok(line,"\r\n");
+      if(strip_line){
+	  line=strip_line;
+      }
+      switch(runData.proxyLoginState){
+      case PROXY_LOGIN_PROMPT:
+	  strncpy(saved_handle,line,18);
+	  runData.proxyLoginState=PROXY_PASSWORD_PROMPT;
+	  SendToProxy("password: ");
+	  return;
+      case PROXY_PASSWORD_PROMPT:
+	  strncpy(saved_password,line,18);
+	  logme(LOG_DEBUG,"Comparing (%s,%s) to (%s,%s)",
+		saved_handle,
+		saved_password,
+		appData.handle,
+		appData.passwd);
+	  if(!strcmp(saved_handle,appData.handle) && 
+	     !strcmp(saved_password,appData.passwd)){
+	      runData.proxyLoginState=PROXY_LOGGED_IN;
+	      if(runData.inGame){
+		  SendToProxy("%s\r\n",runData.lineBoard);
+	      }
+	      SendMarker(PROXYPROMPT);
+	      logme(LOG_INFO,"Proxy login succeeded.");
+	  }else{
+	      SendToProxy("**** Login incorrect! ****\n");
+	      SendToProxy("login: ");
+	      runData.proxyLoginState=PROXY_LOGIN_PROMPT;
+	  }
+	  return;
+	  
+      }
+  }
+  
+  // Make sure "quit" does not kill icsdrone.
   if(!strncmp("quit",line,4)){
      SendToProxy("Bye!\r\n");
      close(runData.proxyFd);
+     runData.proxyLoginState=PROXY_LOGIN_INIT;
      runData.proxyFd=-1;
      return;
   }  

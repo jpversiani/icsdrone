@@ -241,6 +241,7 @@ typedef struct {
   Bool processingLastMoves;
   int internalIcsCommand;
   char lastIcsPrompt[10];
+  int proxyLoginState;
 } RunData;
 
 /* AppData */
@@ -251,6 +252,7 @@ typedef struct {
     int   proxyPort;
     char* proxyHost;
     Bool  proxy;
+    Bool  proxyLogin;
     int   searchDepth;
     int   secPerMove;
     int   logLevel;
@@ -413,6 +415,11 @@ extern void ProcessProxyLine P((char *));
 extern int StartProxy P((void));
 extern void CloseProxy P((void));
 extern void SendToProxy P((char *format, ... ));
+
+#define PROXY_LOGIN_INIT 0
+#define PROXY_LOGIN_PROMPT 1
+#define PROXY_PASSWORD_PROMPT 2
+#define PROXY_LOGGED_IN 3
 
 /*
  * Error handling

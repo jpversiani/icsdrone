@@ -303,7 +303,7 @@ int SetOption(char* name, int flags, int mask, char* format, ...){
   vsnprintf(value, sizeof(value), format, ap);
   value[sizeof(value)-1]='\0';
   va_end(ap);
-  /*printf("Calling SetOption with name=%s format=%s value=%s flags=%x mask=%s\n", name, format, value,flags);*/ 
+  //  logme(LOG_DEBUG,"SetOption with name=\"%s\" format=\"%s\" value=\"%\"s flags=\"%x\" mask=\"%x\"", name, format, value,flags,mask);
   if(!(flags & CLEAR)){
     Feedback(mask,"Setting option %s to %s.",name,value);
   }else if (flags & CLEAR){

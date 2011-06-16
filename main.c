@@ -133,6 +133,7 @@ void InitRunData(){
   runData.processingLastMoves=FALSE;
   runData.internalIcsCommand=0;
   runData.lastIcsPrompt[0]='\0';
+  runData.proxyLoginState=PROXY_LOGIN_INIT;
 }
 
 PersistentData persistentData;
@@ -151,6 +152,7 @@ AppData appData = {
     5000,            /* proxyPort */
     NULL,            /* proxyHost */
     0,               /* proxy */
+    TRUE,            /* proxyLogin */ 
     0,               /* searchDepth */
     0,               /* secPerMove */
     255,             /* logLevel */
@@ -425,6 +427,7 @@ void MainLoop()
 			  ProcessProxyLine) == ERROR){
 	  logme(LOG_DEBUG,"EOF on proxy.");
 	  close(runData.proxyFd);
+	  runData.proxyLoginState=PROXY_LOGIN_INIT;
 	  runData.proxyFd=-1;
       }
     }
@@ -439,6 +442,7 @@ void MainLoop()
 	if(runData.proxyFd!=-1){
 	    logme(LOG_WARNING,"New proxy connection. Closing prior one.\n");
 	    close(runData.proxyFd);
+	    runData.proxyLoginState=PROXY_LOGIN_INIT;
 	    runData.proxyFd=-1;
 	}
 	if((runData.proxyFd=accept(runData.proxyListenFd, 
@@ -447,11 +451,13 @@ void MainLoop()
 	    logme(LOG_ERROR,"Unable to accept proxy connection.");
 	}else{
 	    SendToProxy("%s",welcome);
-	    if(runData.inGame){
-		SendToProxy("%s\r\n",runData.lineBoard);
+	    if(appData.proxyLogin){
+		SendToProxy("%s","login: ");
+		runData.proxyLoginState=PROXY_LOGIN_PROMPT;
+		logme(LOG_INFO,"Proxy connected.");
+	    }else{
+		SendMarker(PROXYPROMPT);
 	    }
-	    SendMarker(PROXYPROMPT);
-	    logme(LOG_INFO,"Proxy connected.");
 	}
 
     }
@@ -670,7 +676,12 @@ int main(int argc, char *argv[])
                 }
                 strncpy(runData.handle,buf,sizeof(runData.handle));
                 runData.handle[sizeof(runData.handle)-1]='\0';
-                SetOption("handle",LOGIN,0,"%s",runData.handle);
+		if(runData.handle[0]!='\0'){
+		    SetOption("handle",LOGIN,0,"%s",runData.handle);
+		}else{
+		    SetOption("handle",LOGIN,0,"%s","guest");
+
+		}
                 if(appData.passwd){
                     strncpy(buf,appData.passwd,sizeof(buf));
                 }else if(getenv("FICSPASSWD")){
@@ -690,7 +701,11 @@ int main(int argc, char *argv[])
                 }
                 strncpy(runData.passwd,buf,sizeof(runData.passwd));
                 runData.passwd[sizeof(runData.passwd)-1]='\0';
-                SetOption("password",LOGIN,0,"%s",runData.passwd);
+		if(runData.passwd[0]!='\0'){
+		    SetOption("password",LOGIN,0,"%s",runData.passwd);
+		}else{
+		    SetOption("password",LOGIN,0,"%s","xxx");
+		}
                 if(runData.handle[0]=='\0'){
                     strcpy(runData.handle,"guest");
                 }
