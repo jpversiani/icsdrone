@@ -120,7 +120,7 @@ void InitRunData(){
   runData.onFICS=FALSE;
   runData.parsingMoveList=FALSE;
   runData.processingLastMoves=FALSE;
-  runData.garbage=FALSE;
+  runData.internalIcsCommand=0;
   runData.lastIcsPrompt[0]='\0';
 }
 

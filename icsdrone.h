@@ -232,7 +232,7 @@ typedef struct {
   Bool onFICS;
   Bool parsingMoveList;
   Bool processingLastMoves;
-  Bool garbage;
+  int internalIcsCommand;
   char lastIcsPrompt[10];
 } RunData;
 
@@ -526,6 +526,8 @@ extern Bool IsAMarker P((char *));
 #define PING "ping"
 #define ENDLOGIN "endlogin"
 #define PROXYPROMPT "prompt"
+#define STARTINTERNAL "startinternal"
+#define STOPINTERNAL "stopinternal"
 
 /*
  * Miscellaneous definitions

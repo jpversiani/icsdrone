@@ -45,6 +45,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define MAX_FORWARDING 200
 
+void InternalIcsCommand(char *command){
+    SendMarker(STARTINTERNAL);
+    SendToIcs("\n%s\n",command);
+    SendMarker(STOPINTERNAL);
+}
+
 void CancelTimers(){
   delete_timer(&runData.idleTimeoutTimer);
   delete_timer(&runData.findChallengeTimer);
@@ -89,7 +95,7 @@ void IdleTimeout(void *data)
 void FindChallenge(void *data){
     
     /* Get a list of pending challenges; much better than maintaining it ourselves */
-    SendToIcs("\npending\n");
+    InternalIcsCommand("\npending\n");
 
     /* In case there are no pendings left, we'll want to have the timeout handler setup */
     if(!runData.inGame && !runData.inTourney){ /* for safety */
@@ -642,6 +648,17 @@ char * KillPrompts(char *line){
   //    *eol='\0';
   //}
   return line;
+}
+
+Bool ProcessInternalMarkers(char *line){
+    if(IsMarker(STARTINTERNAL,line)){
+	runData.internalIcsCommand++;
+	return TRUE;
+    }else if(IsMarker(STOPINTERNAL,line)){
+	runData.internalIcsCommand--;
+	return TRUE;
+    }
+    return FALSE;
 }
 
 Bool ProcessPings(char *line){
@@ -1352,9 +1369,9 @@ Bool ProcessStartOfGame(char *line){
     runData.moveList[0] = '\0';
     SendMarker(ASKSTARTMOVES);
     if (runData.longAlgMoves)
-      SendToIcs("moves l\n");
+      InternalIcsCommand("moves l\n");
     else
-      SendToIcs("moves\n");
+      InternalIcsCommand("moves\n");
     /* send opponent name and ratings to computer */
     if (!strcmp(name, runData.handle)) {
        SendToComputer("name %s\n", name2);
@@ -1375,7 +1392,6 @@ Bool ProcessStartOfGame(char *line){
   if (!strncmp(line, "{Game ", 6) &&
       strstr(line, runData.handle) &&
       (strstr(line, ") Creating ") || strstr(line, ") Continuing "))) {
-    runData.garbage=TRUE;
     sscanf(line, "{Game %d", &runData.gameID);
     logme(LOG_INFO, "Current game has ID: %d", runData.gameID);
     return TRUE;
@@ -1439,7 +1455,6 @@ Bool ProcessMoveList(char *line){
             HandleBoard(&(runData.icsBoard),runData.moveList);
             runData.parsingMoveList=FALSE;
             runData.waitingForMoveList=FALSE;
-	    runData.garbage=TRUE;
             return TRUE;
         }
     }
@@ -1499,7 +1514,6 @@ Bool ProcessGameEnd(char *line){
   if(sscanf(line,"{Game %*d %*s vs. %*s%*[ ]%100[^}]} %30s",
 	    resultString,
 	    result)==2){
-    runData.garbage=TRUE;
     resultString[sizeof(resultString)-1]='\0';
     logme(LOG_DEBUG, "[resultString=%s] [result=%s]",resultString,result);
     logme(LOG_INFO, "Detected end of game: %s", line);
@@ -1521,8 +1535,11 @@ Bool ProcessGameEnd(char *line){
        * than from the last game. Chances of this happening are slim though.
        */
         if(appData.pgnLogging){
+	    char tmp[100];
             SendMarker(ASKLASTMOVES);
-            SendToIcs("smoves %s -1\n",runData.handle);
+	    snprintf(tmp,sizeof(tmp)-1,"smoves %s -1\n",runData.handle);
+	    tmp[sizeof(tmp)-1]='\0';
+            InternalIcsCommand(tmp);
         }
         persistentData.games++;
         SetInterface();
@@ -1693,7 +1710,6 @@ Bool ProcessCreatePGN(char *line){
   if(state==2 && sscanf(line,"%*[ ]{%60[^}]}%*[ ]%30[^ \r\n]",resultString,result) ==2){
     state=0;
     logme(LOG_DEBUG,"[ResultString=%s] [Result=%s]",resultString,result);
-    runData.garbage=TRUE;
     runData.processingLastMoves=FALSE;
     if (appData.pgnFile[0] == '|') {
       pgnFile=popen(appData.pgnFile+1,"w");
@@ -1801,9 +1817,8 @@ Bool ProcessCleanUps(char *line){
 void ProcessIcsLine(char *line){
   char *old_line;
   old_line=strdup(line);
-  runData.garbage=FALSE;
   line=KillPrompts(line);
-  
+  if(ProcessInternalMarkers(line))goto finish;
   if(ProcessForwardingMarkers(line))goto finish;
   if(ProcessPings(line))goto finish;
   if(ProcessLogin(line))goto finish;
@@ -1834,9 +1849,7 @@ finish:
       SendToProxy("%s", runData.lastIcsPrompt);
   }else  if(!runData.forwarding && 
 	    !IsAMarker(line) && 
-	    !runData.parsingMoveList &&
-	    !runData.processingLastMoves &&
-	    !runData.garbage){
+	    !runData.internalIcsCommand){
       SendToProxy("%s",old_line);
   }
 
