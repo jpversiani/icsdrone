@@ -377,35 +377,42 @@ void ExecFile(char * filename, int mask){
 }
 
 void StartForwarding(int mask){
-  if(mask){
+    if(mask){
 #ifdef HAVE_LIBREADLINE
-    int rows,cols;
-    rl_get_screen_size (&rows, &cols);
-    SendToIcs("set width %d\n",cols);
-    SendToIcs("set height %d\n",rows);
+	if(mask & CONSOLE){
+	    int rows,cols;
+	    rl_get_screen_size (&rows, &cols);
+	    SendToIcs("set width %d\n",cols);
+	    SendToIcs("set height %d\n",rows);
+	}
 #endif
-    runData.forwardingMask=mask;
-    SendMarker(STARTFORWARDING);
-  }
+	runData.forwardingMask=mask;
+	SendMarker(STARTFORWARDING);
+    }
 }
 void StopForwarding(int mask){
-  if(mask){
-    SendMarker(STOPFORWARDING);
-    SendToIcs("set width 240\n");
-  }
+    if(mask){
+	SendMarker(STOPFORWARDING);
+	if(mask & CONSOLE){
+	    SendToIcs("set width 240\n");
+	}
+    }
 }
-
 
 
 void ExecCommand(char * command, int mask){
   int i;
   char key[256];
   char value[8192];
+  char *strip_command;
   /* delete white space */
   while(*command==' '){
       command++;
   }
-  command=strtok(command,"\r\n");
+  strip_command=strtok(command,"\r\n");
+  if(strip_command){
+      command=strip_command;
+  }
   if (!strcmp(command, "restart")) {
     if (runData.gameID != -1) {
       Feedback(mask,"Ok, I will restart as soon as this game is over.");
