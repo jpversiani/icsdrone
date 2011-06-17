@@ -14,5 +14,8 @@ Proxy
 =====
 
 -Filter out moves sent by xboard.
--Filter out "quit" on proxy. Currently it kills icsdrone!
+-Turn off echo on proxy password entry.
+-Why are blank lines supressed in Feedback?
+-Only send things to proxy when the proxy login procedure is complete.
+-Only start proxy after ICS login.
 
