@@ -461,6 +461,7 @@ void MainLoop()
 		if(runData.inGame){
 		    SendToProxy("%s\r\n",runData.lineBoard);
 		}
+		runData.proxyLoginState=PROXY_LOGGED_IN;
 		SendMarker(PROXYPROMPT);
 	    }
 	}
