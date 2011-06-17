@@ -219,7 +219,7 @@ void Feedback(int mask,char *format,...){
   if((mask & PROXY)){
        va_start(ap,format); 
        if(vsnprintf(buf,BUF_SIZE,format,ap)<BUF_SIZE){
-	   SendToProxy("%s\n",buf);
+	   SendToProxy("%s\r\n",buf);
        } else {
 	   logme(LOG_WARNING,"Feedback: feedback buffer too small");
        }
@@ -1423,7 +1423,11 @@ void ProcessFeedback(char *line){
   char *p;
   if(!runData.loggedIn) return ;
   /* anything else might be feedback */
-  p = strtok(line,"\r\n");
+  if(IsWhiteSpace(line)){
+      p="";
+  }else{
+      p = strtok(line,"\r\n");
+  }
   if(p && runData.forwarding){
     if(strstr(line,"Your communication has been queued for")) return;
     if(strstr(line,"You have reached the communication")) return;
