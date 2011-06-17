@@ -1866,7 +1866,8 @@ finish:
       SendToProxy("%s", runData.lastIcsPrompt);
   }else if(IsMarker(STOPFORWARDING,line) && (runData.forwardingMask & PROXY)){
       SendToProxy("%s", runData.lastIcsPrompt);
-  }else if(!runData.forwarding && 
+  }else if(runData.proxyLoginState==PROXY_LOGGED_IN &&
+	   !runData.forwarding && 
 	    !IsAMarker(line) && 
 	    !runData.internalIcsCommand){
       SendToProxy("%s",old_line);
