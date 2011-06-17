@@ -771,7 +771,6 @@ int main(int argc, char *argv[])
                           "iset lock 1\n"
                           "td set tourneyinfo on\n"
                           "td set autostart yes\n"
-                          "resume\n"
 			  "finger\n"
 			  );
 		SendMarker(ENDLOGIN);
