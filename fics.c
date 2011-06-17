@@ -131,6 +131,9 @@ void CourtesyAdjourn(void *data)
 }
 
 void Prompt(mask){
+    if((mask & PROXY) && !runData.inhibitPrompt){
+	SendToProxy("%s", runData.lastIcsPrompt);
+    }
 #ifdef HAVE_LIBREADLINE
   if((mask & CONSOLE) && appData.console && !runData.inhibitPrompt){
     if(runData.inReadline){
@@ -157,14 +160,14 @@ void AutoJoin(){
 */
 
 void StartMultiFeedback(mask){
-  if(mask & CONSOLE){
+  if(mask & (CONSOLE|PROXY)){
     
     runData.multiFeedbackDepth++;
   }
 }
 
 void StopMultiFeedback(mask){
-  if(mask & CONSOLE){
+  if(mask & (CONSOLE|PROXY)){
     runData.multiFeedbackDepth--;
     if(runData.multiFeedbackDepth==0){
       Prompt(mask);
@@ -220,6 +223,9 @@ void Feedback(int mask,char *format,...){
        va_start(ap,format); 
        if(vsnprintf(buf,BUF_SIZE,format,ap)<BUF_SIZE){
 	   SendToProxy("%s\r\n",buf);
+	   if(runData.multiFeedbackDepth==0){
+	       Prompt(mask);
+	   }
        } else {
 	   logme(LOG_WARNING,"Feedback: feedback buffer too small");
        }
@@ -447,7 +453,7 @@ void ExecCommand(char * command, int mask){
   } else if(sscanf(command,"load %8191[^\n\r]",value)==1){
     ExecFile(value,mask); 
   } else if(((i=sscanf(command,"set %254[^=\n\r ] %8191[^\n\r]", key,value))==1)  || (i==2)){
-    if(mask & CONSOLE){
+      if(mask & (CONSOLE|PROXY)){
       runData.inhibitPrompt=TRUE;
     }
     if(i==1){
@@ -483,7 +489,7 @@ void ExecCommand(char * command, int mask){
     StopMultiFeedback(mask);
   }else if(!strncmp(command,"help",4)){
     StartForwarding(mask);
-    if(mask & CONSOLE){
+    if(mask & (CONSOLE|PROXY)){
       runData.inhibitPrompt=TRUE;
     }
     Feedback(mask,"===> This is ICS help. Use \"help icsdroneng\" for general icsdroneng help.");
@@ -795,6 +801,7 @@ Bool ProcessLogin(char *line){
     if(appData.sendLogin){
         ExecCommandList(appData.sendLogin,0);
     }
+    SendToIcs("resume\n");
     return TRUE;
   }
   if(!runData.loggedIn && (
@@ -1871,13 +1878,17 @@ finish:
   
   if(IsMarker(PROXYPROMPT,line)){
       SendToProxy("%s", runData.lastIcsPrompt);
-  }else if(IsMarker(STOPFORWARDING,line) && (runData.forwardingMask & PROXY)){
-      SendToProxy("%s", runData.lastIcsPrompt);
-  }else if(runData.proxyLoginState==PROXY_LOGGED_IN &&
+  }//else if(IsMarker(STOPFORWARDING,line) && (runData.forwardingMask & PROXY)){
+   //   SendToProxy("%s", runData.lastIcsPrompt);
+  //}
+else if(runData.proxyLoginState==PROXY_LOGGED_IN &&
 	   !runData.forwarding && 
 	    !IsAMarker(line) && 
 	    !runData.internalIcsCommand){
       SendToProxy("%s",old_line);
+      if(!IsWhiteSpace(line) && strncmp(line,"<12>",4)){
+	  Prompt(PROXY);
+      }
   }
 
   free(old_line);
