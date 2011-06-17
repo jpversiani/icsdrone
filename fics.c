@@ -1843,6 +1843,15 @@ Bool ProcessCleanUps(char *line){
   return FALSE;
 }
 
+Bool ProcessProxyPrompt(char *line){
+    if(IsMarker(PROXYPROMPT,line)){
+	runData.inhibitPrompt=FALSE;
+	Prompt(PROXY);
+	return TRUE;
+    }
+    return FALSE;
+}
+
 
 
 void ProcessIcsLine(char *line){
@@ -1851,6 +1860,7 @@ void ProcessIcsLine(char *line){
   line=KillPrompts(line);
   if(ProcessInternalMarkers(line))goto finish;
   if(ProcessForwardingMarkers(line))goto finish;
+  if(ProcessProxyPrompt(line))goto finish;
   if(ProcessPings(line))goto finish;
   if(ProcessLogin(line))goto finish;
   if(ProcessTells(line))goto finish;
@@ -1876,17 +1886,15 @@ void ProcessIcsLine(char *line){
 
 finish:
   
-  if(IsMarker(PROXYPROMPT,line)){
-      SendToProxy("%s", runData.lastIcsPrompt);
-  }//else if(IsMarker(STOPFORWARDING,line) && (runData.forwardingMask & PROXY)){
-   //   SendToProxy("%s", runData.lastIcsPrompt);
-  //}
-else if(runData.proxyLoginState==PROXY_LOGGED_IN &&
+  if(runData.proxyLoginState==PROXY_LOGGED_IN &&
 	   !runData.forwarding && 
 	    !IsAMarker(line) && 
 	    !runData.internalIcsCommand){
       SendToProxy("%s",old_line);
-      if(!IsWhiteSpace(line) && strncmp(line,"<12>",4)){
+      if(strstr(line,"shouts")){
+	  runData.inhibitPrompt=TRUE;
+	  SendMarker(PROXYPROMPT);
+      }else if(!IsWhiteSpace(line) && strncmp(line,"<12>",4)){
 	  Prompt(PROXY);
       }
   }
