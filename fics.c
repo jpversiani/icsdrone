@@ -1024,7 +1024,7 @@ Bool ProcessTells(char *line){
 #endif
       }
       SetFeedbackColor(appData.colorTell);
-      Feedback(CONSOLE|OWNER|SHORTLOG|PROXY,"%s: %s",name,tmp);
+      Feedback(CONSOLE|OWNER|SHORTLOG,"%s: %s",name,tmp);
       UnsetFeedbackColor();
       if (strcmp(runData.last_talked_to, name)) {
 	/*  SendToIcs("tell %s (auto-response) Hi, I'm an automated computer.  I forwarded your comment to my owner.\n", name); */
