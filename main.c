@@ -357,6 +357,7 @@ void MainLoop()
   struct timeval timeout;
   char cBuf[2*BUF_SIZE], sBuf[2*BUF_SIZE];
   char conBuf[2*BUF_SIZE];
+  char proxyBuf[2*BUF_SIZ];
   int selectVal;
   int events;
   struct sockaddr_in client_addr;  
@@ -366,6 +367,7 @@ void MainLoop()
   sBuf[0] = '\0';
   cBuf[0] = '\0';
   conBuf[0]='\0';
+  proxyBuf[0]='\0';
   while (1) {
     UpdateTimeString();
     maxfd=-1;
@@ -423,7 +425,7 @@ void MainLoop()
       }
     }
     if (runData.proxyFd!=-1 && FD_ISSET(runData.proxyFd, &readfds)){
-      if (ProcessRawInput(runData.proxyFd, cBuf, sizeof(cBuf), 
+      if (ProcessRawInput(runData.proxyFd, proxyBuf, sizeof(proxyBuf), 
 			  ProcessProxyLine) == ERROR){
 	  logme(LOG_DEBUG,"EOF on proxy.");
 	  close(runData.proxyFd);
