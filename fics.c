@@ -377,9 +377,6 @@ void ExecFile(char * filename, int mask){
 }
 
 void StartForwarding(int mask){
-    if(mask==PROXY){
-	return;
-    }
     if(mask){
 #ifdef HAVE_LIBREADLINE
 	if(mask & CONSOLE){
@@ -394,9 +391,6 @@ void StartForwarding(int mask){
     }
 }
 void StopForwarding(int mask){
-    if(mask==PROXY){
-	return;
-    }
     if(mask){
 	SendMarker(STOPFORWARDING);
 	if(mask & CONSOLE){
@@ -1870,7 +1864,9 @@ finish:
   
   if(IsMarker(PROXYPROMPT,line)){
       SendToProxy("%s", runData.lastIcsPrompt);
-  }else  if(!runData.forwarding && 
+  }else if(IsMarker(STOPFORWARDING,line) && (runData.forwardingMask & PROXY)){
+      SendToProxy("%s", runData.lastIcsPrompt);
+  }else if(!runData.forwarding && 
 	    !IsAMarker(line) && 
 	    !runData.internalIcsCommand){
       SendToProxy("%s",old_line);

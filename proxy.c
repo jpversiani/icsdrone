@@ -137,6 +137,6 @@ void ProcessProxyLine(char * line){
       line++;
   }
   ExecCommand(line,PROXY);
-  SendMarker(PROXYPROMPT);
+  //SendMarker(PROXYPROMPT);
   return;
 }
