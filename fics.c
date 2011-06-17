@@ -765,6 +765,9 @@ Bool ProcessLogin(char *line){
   if(!runData.loggedIn && IsMarker(ENDLOGIN,line)){
     logme(LOG_INFO,"It seems we are succesfully logged in!");
     StartComputer();
+    if(appData.proxy && StartProxy()){
+	logme(LOG_INFO,"Proxy started.");
+    }
     runData.loggedIn=1;
     persistentData.wasLoggedIn=TRUE;
 

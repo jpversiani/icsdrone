@@ -727,10 +727,6 @@ int main(int argc, char *argv[])
                     sleep(RECONNECTINTERVAL);
                     BlockSignals();
                 }
-		if(appData.proxy && StartProxy()){
-		    logme(LOG_INFO,"Proxy started.");
-		}
-
                     /* for polyglot board support */
                 if(appData.book){
                     book_open(appData.book);
