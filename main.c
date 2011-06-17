@@ -357,7 +357,7 @@ void MainLoop()
   struct timeval timeout;
   char cBuf[2*BUF_SIZE], sBuf[2*BUF_SIZE];
   char conBuf[2*BUF_SIZE];
-  char proxyBuf[2*BUF_SIZ];
+  char proxyBuf[2*BUF_SIZE];
   int selectVal;
   int events;
   struct sockaddr_in client_addr;  
