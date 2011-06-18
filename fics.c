@@ -224,7 +224,7 @@ void Feedback(int mask,char *format,...){
        if(vsnprintf(buf,BUF_SIZE,format,ap)<BUF_SIZE){
 	   SendToProxy("%s\r\n",buf);
 	   if(runData.multiFeedbackDepth==0){
-	       Prompt(mask);
+	       Prompt(PROXY);
 	   }
        } else {
 	   logme(LOG_WARNING,"Feedback: feedback buffer too small");
@@ -262,7 +262,7 @@ void Feedback(int mask,char *format,...){
     va_end(ap);
     ResetColor();
     if(runData.multiFeedbackDepth==0){
-      Prompt(mask);
+      Prompt(CONSOLE);
     }
   }
 }
@@ -1847,8 +1847,9 @@ Bool ProcessCleanUps(char *line){
 
 void ProcessIcsLine(char *line){
   char *old_line;
-  old_line=strdup(line);
   line=KillPrompts(line);
+  // preserve eol's, they are killed somewhere below. Debug!
+  old_line=strdup(line);
   if(ProcessInternalMarkers(line))goto finish;
   if(ProcessForwardingMarkers(line))goto finish;
   if(ProcessPings(line))goto finish;
@@ -1876,19 +1877,18 @@ void ProcessIcsLine(char *line){
 
 finish:
   
-  if(IsMarker(PROXYPROMPT,line)){
+  if(IsMarker(PROXYPROMPT,old_line)){
       SendToProxy("%s", runData.lastIcsPrompt);
-  }//else if(IsMarker(STOPFORWARDING,line) && (runData.forwardingMask & PROXY)){
+  }//else if(IsMarker(STOPFORWARDING,old_line) && (runData.forwardingMask & PROXY)){
    //   SendToProxy("%s", runData.lastIcsPrompt);
   //}
-else if(runData.proxyLoginState==PROXY_LOGGED_IN &&
+  else if(!strncmp(old_line,"<12>",4)){
+      SendToProxy("%s%s",old_line,runData.lastIcsPrompt);
+  }else if(runData.proxyLoginState==PROXY_LOGGED_IN &&
 	   !runData.forwarding && 
-	    !IsAMarker(line) && 
+	    !IsAMarker(old_line) && 
 	    !runData.internalIcsCommand){
       SendToProxy("%s",old_line);
-      if(!IsWhiteSpace(line) && strncmp(line,"<12>",4)){
-	  Prompt(PROXY);
-      }
   }
 
   free(old_line);
