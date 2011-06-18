@@ -64,6 +64,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sys/wait.h>
 #include <arpa/inet.h>
 #include <setjmp.h>
+#include <netinet/tcp.h>
 #ifdef HAVE_LIBZ
 #include <zlib.h>
 #endif

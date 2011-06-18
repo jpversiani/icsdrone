@@ -13,14 +13,14 @@ int StartProxy(){
 	       SOL_SOCKET, 
 	       SO_REUSEADDR, 
 	       &optval,
-		  sizeof(optval))){
+		  sizeof(optval))==-1){
 	logme(LOG_ERROR,"Could not set socket option REUSEADDR.");
     }
     if(setsockopt(runData.proxyListenFd, 
-	       SOL_SOCKET, 
-	       SO_TCP_NODELAY, 
-	       &optval,
-		  sizeof(optval))){
+		  IPPROTO_TCP,    
+		  TCP_NODELAY,
+		  &optval,
+		  sizeof(optval))==-1){
 	logme(LOG_ERROR,"Could not set socket option TCP_NODELAY.");
     }
     memset(&server_addr,0,sizeof(struct sockaddr_in));
