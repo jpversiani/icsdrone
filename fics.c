@@ -1900,7 +1900,7 @@ finish:
 	   !runData.forwarding && 
 	    !IsAMarker(old_line) && 
 	    !runData.internalIcsCommand &&
-	   !prompt_line){
+	   !IsWhiteSpace(line)){
       SendToProxy("%s",old_line);
       create_timer(&(runData.promptTimer),200,HandlePrompt,NULL);  
   }
