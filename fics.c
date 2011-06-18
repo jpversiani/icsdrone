@@ -1852,7 +1852,13 @@ Bool ProcessCleanUps(char *line){
 
 void ProcessIcsLine(char *line){
   char *old_line;
+  Bool prompt_line;
+  old_line=line;
   line=KillPrompts(line);
+  prompt_line=FALSE;
+  if(line!=old_line && IsWhiteSpace(line)){
+      prompt_line=TRUE;
+  }
   // preserve eol's, they are killed somewhere below. Debug!
   old_line=strdup(line);
   if(ProcessInternalMarkers(line))goto finish;
@@ -1893,7 +1899,8 @@ finish:
   }else if(runData.proxyLoginState==PROXY_LOGGED_IN &&
 	   !runData.forwarding && 
 	    !IsAMarker(old_line) && 
-	    !runData.internalIcsCommand){
+	    !runData.internalIcsCommand &&
+	   !prompt_line){
       SendToProxy("%s",old_line);
       create_timer(&(runData.promptTimer),200,HandlePrompt,NULL);  
   }
