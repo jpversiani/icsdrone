@@ -220,6 +220,7 @@ typedef struct {
   event_t flagTimer;
   event_t courtesyAdjournTimer;
   event_t pingTimer;
+  event_t promptTimer;
   char *timestring;
   Bool inGame;
   Bool inTourney;

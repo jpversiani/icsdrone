@@ -130,9 +130,14 @@ void CourtesyAdjourn(void *data)
     }
 }
 
+void HandlePrompt(void *data){
+    Prompt(PROXY);
+}
+
 void Prompt(mask){
     if((mask & PROXY) && !runData.inhibitPrompt){
 	SendToProxy("%s", runData.lastIcsPrompt);
+	delete_timer(&runData.promptTimer);
     }
 #ifdef HAVE_LIBREADLINE
   if((mask & CONSOLE) && appData.console && !runData.inhibitPrompt){
@@ -1884,11 +1889,13 @@ finish:
   //}
   else if(!strncmp(old_line,"<12>",4)){
       SendToProxy("%s%s",old_line,runData.lastIcsPrompt);
+      delete_timer(&(runData.promptTimer));  
   }else if(runData.proxyLoginState==PROXY_LOGGED_IN &&
 	   !runData.forwarding && 
 	    !IsAMarker(old_line) && 
 	    !runData.internalIcsCommand){
       SendToProxy("%s",old_line);
+      create_timer(&(runData.promptTimer),200,HandlePrompt,NULL);  
   }
 
   free(old_line);
