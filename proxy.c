@@ -9,11 +9,20 @@ int StartProxy(){
 	return FALSE;
     }
     optval=1;
-    setsockopt(runData.proxyListenFd, 
+    if(setsockopt(runData.proxyListenFd, 
 	       SOL_SOCKET, 
 	       SO_REUSEADDR, 
 	       &optval,
-	       sizeof(optval));
+		  sizeof(optval))){
+	logme(LOG_ERROR,"Could not set socket option REUSEADDR.");
+    }
+    if(setsockopt(runData.proxyListenFd, 
+	       SOL_SOCKET, 
+	       SO_TCP_NODELAY, 
+	       &optval,
+		  sizeof(optval))){
+	logme(LOG_ERROR,"Could not set socket option TCP_NODELAY.");
+    }
     memset(&server_addr,0,sizeof(struct sockaddr_in));
     server_addr.sin_family = AF_INET;         
     server_addr.sin_port = htons(appData.proxyPort);     
