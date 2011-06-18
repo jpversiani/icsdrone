@@ -1895,7 +1895,10 @@ finish:
   //}
   else if(!strncmp(old_line,"<12>",4)){
       SendToProxy("%s%s",old_line,runData.lastIcsPrompt);
-      delete_timer(&(runData.promptTimer));  
+      if(runData.promptTimer!=NULL){
+	  create_timer(&(runData.promptTimer),200,HandlePrompt,NULL);  
+      }
+      //      delete_timer(&(runData.promptTimer));  
   }else if(runData.proxyLoginState==PROXY_LOGGED_IN &&
 	   !runData.forwarding && 
 	    !IsAMarker(old_line) && 
