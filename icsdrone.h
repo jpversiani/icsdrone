@@ -416,7 +416,9 @@ void CancelTimers P(());
 extern void ProcessProxyLine P((char *, char *));
 extern int StartProxy P((void));
 extern void CloseProxy P((void));
+extern void DisconnectProxy P((void));
 extern void SendToProxy P((char *format, ... ));
+extern void SendToProxyLogin P((char *format, ... ));
 
 #define PROXY_LOGIN_INIT 0
 #define PROXY_LOGIN_PROMPT 1

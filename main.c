@@ -448,9 +448,9 @@ void MainLoop()
 				   &sin_size))==-1){
 	    logme(LOG_ERROR,"Unable to accept proxy connection.");
 	}else{
-	    SendToProxy("%s",welcome);
+	    SendToProxyLogin("%s",welcome);
 	    if(appData.proxyLogin){
-		SendToProxy("%s","login: ");
+		SendToProxyLogin("%s","login: ");
 		runData.proxyLoginState=PROXY_LOGIN_PROMPT;
 		logme(LOG_INFO,"Proxy connected.");
 	    }else{

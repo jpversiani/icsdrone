@@ -77,6 +77,30 @@ void SendToProxy(char *format, ... )
   va_start(ap, format);
   vsnprintf(buf, sizeof(buf), format, ap);
   buf[sizeof(buf)-1]='\0';
+  if(runData.proxyFd!=-1 && runData.proxyLoginState==PROXY_LOGGED_IN){
+      // HACK
+      void (*sighandler_org)(int);
+      logcomm("icsdrone","proxy", buf);
+      sighandler_org=signal(SIGPIPE,SIG_IGN);
+      // The signal should be delivered right here.
+      UnblockSignals();
+      if(write(runData.proxyFd,buf,strlen(buf))==-1){
+	  logme(LOG_DEBUG,"Unable to write to proxy.");
+      };
+      BlockSignals();
+      signal(SIGPIPE,sighandler_org);
+  }
+  va_end(ap);
+}
+
+void SendToProxyLogin(char *format, ... )
+{
+  char buf[16384] = "";
+  va_list ap;
+  
+  va_start(ap, format);
+  vsnprintf(buf, sizeof(buf), format, ap);
+  buf[sizeof(buf)-1]='\0';
   if(runData.proxyFd!=-1){
       // HACK
       void (*sighandler_org)(int);
@@ -109,7 +133,7 @@ void ProcessProxyLine(char * line, char * queue){
       case PROXY_LOGIN_PROMPT:
 	  strncpy(saved_handle,line,18);
 	  runData.proxyLoginState=PROXY_PASSWORD_PROMPT;
-	  SendToProxy("password: ");
+	  SendToProxyLogin("password: ");
 	  return;
       case PROXY_PASSWORD_PROMPT:
 	  strncpy(saved_password,line,18);
@@ -127,8 +151,8 @@ void ProcessProxyLine(char * line, char * queue){
 	      SendMarker(PROXYPROMPT);
 	      logme(LOG_INFO,"Proxy login succeeded.");
 	  }else{
-	      SendToProxy("**** Login incorrect! ****\n");
-	      SendToProxy("login: ");
+	      SendToProxyLogin("**** Login incorrect! ****\n");
+	      SendToProxyLogin("login: ");
 	      runData.proxyLoginState=PROXY_LOGIN_PROMPT;
 	  }
 	  return;
