@@ -62,11 +62,11 @@ void CloseProxy(){
 
 void DisconnectProxy(){
     logme(LOG_DEBUG,"Disconnecting proxy.");
-    runData.proxyLoginState=PROXY_LOGIN_INIT;
     if(runData.proxyFd!=-1){
 	close(runData.proxyFd);
 	runData.proxyFd=-1;
     }
+    runData.proxyLoginState=PROXY_LOGIN_INIT;
 }
 
 void SendToProxy(char *format, ... )
