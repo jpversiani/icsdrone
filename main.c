@@ -428,9 +428,7 @@ void MainLoop()
       if (ProcessRawInput(runData.proxyFd, proxyBuf, sizeof(proxyBuf), 
 			  ProcessProxyLine) == ERROR){
 	  logme(LOG_DEBUG,"EOF on proxy.");
-	  close(runData.proxyFd);
-	  runData.proxyLoginState=PROXY_LOGIN_INIT;
-	  runData.proxyFd=-1;
+	  DisconnectProxy();
       }
     }
     if (FD_ISSET(runData.icsReadFd, &readfds)) {
@@ -443,9 +441,7 @@ void MainLoop()
 	sin_size=sizeof(struct sockaddr_in);
 	if(runData.proxyFd!=-1){
 	    logme(LOG_WARNING,"New proxy connection. Closing prior one.\n");
-	    close(runData.proxyFd);
-	    runData.proxyLoginState=PROXY_LOGIN_INIT;
-	    runData.proxyFd=-1;
+	    DisconnectProxy();
 	}
 	if((runData.proxyFd=accept(runData.proxyListenFd, 
 			       (struct sockaddr *)&client_addr,

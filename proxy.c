@@ -52,9 +52,20 @@ void CloseProxy(){
     runData.proxyLoginState=PROXY_LOGIN_INIT;
     if(runData.proxyListenFd!=-1){
 	close(runData.proxyListenFd);
+	runData.proxyListenFd=-1;
     }
     if(runData.proxyFd!=-1){
 	close(runData.proxyFd);
+	runData.proxyFd=-1;
+    }
+}
+
+void DisconnectProxy(){
+    logme(LOG_DEBUG,"Disconnecting proxy.");
+    runData.proxyLoginState=PROXY_LOGIN_INIT;
+    if(runData.proxyFd!=-1){
+	close(runData.proxyFd);
+	runData.proxyFd=-1;
     }
 }
 
@@ -128,9 +139,7 @@ void ProcessProxyLine(char * line, char * queue){
   // Make sure "quit" does not kill icsdrone.
   if(!strncmp("quit",line,4)){
      SendToProxy("Bye!\r\n");
-     close(runData.proxyFd);
-     runData.proxyLoginState=PROXY_LOGIN_INIT;
-     runData.proxyFd=-1;
+     DisconnectProxy();
      return;
   }  
   // Do not allow xboard to set things.
