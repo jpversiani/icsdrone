@@ -133,9 +133,10 @@ void ProcessProxyLine(char * line, char * queue){
       case PROXY_LOGIN_PROMPT:
 	  strncpy(saved_handle,line,18);
 	  runData.proxyLoginState=PROXY_PASSWORD_PROMPT;
-	  SendToProxyLogin("password: ");
+	  SendToProxyLogin("%s%c%c%c","\r\npassword: ",IAC,WILL,TELOPT_ECHO);
 	  return;
       case PROXY_PASSWORD_PROMPT:
+	  SendToProxyLogin("%c%c%c",IAC,WONT,TELOPT_ECHO);
 	  strncpy(saved_password,line,18);
 	  logme(LOG_DEBUG,"Comparing (%s,%s) to (%s,%s)",
 		saved_handle,
@@ -145,6 +146,7 @@ void ProcessProxyLine(char * line, char * queue){
 	  if(!strcmp(saved_handle,appData.handle) && 
 	     !strcmp(saved_password,appData.passwd)){
 	      runData.proxyLoginState=PROXY_LOGGED_IN;
+	      SendToProxy("\r\n");
 	      if(runData.inGame){
 		  SendToProxy("%s\r\n",runData.lineBoard);
 	      }
