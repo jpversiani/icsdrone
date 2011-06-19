@@ -350,7 +350,7 @@ void PVFeedback(){
      pv); */
 }
 
-void ProcessComputerLine(char *line) 
+void ProcessComputerLine(char *line, char *queue) 
 {
   move_t move;
   char *tmp;

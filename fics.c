@@ -130,14 +130,13 @@ void CourtesyAdjourn(void *data)
     }
 }
 
-void HandlePrompt(void *data){
-    Prompt(PROXY);
+void ProcessConsoleLineRed(char *line){
+    ProcessConsoleLine(line, NULL);
 }
 
 void Prompt(mask){
     if((mask & PROXY) && !runData.inhibitPrompt){
 	SendToProxy("%s", runData.lastIcsPrompt);
-	delete_timer(&runData.promptTimer);
     }
 #ifdef HAVE_LIBREADLINE
   if((mask & CONSOLE) && appData.console && !runData.inhibitPrompt){
@@ -145,7 +144,7 @@ void Prompt(mask){
       rl_reset_line_state();
       rl_redisplay();
     }else{
-      rl_callback_handler_install(runData.prompt,ProcessConsoleLine);  
+      rl_callback_handler_install(runData.prompt,ProcessConsoleLineRed);  
     }
     runData.promptOnLine=TRUE;
     runData.inReadline=TRUE;
@@ -1850,7 +1849,7 @@ Bool ProcessCleanUps(char *line){
 
 
 
-void ProcessIcsLine(char *line){
+void ProcessIcsLine(char *line, char *queue){
   char *old_line;
   Bool prompt_line;
   old_line=line;
@@ -1890,22 +1889,17 @@ finish:
   
   if(IsMarker(PROXYPROMPT,old_line)){
       SendToProxy("%s", runData.lastIcsPrompt);
-  }//else if(IsMarker(STOPFORWARDING,old_line) && (runData.forwardingMask & PROXY)){
-   //   SendToProxy("%s", runData.lastIcsPrompt);
-  //}
-  else if(!strncmp(old_line,"<12>",4)){
+  }else if(!strncmp(old_line,"<12>",4)){
       SendToProxy("%s%s",old_line,runData.lastIcsPrompt);
-      if(runData.promptTimer!=NULL){
-	  create_timer(&(runData.promptTimer),200,HandlePrompt,NULL);  
-      }
-      //      delete_timer(&(runData.promptTimer));  
   }else if(runData.proxyLoginState==PROXY_LOGGED_IN &&
 	   !runData.forwarding && 
 	    !IsAMarker(old_line) && 
-	    !runData.internalIcsCommand &&
-	   !IsWhiteSpace(line)){
-      SendToProxy("%s",old_line);
-      create_timer(&(runData.promptTimer),200,HandlePrompt,NULL);  
+	   !runData.internalIcsCommand){
+      if(!strncmp(runData.lastIcsPrompt,queue,6)){
+	  SendToProxy("%s%s",old_line,runData.lastIcsPrompt);
+      }else{
+	  SendToProxy("%s",old_line);
+      }
   }
 
   free(old_line);

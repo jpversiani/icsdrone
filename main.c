@@ -113,7 +113,6 @@ void InitRunData(){
   runData.flagTimer=NULL;
   runData.courtesyAdjournTimer=NULL;
   runData.pingTimer=NULL;
-  runData.promptTimer=NULL;
   runData.timestring=NULL;
   runData.inGame=FALSE;
   runData.inTourney=FALSE;
@@ -205,7 +204,7 @@ AppData appData = {
     FALSE,           /* engineQuiet */
 };
 
-int  ProcessRawInput P((int, char *, int, void (*)(char *)));
+int  ProcessRawInput P((int, char *, int, void (*)(char *, char*)));
 
 void MainLoop P(());
 void TerminateProg P((int));
@@ -219,7 +218,7 @@ void BlockConsole(){
 #endif
 }
 
-void ProcessConsoleLine(char *line) 
+void ProcessConsoleLine(char *line, char *queue) 
 {
   logcomm("console","icsdrone",line);
   line=strtok(line,"\r\n");

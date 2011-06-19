@@ -358,7 +358,7 @@ extern void StartComputer P(());
 extern void KillComputer P(());
 extern void InterruptComputer P(());
 extern void EnsureComputerReady P(());
-extern void ProcessComputerLine P((char *line)); 
+extern void ProcessComputerLine P((char *line, char *queue)); 
 extern void Force P(());
 extern void Go P(());
 extern void Level P((int,int));
@@ -389,7 +389,7 @@ extern Bool EvalDraw P((int));
  * Interaction with FICS
  */
 
-extern void ProcessIcsLine P((char *));
+extern void ProcessIcsLine P((char *, char *));
 extern void ExecCommand P((char *, int interactive));
 extern void ExecFile P((char *, int interactive));
 extern void Feedback P((int mask, char *format, ... ));
@@ -413,7 +413,7 @@ void CancelTimers P(());
 /*
  * Proxy
  */
-extern void ProcessProxyLine P((char *));
+extern void ProcessProxyLine P((char *, char *));
 extern int StartProxy P((void));
 extern void CloseProxy P((void));
 extern void SendToProxy P((char *format, ... ));
@@ -511,7 +511,7 @@ void book_move P((IcsBoard *icsBoard, book_move_t * bmove, Bool random));
  * Console
  */
 
-void ProcessConsoleLine P((char *));
+void ProcessConsoleLine P((char *, char *));
 void Prompt P(());
 
 #ifndef HAVE_LIBREADLINE

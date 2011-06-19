@@ -118,7 +118,7 @@ void SendToComputer(char *format, ... )
 #define TS_NONE 0
 #define TS_IAC 1
 #define TS_CMD 2
-int ProcessRawInput(int fd, char *buf, int sizeofbuf, void (*LineFunc)(char *line))
+int ProcessRawInput(int fd, char *buf, int sizeofbuf, void (*LineFunc)(char *line, char *queue))
 {
     int i, state, num, pos = strlen(buf);
     u_char c;
@@ -166,7 +166,7 @@ int ProcessRawInput(int fd, char *buf, int sizeofbuf, void (*LineFunc)(char *lin
 			    u++;
 			}
 		    }
-		    LineFunc(tmp);
+		    LineFunc(tmp,buf+i);
 		    /*bytecopy(buf, buf + i, pos+1 - i);*/
 		    memmove(buf, buf + i, pos+1 - i);
 		    i = 0;

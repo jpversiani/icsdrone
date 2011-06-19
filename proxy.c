@@ -82,7 +82,7 @@ void SendToProxy(char *format, ... )
   va_end(ap);
 }
 
-void ProcessProxyLine(char * line){
+void ProcessProxyLine(char * line, char * queue){
   char* strip_line;
   static char saved_handle[20];
   static char saved_password[20];
