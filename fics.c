@@ -1886,8 +1886,11 @@ void ProcessIcsLine(char *line, char *queue){
   ProcessFeedback(line);
 
 finish:
-  
-  if(IsMarker(PROXYPROMPT,old_line)){
+  if(!strcmp(old_line,"\012\015\015")){
+      // This is a spurious character sequence inserted by FICS
+      // timeseal. Since it is unlikely to occur normally
+      // we just drop it. 
+  }else if(IsMarker(PROXYPROMPT,old_line)){
       SendToProxy("%s", runData.lastIcsPrompt);
   }else if(!strncmp(old_line,"<12>",4)){
       SendToProxy("%s%s",old_line,runData.lastIcsPrompt);
