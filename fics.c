@@ -1851,14 +1851,10 @@ Bool ProcessCleanUps(char *line){
 
 void ProcessIcsLine(char *line, char *queue){
   char *old_line;
-  Bool prompt_line;
   old_line=line;
   line=KillPrompts(line);
-  prompt_line=FALSE;
-  if(line!=old_line && IsWhiteSpace(line)){
-      prompt_line=TRUE;
-  }
-  // preserve eol's, they are killed somewhere below. Debug!
+  // Eol's are killed somewhere below. Debug!
+  // For now we just keep a copy of line.
   old_line=strdup(line);
   if(ProcessInternalMarkers(line))goto finish;
   if(ProcessForwardingMarkers(line))goto finish;
