@@ -42,12 +42,14 @@ In this case the setup is
 
      xboard--->icsdroneng--->ics
 
-This is very similar to xboard with zippy except that now the engine remains
-connected to the ICS even when xboard is disconnected. Furthermore
-connecting xboard to icsdroneng is much faster than connecting it
-directly to the ics as the login procedure is no longer necessary.
-Finally xboard and icsdroneng do not have to be on the same machine
-of course.
+where xboard and icsdroneng do not have to be on the same machine.
+
+Using the proxy with xboard is very similar to xboard with zippy
+except that now the engine remains connected to the ICS even when
+xboard is disconnected. Furthermore connecting xboard to icsdroneng is
+much faster than connecting it directly to the ics as the login
+procedure is no longer necessary.
+
 
 
 =head1 OPTIONS
@@ -261,7 +263,7 @@ To allow connections from anywhere use "0.0.0.0".
 This is only recommended if you are behind a firewall
 as icsdroneng is not designed for security. 
 
-=item B <-proxyLogin> (default "on")
+=item B<-proxyLogin> (default "on")
 
 If this is true, icsdroneng will display a login prompt
 on the proxy. User/password are derived from
