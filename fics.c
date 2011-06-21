@@ -485,10 +485,10 @@ void ExecCommand(char * command, int mask){
     Feedback(mask,"         : daemonize load");
     Feedback(mask,"Options  : searchdepth easymode secpermove sendgameend limitrematches");
     Feedback(mask,"           issuerematch sendgamestart acceptonly feedback feedbackonlyfinal");
-    Feedback(mask,"           feedbackcommand pgnlogging scoreforwhite sendtimeout shortlogfile");
-    Feedback(mask,"           shortlogging sendlogin hardlimit noplay autojoin autoreconnect");
-    Feedback(mask,"           resign acceptdraw scoreforwhite ownerquiet enginequiet");
-    Feedback(mask,"           colortell coloralert colordefault");
+    Feedback(mask,"           feedbackcommand proxyfeedback pgnlogging scoreforwhite ");
+    Feedback(mask,"           sendtimeout shortlogfile shortlogging sendlogin hardlimit");
+    Feedback(mask,"           noplay autojoin autoreconnect resign acceptdraw scoreforwhite ");
+    Feedback(mask,"           ownerquiet enginequiet colortell coloralert colordefault");
     Feedback(mask,"Read the manual page or README file for more information.");
     StopMultiFeedback(mask);
   }else if(!strncmp(command,"help",4)){
