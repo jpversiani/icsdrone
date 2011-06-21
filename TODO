@@ -14,7 +14,3 @@ Proxy
 =====
 
 -Filter out moves sent by xboard.
--Hide output of ListTourneys -j.
--Perhaps send feedback directly from icsdrone to proxy
-(i.e. do not pass through kibitz).
--Update help with new commands.
