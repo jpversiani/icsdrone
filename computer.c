@@ -333,21 +333,22 @@ Bool EvalDraw(int eval){
 }
 
 void PVFeedback(){
-    if(!appData.feedbackCommand) return;
-    SendToIcs("%s depth=%d score=%0.2f time=%0.2f node=%d speed=%d pv=%s\n",
-              appData.feedbackCommand,
+    char feedbackBuffer[1024];
+    if(!appData.feedback && !appData.proxyFeedback) return;
+    snprintf(feedbackBuffer,sizeof(feedbackBuffer)-1,"depth=%d score=%0.2f time=%0.2f node=%d speed=%d pv=%s",
               depth,
               (eval+0.0)/100,
               (time_+0.0)/100,
               nodes,
               time_?(int)(100*(nodes+0.0)/time_):0,
               pv);
-  /* Feedback(CONSOLE,"Analysis: depth=%d score=%0.2f time=%0.2f node=%d speed=%d pv=%s",depth,
-     (eval+0.0)/100,
-     (time_+0.0)/100,
-     nodes,
-     time_?(int)(100*(nodes+0.0)/time_):0,
-     pv); */
+    feedbackBuffer[sizeof(feedbackBuffer)-1]='\0';
+    if(appData.feedback){
+	SendToIcs("%s %s\n",appData.feedbackCommand,feedbackBuffer);
+    }
+    if(appData.proxyFeedback){
+	Feedback(PROXY,"Engine: %s",feedbackBuffer);
+    }
 }
 
 void ProcessComputerLine(char *line, char *queue) 
@@ -359,7 +360,7 @@ void ProcessComputerLine(char *line, char *queue)
   if (sscanf(line, "%*s ... %15s", move) == 1 ||
       sscanf(line, "move %15s", move) == 1) {
     if (runData.gameID != -1) {
-      if(appData.feedback && validKibitzSeen){
+      if((appData.feedback || appData.proxyFeedback) && validKibitzSeen){
 	PVFeedback();
       }
       if(appData.resign && validKibitzSeen && eval<RESIGN_SCORE){
