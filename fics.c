@@ -620,13 +620,13 @@ void HandleBoard(IcsBoard * icsBoard, char *moveList){
     }
     if(strcmp(bmove.move,"none")){
       logme(LOG_INFO,"Bookmove: %s score=%d\n",bmove.move,bmove.score);
-      SendToIcs("%s\n",bmove.move);
       if(appData.feedback && appData.feedbackCommand){
 	  SendToIcs("%s Bookmove: %s score=%d\n",appData.feedbackCommand,bmove.move,bmove.score); 
       }
       if(appData.proxyFeedback){
 	  Feedback(PROXY,"icsdrone: Bookmove: %s score=%d",bmove.move,bmove.score); 
       }
+      SendToIcs("%s\n",bmove.move);
       SendMoveToComputer(bmove.move);
       if(runData.icsBoard.nextMoveNum>1){
 	runData.calculatedTime+=100*runData.icsBoard.inctime;
