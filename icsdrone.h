@@ -244,6 +244,7 @@ typedef struct {
   int internalIcsCommand;
   char lastIcsPrompt[10];
   int proxyLoginState;
+  Bool hideFromProxy;
 } RunData;
 
 /* AppData */
