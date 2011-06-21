@@ -14,8 +14,6 @@ Proxy
 =====
 
 -Filter out moves sent by xboard.
--Turn off echo on proxy password entry.
--Why are blank lines supressed in Feedback?
--Only send things to proxy when the proxy login procedure is complete.
--Only start proxy after ICS login.
-
+-Hide output of ListTourneys -j.
+-Perhaps send feedback directly from icsdrone to proxy
+(i.e. do not pass through kibitz).
