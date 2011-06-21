@@ -134,6 +134,7 @@ void InitRunData(){
   runData.internalIcsCommand=0;
   runData.lastIcsPrompt[0]='\0';
   runData.proxyLoginState=PROXY_LOGIN_INIT;
+  runData.hideFromProxy=FALSE;
 }
 
 PersistentData persistentData;

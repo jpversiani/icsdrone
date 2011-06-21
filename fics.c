@@ -1188,6 +1188,7 @@ Bool ProcessTourneyNotifications(char *line){
    */
   int tournamentId;
   Bool endOfTournament=FALSE;
+  static Bool hideFromProxy=FALSE;
   /* dummies for now */
   char c[2];
   char open[30+1];
@@ -1197,6 +1198,9 @@ Bool ProcessTourneyNotifications(char *line){
   char color[30+1];
   char name[30+1];
 
+  if(hideFromProxy){
+      runData.hideFromProxy=TRUE;
+  }
 
   if(!runData.loggedIn) return FALSE;
   /* join messages */
@@ -1286,9 +1290,16 @@ Bool ProcessTourneyNotifications(char *line){
     GetTourney();
     return FALSE;  /* our tests are rudimentary so we give other classifiers a chance to look */
   }
+  /* First line of result of "tdListTourneys -j" */
+  if(runData.parsingListTourneys && !strncmp(line,":mamer's tourney list:",22)){
+      hideFromProxy=TRUE;
+      runData.hideFromProxy=TRUE;
+  }
   /* Last line of result of "td ListTourneys -j" */
   if(runData.parsingListTourneys && !strncmp(line,":Listed:",8)){
     runData.parsingListTourneys=FALSE;
+    hideFromProxy=FALSE;
+    runData.hideFromProxy=TRUE;
     return TRUE;
   }
   /* result of "td ListTourneys -j" */
@@ -1891,6 +1902,7 @@ finish:
   }else if(!strncmp(old_line,"<12>",4)){
       SendToProxy("%s%s",old_line,runData.lastIcsPrompt);
   }else if(runData.proxyLoginState==PROXY_LOGGED_IN &&
+	   !runData.hideFromProxy &&
 	   !runData.forwarding && 
 	    !IsAMarker(old_line) && 
 	   !runData.internalIcsCommand){
