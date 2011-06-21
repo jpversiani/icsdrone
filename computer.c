@@ -343,11 +343,11 @@ void PVFeedback(){
               time_?(int)(100*(nodes+0.0)/time_):0,
               pv);
     feedbackBuffer[sizeof(feedbackBuffer)-1]='\0';
-    if(appData.feedback){
+    if(appData.feedback && appData.feedbackCommand){
 	SendToIcs("%s %s\n",appData.feedbackCommand,feedbackBuffer);
     }
     if(appData.proxyFeedback){
-	Feedback(PROXY,"Engine: %s",feedbackBuffer);
+	Feedback(PROXY,"icsdrone: %s",feedbackBuffer);
     }
 }
 
