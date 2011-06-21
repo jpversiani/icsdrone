@@ -73,6 +73,7 @@ ArgList argList = {
     {"-logAppend",            ArgBool,   &appData.logAppend         , 0 },
     {"-feedback",             ArgBool,   &appData.feedback          , 1 },
     {"-feedbackOnlyFinal",    ArgBool,   &appData.feedbackOnlyFinal , 1 },
+    {"-proxyFeedback",        ArgBool,   &appData.proxyFeedback     , 1 },
     {"-dontReuseEngine",      ArgBool,   &appData.dontReuseEngine   , 0 },
     {"-nice",                 ArgInt,    &appData.nice              , 0 },
     {"-pgnFile",              ArgString, &appData.pgnFile           , 0 },

@@ -179,6 +179,7 @@ AppData appData = {
     FALSE,           /* logAppend */
     FALSE,           /* feedback */
     TRUE,            /* feedbackOnlyFinal */
+    FALSE,           /* proxyFeedback */
     TRUE,            /* dontReuseEngine */
 #ifdef __CYGWIN__
     5,               /* nice */

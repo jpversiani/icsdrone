@@ -281,6 +281,7 @@ typedef struct {
     Bool logAppend;
     Bool feedback;
     Bool feedbackOnlyFinal;
+    Bool proxyFeedback;
     Bool dontReuseEngine;
     int nice;
     char* pgnFile;
