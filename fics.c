@@ -1867,6 +1867,7 @@ void ProcessIcsLine(char *line, char *queue){
   // Eol's are killed somewhere below. Debug!
   // For now we just keep a copy of line.
   old_line=strdup(line);
+  runData.hideFromProxy=FALSE;
   if(ProcessInternalMarkers(line))goto finish;
   if(ProcessForwardingMarkers(line))goto finish;
   if(ProcessPings(line))goto finish;
