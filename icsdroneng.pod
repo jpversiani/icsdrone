@@ -36,7 +36,7 @@ icsdroneng has the following new features.
     - An ICS proxy.
 
 When instructed to do so, icsdroneng will serve as a proxy for the ICS
-it is connected to. This proxy works fairly well with xboard. 
+it is connected to. This proxy works fairly well with xboard/winboard. 
 
 In this case the setup is
 
@@ -46,6 +46,8 @@ This is very similar to xboard with zippy except that now the engine remains
 connected to the ICS even when xboard is disconnected. Furthermore
 connecting xboard to icsdroneng is much faster than connecting it
 directly to the ics as the login procedure is no longer necessary.
+Finally xboard and icsdroneng do not have to be on the same machine
+of course.
 
 
 =head1 OPTIONS
@@ -276,10 +278,10 @@ Some colors for use in the console when icsdroneng is compiled with readline sup
 
 =back
 
-=head1 CONSOLE AND TELL COMMANDS, SCRIPTS
+=head1 CONSOLE, PROXY AND TELL COMMANDS, SCRIPTS
 
 While icsdroneng is running you can send commands to it via the console
-and if you are the owner also via "tell". In addition commands 
+or via the proxy and if you are the owner also via "tell". In addition commands 
 can be put in scripts which can be loaded or specified as a 
 login script (with the command line option "-loginScript").
 
