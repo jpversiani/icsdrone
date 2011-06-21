@@ -360,9 +360,6 @@ int SetOption(char* name, int flags, int mask, char* format, ...){
     }
     a++;
   }
-  /* if(!found && appData.owner){
-    SendToIcs("tell %s No such option %s.\n",appData.owner,name);
-  }*/
   return found;
 }
 
@@ -370,10 +367,6 @@ void ExecFile(char * filename, int mask){
   FILE *f;
   char buf[256];
   char filenameBuf[256];
-  /*  if(strpbrk(filename, " \r\n.\\/")){
-    Feedback(mask,"Only ordinary characters are allowed in script name.");
-    return;    
-    }*/
   strncpy(filenameBuf,filename,256-9-1); /* 9=strlen(".icsdrone") */
   strcat(filenameBuf,".icsdrone");
   f=fopen(filenameBuf,"r");
@@ -671,12 +664,6 @@ char * KillPrompts(char *line){
     }
     line += 6;
   }
-  //  if((eol=strchr(line,'\n'))){
-  //    *eol='\0';
-  //}
-  //if((eol=strchr(line,'\r'))){
-  //    *eol='\0';
-  //}
   return line;
 }
 
@@ -917,7 +904,6 @@ Bool ProcessOffers(char *line){
       ||
       (sscanf(line, "Your opponent offers you a draw%c", &dummy) == 1) //ICC
   ) {
-      //    Feedback(mask,"%s offers a draw.",name);
       Feedback(mask,"Your opponent offers a draw.");
       
     if(!appData.acceptDraw){
@@ -1185,10 +1171,6 @@ Bool ProcessStandings(char *line){
  }
 
 Bool ProcessTourneyNotifications(char *line){
-  /* 
-   * Some of this code will become obsolete once "td GetTourney" works
-   * properly.
-   */
   int tournamentId;
   Bool endOfTournament=FALSE;
   static Bool hideFromProxy=FALSE;
@@ -1683,8 +1665,6 @@ Bool ProcessCreatePGN(char *line){
     runData.processingLastMoves=FALSE;
     return TRUE;
   }
-  //  memset(ratingWhite,0,sizeof(ratingWhite));
-  // memset(ratingWhite,0,sizeof(ratingBlack));
   // FICS start of movelist
   if(state==0 && sscanf(line,"%30s (%[^)]) vs. %30s (%[^)]) --- %30s %30s %d, %30s %30s %30s",
 			nameWhite,

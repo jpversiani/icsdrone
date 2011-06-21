@@ -124,14 +124,6 @@ int ProcessRawInput(int fd, char *buf, int sizeofbuf, void (*LineFunc)(char *lin
     u_char c;
     char tmp[1024];
     num = read(fd, buf + pos, sizeofbuf - pos - 1);
-    //    if(fd==runData.icsReadFd){
-    //  printf("Process raw input: runData.icsReadFd=%d\n",runData.icsReadFd);
-    //  printf("Nr of bytes seen: %d\n [",num);
-    //  for(i=0;i<num;i++){
-    //printf("%c",*(buf+pos+i));
-    //}
-    // printf("]\n");
-    //}    
     if ((num == -1) && ((errno == EWOULDBLOCK) || (errno == EAGAIN))) {
 	return NETOK;
     } else if (num == -1) { /* some other error */

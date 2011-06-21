@@ -226,8 +226,6 @@ void StartComputer()
   default:
     close(fdin[0]);
     close(fdout[1]);
-    //    printf("computer: closed %d %d\n",fdin[0],fdout[1]);
-    //    printf("computer: inuse %d %d\n",fdin[1],fdout[0]);
     runData.computerReadFd = fdout[0];
     runData.computerWriteFd = fdin[1];
     break;
