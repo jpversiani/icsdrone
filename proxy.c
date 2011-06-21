@@ -38,10 +38,14 @@ int StartProxy(){
 	     sizeof(struct sockaddr))
 	== -1) {
 	logme(LOG_ERROR,"Unable to bind proxy socket.");
+	close(runData.proxyListenFd);
+	runData.proxyListenFd=-1;
 	return FALSE;
     }
     if (listen(runData.proxyListenFd, 2) == -1) {
-	logme(LOG_ERROR,"Unable to bind proxy socket.");
+	logme(LOG_ERROR,"Unable to listen on proxy socket.");
+	close(runData.proxyListenFd);
+	runData.proxyListenFd=-1;
 	return FALSE;
     }
     return TRUE;
@@ -160,6 +164,20 @@ void ProcessProxyLine(char * line, char * queue){
 	  return;
 	  
       }
+  }
+
+  // Filter out moves
+
+  if(line[0]>='a' && 
+     line[0]<='h' && 
+     line[1]>='1' && 
+     line[1]<='8' &&
+     line[2]>='a' && 
+     line[2]<='h' && 
+     line[3]>='1' && 
+     line[3]<='8'){
+      logme(LOG_ERROR,"Move received from proxy. Ignoring it.");
+      return;
   }
   
   // Make sure "quit" does not kill icsdrone.
