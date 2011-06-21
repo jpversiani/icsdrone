@@ -625,7 +625,7 @@ void HandleBoard(IcsBoard * icsBoard, char *moveList){
 	  SendToIcs("%s Bookmove: %s score=%d\n",appData.feedbackCommand,bmove.move,bmove.score); 
       }
       if(appData.proxyFeedback){
-	  Feedback(PROXY,"icsdrone: %s Bookmove: %s score=%d",appData.feedbackCommand,bmove.move,bmove.score); 
+	  Feedback(PROXY,"icsdrone: Bookmove: %s score=%d",bmove.move,bmove.score); 
       }
       SendMoveToComputer(bmove.move);
       if(runData.icsBoard.nextMoveNum>1){
