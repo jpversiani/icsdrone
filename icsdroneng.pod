@@ -70,7 +70,7 @@ Path to timeseal binary.
 
 Login handle. 
 
-=item B<-password> 
+=item B<-password> (default: "xxx") 
 
 ICS password
 
@@ -107,6 +107,11 @@ Give feedback info only before move.
 
 The command to use to send feedback to observers. Use "kibitz" if you want your
 opponent to also see the feedback.
+
+=item B<-proxyFeedback> (default: "off")
+
+Make icsdroneng give PV feedback directly to the proxy
+(i.e. without relying on kibitz/whisper).
 
 =item B<-ownerQuiet> (default: "off") 
 
@@ -258,7 +263,8 @@ as icsdroneng is not designed for security.
 
 If this is true, icsdroneng will display a login prompt
 on the proxy. User/password are derived from
-the -handle and -password arguments.
+the -handle and -password arguments and from the
+strings entered at the icsdrone login prompt.
 
 =item B<-colorTell>
 
@@ -310,7 +316,9 @@ This applies to the following options.
     hardlimit
     acceptonly 
     feedback 
+    feedbackonlyfinal
     feedbackcommand
+    proxyfeedback
     ownerquiet
     pgnlogging
     shortlogging
