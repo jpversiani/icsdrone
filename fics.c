@@ -1124,38 +1124,43 @@ Bool ProcessIncomingMatches(char *line){
 
 Bool ProcessStandings(char *line){
     int tournamentId;
+    static Bool parsingStandings=FALSE;
     char c[2];
     if(!runData.loggedIn) return FALSE;
     if(!runData.parsingStandings) return FALSE;
 
+    // first line of standings
     if(sscanf(line,":Tourney #%d's standings%1[:]",&tournamentId,c)==2 && 
        tournamentId==runData.lastTourney){
         StartMultiFeedback(CONSOLE|OWNER|SHORTLOG);
         logme(LOG_DEBUG,"Detected start of standings of #%d",tournamentId);
+	parsingStandings=TRUE;
         Feedback(CONSOLE|SHORTLOG,"Tourney #%d standings:",tournamentId);
         return TRUE;
     }
-    if(			    !strncmp(line,":*: Paired.",11) ||
-			    !strncmp(line,":Total:",7) 
+    // last line of standings
+    if(parsingStandings &&  (!strncmp(line,":*: Paired.",11) ||
+			     !strncmp(line,":Total:",7)) 
        ){
         logme(LOG_DEBUG,"Detected end of standings");
         runData.parsingStandings=FALSE;
+	parsingStandings=FALSE;
         StopMultiFeedback(CONSOLE|OWNER|SHORTLOG);
         return TRUE;
     }
-    if(runData.parsingStandings &&
+    if(parsingStandings &&
        (
            !strncmp(line,":+-",3) ||
            !strncmp(line,":| ",3) ||
            !strncmp(line,":|-",3)
         )){
-        line=strtok(line,"\r\r");
+        line=strtok(line,"\r\n");
 	/* 
 	 *  Owner feedback of the standigns looks ugly
 	 *  due to the limited possibilities of tells.
 	 *  Later we will make the standings more compact.
 	 */
-        Feedback(CONSOLE|SHORTLOG|PROXY,line);
+        Feedback(CONSOLE|SHORTLOG,line);
         return TRUE;
     }
     return FALSE;
