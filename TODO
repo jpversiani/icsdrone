@@ -13,4 +13,5 @@
 Proxy
 =====
 
--Filter out moves sent by xboard.
+-Only check for the end of a game in which we participate.
+-Fix forwarding of standings after a tourney.
