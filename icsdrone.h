@@ -493,6 +493,7 @@ extern void StopLogging P(());
  */
 
 Bool ParseBoard P((IcsBoard *icsBoard, char * line));
+void BoardToString P((char *s, IcsBoard *icsBoard));
 
 /*
  * Book

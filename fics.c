@@ -1494,10 +1494,12 @@ Bool ProcessMoveList(char *line){
 
 Bool ProcessBoard(char *line){
   char *oppname;
+  IcsBoard icsBoardCopy;
   if(!runData.loggedIn) return FALSE;
   if(!ParseBoard(&(runData.icsBoard),line)) return FALSE;
-  strncpy(runData.lineBoard, line, sizeof(runData.lineBoard)-1);
-  runData.lineBoard[sizeof(runData.lineBoard)-1]='\0';
+  memcpy(&icsBoardCopy,&runData.icsBoard,sizeof(IcsBoard));
+  icsBoardCopy.status=0; // observing
+  BoardToString(runData.lineBoard, &icsBoardCopy);
   if(runData.waitingForFirstBoard){
     runData.waitingForFirstBoard = FALSE;
     if (!strcmp(runData.icsBoard.nameOfWhite, runData.handle)) {
@@ -1884,7 +1886,7 @@ finish:
   }else if(IsMarker(PROXYPROMPT,old_line)){
       SendToProxy("%s", runData.lastIcsPrompt);
   }else if(!strncmp(old_line,"<12>",4)){
-      SendToProxy("%s%s",old_line,runData.lastIcsPrompt);
+      SendToProxy("%s\r\n%s",runData.lineBoard,runData.lastIcsPrompt);
   }else if(runData.proxyLoginState==PROXY_LOGGED_IN &&
 	   !runData.hideFromProxy &&
 	   !runData.forwarding && 
