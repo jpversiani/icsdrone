@@ -1544,17 +1544,29 @@ Bool ProcessBoard(char *line){
 Bool ProcessGameEnd(char *line){
   char resultString[100+1];
   char result[30+1];
+  char handle1[30];
+  char handle2[30];
   if(!runData.loggedIn) return FALSE;  
   /* 
    *  Check for game-end messages.
    *  We dont care how the game ended, just that it ended.
    */
   memset(resultString,0,sizeof(resultString));
-  if(sscanf(line,"{Game %*d %*s vs. %*s%*[ ]%100[^}]} %30s",
+  if(sscanf(line,"{Game %*d (%17s vs. %17s%*[ ]%100[^}]} %30s",
+	    handle1,
+	    handle2,
 	    resultString,
-	    result)==2){
+	    result)==4){
     resultString[sizeof(resultString)-1]='\0';
-    logme(LOG_DEBUG, "[resultString=%s] [result=%s]",resultString,result);
+    handle1[sizeof(handle1)-1]='\0';
+    handle2[sizeof(handle2)-1]='\0';
+    // handle2 contains an extra ) but we don't care.
+    logme(LOG_DEBUG, "[resultString=%s] [handle1=%s] [handle2=%s] [result=%s]",
+	  resultString,handle1,handle2,result);
+    if(strncasecmp(handle1,runData.handle,strlen(runData.handle)) &&
+       strncasecmp(handle2,runData.handle,strlen(runData.handle))){
+		       return TRUE;
+       }		 
     logme(LOG_INFO, "Detected end of game: %s", line);
     {
         int mask=CONSOLE|SHORTLOG|PROXY;
