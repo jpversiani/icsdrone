@@ -624,7 +624,7 @@ void HandleBoard(IcsBoard * icsBoard, char *moveList){
 	  SendToIcs("%s Bookmove: %s score=%d\n",appData.feedbackCommand,bmove.move,bmove.score); 
       }
       if(appData.proxyFeedback){
-	  Feedback(PROXY,"icsdrone: Bookmove: %s score=%d",bmove.move,bmove.score); 
+	  Feedback(PROXY,"--> icsdrone: Bookmove: %s score=%d",bmove.move,bmove.score); 
       }
       SendToIcs("%s\n",bmove.move);
       SendMoveToComputer(bmove.move);
@@ -1372,6 +1372,7 @@ Bool ProcessStartOfGame(char *line){
 	     &inc) == 8) {
     logme(LOG_DEBUG, "Detected start of game: %s (%s) vs %s (%s) %s %s %d %d", 
 	  name, rating, name2, rating2,rated,variant,time,inc);
+    runData.hideFromProxy=TRUE;
     if(appData.sendGameStart){
         ExecCommandList(appData.sendGameStart,0);
     }
@@ -1419,6 +1420,7 @@ Bool ProcessStartOfGame(char *line){
   if (!strncmp(line, "{Game ", 6) &&
       strstr(line, runData.handle) &&
       (strstr(line, ") Creating ") || strstr(line, ") Continuing "))) {
+      runData.hideFromProxy=TRUE;
     sscanf(line, "{Game %d", &runData.gameID);
     logme(LOG_INFO, "Current game has ID: %d", runData.gameID);
     return TRUE;
@@ -1498,8 +1500,12 @@ Bool ProcessBoard(char *line){
   if(!runData.loggedIn) return FALSE;
   if(!ParseBoard(&(runData.icsBoard),line)) return FALSE;
   memcpy(&icsBoardCopy,&runData.icsBoard,sizeof(IcsBoard));
-  icsBoardCopy.status=0; // observing
+  if(runData.icsBoard.status==1 /* my move */ || runData.icsBoard.status==-1 /* your move */){      icsBoardCopy.status=0; // observing
+  }      
   BoardToString(runData.lineBoard, &icsBoardCopy);
+  if(runData.icsBoard.status!=1 &&  runData.icsBoard.status!=-1){
+      return TRUE;
+  }
   if(runData.waitingForFirstBoard){
     runData.waitingForFirstBoard = FALSE;
     if (!strcmp(runData.icsBoard.nameOfWhite, runData.handle)) {

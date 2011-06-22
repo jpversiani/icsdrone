@@ -345,7 +345,7 @@ void PVFeedback(){
 	SendToIcs("%s %s\n",appData.feedbackCommand,feedbackBuffer);
     }
     if(appData.proxyFeedback){
-	Feedback(PROXY,"\r\nicsdrone: %s",feedbackBuffer);
+	Feedback(PROXY,"\r\n--> icsdrone: %s",feedbackBuffer);
     }
 }
 
