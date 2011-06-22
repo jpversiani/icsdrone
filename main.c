@@ -117,6 +117,8 @@ void InitRunData(){
   runData.inGame=FALSE;
   runData.inTourney=FALSE;
   runData.currentTourney=-1;
+  runData.lastTourney=-1;
+  runData.parsingStandings=FALSE;
   runData.lastGameWasInTourney=0;
   runData.parsingListTourneys=FALSE;
   runData.tournamentOppName[0]='\0';

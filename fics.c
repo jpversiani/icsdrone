@@ -1124,36 +1124,26 @@ Bool ProcessIncomingMatches(char *line){
 
 Bool ProcessStandings(char *line){
     int tournamentId;
-    static Bool parsingStandings=FALSE;
-    static Bool processEndOfTourney=FALSE;
     char c[2];
     if(!runData.loggedIn) return FALSE;
-    //    if(sscanf(line,":mamer TOURNEY #%d UPDATE: The tourney has ended%1[.]",&tournamentId,c)==2){
-    if(strstr(line,"mamer has set your tourney variable to OFF.")){
-      processEndOfTourney=TRUE;
-      //      SendToIcs("td standings %d\n",tournamentId);
-      return TRUE;
-    }
-    if(processEndOfTourney &&
-       sscanf(line,":Tourney #%d's standings%1[:]",&tournamentId,c)==2){
-        parsingStandings=TRUE;
+    if(!runData.parsingStandings) return FALSE;
+
+    if(sscanf(line,":Tourney #%d's standings%1[:]",&tournamentId,c)==2 && 
+       tournamentId==runData.lastTourney){
         StartMultiFeedback(CONSOLE|OWNER|SHORTLOG);
         logme(LOG_DEBUG,"Detected start of standings of #%d",tournamentId);
         Feedback(CONSOLE|SHORTLOG,"Tourney #%d standings:",tournamentId);
         return TRUE;
     }
-    if(parsingStandings && (
-			    !strncmp(line,":*: Paired.",11) ||
+    if(			    !strncmp(line,":*: Paired.",11) ||
 			    !strncmp(line,":Total:",7) 
-			    )
        ){
         logme(LOG_DEBUG,"Detected end of standings");
-        parsingStandings=FALSE;
-        processEndOfTourney=FALSE;
+        runData.parsingStandings=FALSE;
         StopMultiFeedback(CONSOLE|OWNER|SHORTLOG);
         return TRUE;
     }
-    if(parsingStandings &&
+    if(runData.parsingStandings &&
        (
            !strncmp(line,":+-",3) ||
            !strncmp(line,":| ",3) ||
@@ -1241,6 +1231,8 @@ Bool ProcessTourneyNotifications(char *line){
   }
   if(endOfTournament){
     runData.inTourney=FALSE;
+    runData.lastTourney=runData.currentTourney;
+    runData.parsingStandings=TRUE;
     runData.currentTourney=-1;
     GetTourney();
     /* Should be sendTourneyEnd... */

@@ -226,6 +226,8 @@ typedef struct {
   Bool inGame;
   Bool inTourney;
   int currentTourney;
+  int lastTourney;
+  Bool parsingStandings;
   int lastGameWasInTourney;
   Bool parsingListTourneys;
   char tournamentOppName[30+1];
