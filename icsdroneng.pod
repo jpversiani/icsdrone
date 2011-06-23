@@ -23,7 +23,8 @@ icsdroneng has the following new features.
 
     - Feedback on commands.
     - Builtin polyglot book support. 
-    - Feedback on the current evaluation and principal variation (through "whisper" or "kibitz"). 
+    - Feedback on the current evaluation and principal variation 
+      (through "whisper" or "kibitz" or the "proxyFeedback" option). 
     - "Daemon mode" (run in background).
     - PGN logging. 
     - Auto reconnection in case of network problems.
@@ -35,21 +36,32 @@ icsdroneng has the following new features.
     - Interactive console with readline support and colors.
     - An ICS proxy.
 
-When instructed to do so, icsdroneng will serve as a proxy for the ICS
-it is connected to. This proxy works fairly well with xboard/winboard. 
+When instructed via the "proxy" option, icsdroneng act as a proxy for the ICS
+it is connected to. This is similar to using xboard with zippy 
+but now the "GUI" (xboard/winboard) can be closed without terminating 
+the engine. 
 
-In this case the setup is
+=head1 MANAGING ICSDRONENG
 
-     xboard--->icsdroneng--->ics
+The managing options for icsdroneng are schematically described in the
+following drawing
 
-where xboard and icsdroneng do not have to be on the same machine.
-
-Using the proxy with xboard is very similar to xboard with zippy
-except that now the engine remains connected to the ICS even when
-xboard is disconnected. Furthermore connecting xboard to icsdroneng is
-much faster than connecting it directly to the ics as the login
-procedure is no longer necessary.
-
+                                           
+                                                                                V
+                           console        xboard
+                              A             A
+                              |             | 
+                              |          (owner)
+                              |             | 
+                              V             V
+     xboard<--(proxy)-->icsdroneng<--(C)-->ics
+                              A
+                              |
+                              |
+                              |
+                              V
+                           engine
+                             
 
 
 =head1 OPTIONS
@@ -257,11 +269,14 @@ The port to listen on.
 =item B<-proxyHost> (default: "127.0.0.1")
 
 The interface to listen on. This must be the numeric ip
-address of the interface. The default insures
+address of the interface. The default ensures
 that only connections from localhost are possible. 
 To allow connections from anywhere use "0.0.0.0".
 This is only recommended if you are behind a firewall
 as icsdroneng is not designed for security. 
+Note that even if you are only listening locally
+there are still a number of options to connect remotely
+such as the xboard "gateway" option or ssh tunneling.
 
 =item B<-proxyLogin> (default "on")
 
