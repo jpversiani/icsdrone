@@ -13,5 +13,8 @@
 Proxy
 =====
 
--Only check for the end of a game in which we participate.
 -Fix forwarding of standings after a tourney.
+-Extend "write protection" also to writing to ICS 
+	(cfr "GnuCheese_restart.log").
+-Make kibitzing similar to xboard kibitzing.
+-More sane opening book moves kibitzing.
