@@ -1550,7 +1550,7 @@ Bool ProcessGameEnd(char *line){
    *  We dont care how the game ended, just that it ended.
    */
   memset(resultString,0,sizeof(resultString));
-  if(sscanf(line,"{Game %*d (%17s vs. %17s%*[ ]%100[^}]} %30s",
+  if(sscanf(line,"{Game %*d (%17s vs. %18s%*[ ]%100[^}]} %30s",
 	    handle1,
 	    handle2,
 	    resultString,
