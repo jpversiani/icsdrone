@@ -1,3 +1,14 @@
+Bugs
+====
+
+- There is something weird with icsdrone sometimes starting without
+logging. Debug.
+
+General
+=======
+
+- Make icsdrone remember its options under autorestart (when FICS disconnects). 
+
 - Indicate resume of adjourned game in log. 
 - Wild support (at least FRC).
 - Make pgn standard compliant (lines < 80 chars).
@@ -13,7 +24,6 @@
 Proxy
 =====
 
--Fix forwarding of standings after a tourney.
 -Extend "write protection" also to writing to ICS 
 	(cfr "GnuCheese_restart.log").
 -Make kibitzing similar to xboard kibitzing.
