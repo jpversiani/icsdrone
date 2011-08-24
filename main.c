@@ -155,7 +155,7 @@ AppData appData = {
     5000,            /* proxyPort */
     NULL,            /* proxyHost */
     0,               /* proxy */
-    TRUE,            /* proxyLogin */ 
+    FALSE,           /* proxyLogin */ 
     0,               /* searchDepth */
     0,               /* secPerMove */
     255,             /* logLevel */

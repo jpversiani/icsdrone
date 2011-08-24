@@ -278,7 +278,7 @@ Note that even if you are only listening locally
 there are still a number of options to connect remotely
 such as the xboard "gateway" option or ssh tunneling.
 
-=item B<-proxyLogin> (default "on")
+=item B<-proxyLogin> (default "off")
 
 If this is true, icsdroneng will display a login prompt
 on the proxy. User/password are derived from
