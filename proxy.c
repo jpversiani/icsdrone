@@ -147,8 +147,8 @@ void ProcessProxyLine(char * line, char * queue){
 		saved_password,
 		appData.handle,
 		appData.passwd);
-	  if(!strcmp(saved_handle,appData.handle) && 
-	     !strcmp(saved_password,appData.passwd)){
+	  if(!strcasecmp(saved_handle,appData.handle) && 
+	     !strcasecmp(saved_password,appData.passwd)){
 	      runData.proxyLoginState=PROXY_LOGGED_IN;
 	      SendToProxy("\r\n");
 	      if(runData.inGame){
