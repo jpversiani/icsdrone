@@ -9,9 +9,12 @@ General
 =======
 
 - Make icsdrone remember its options under autorestart (when FICS disconnects). 
+- Make proxy login case insensitive. 
+
 - Implement a version of marker.c using tells (the current version works
   well for unregistered users on FICS where tells sometimes get lost).
 - Wild support (at least FRC).
+
 
 
 - Indicate resume of adjourned game in log. 
