@@ -9,7 +9,8 @@ General
 =======
 
 - Make icsdrone remember its options under autorestart (when FICS disconnects). 
-- Make proxy login case insensitive. 
+
+- Generate pgn file for running game (for pgn4web).
 
 - Implement a version of marker.c using tells (the current version works
   well for unregistered users on FICS where tells sometimes get lost).
