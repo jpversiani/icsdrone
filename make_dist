@@ -1,4 +1,4 @@
-VERSION=0.23
+VERSION=0.25
 NAME=icsdroneng
 # VERSION appears in
 # configure.ac
@@ -11,7 +11,7 @@ SRCDIR=`pwd`
 BUILDDIR=$SRCDIR/${NAME}-${VERSION}
 DISTDIR=$SRCDIR/${NAME}-release
 TARNAME=$SRCDIR/${NAME}-${VERSION}.tar.gz
-RPMNAME=/usr/src/rpm/RPMS/*/${NAME}-${VERSION}-${RELEASE}.*.rpm
+RPMNAME=/home/vdbergh/rpmbuild/RPMS/*/${NAME}-${VERSION}-${RELEASE}.*.rpm
 DEBNAME=$SRCDIR/${NAME}_${VERSION}_*.deb
 
 mkdir $DISTDIR

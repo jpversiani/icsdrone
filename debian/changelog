@@ -1,4 +1,6 @@
-icsdroneng (0.24) unstable; urgency=low
+icsdroneng (0.25) unstable; urgency=low
+
+  * Fix for different "Creating" message for tourney at ICC (M v Kervinck).
 
   * Act as a proxy for the remote ICS.
 	
