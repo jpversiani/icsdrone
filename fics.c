@@ -1353,12 +1353,13 @@ Bool ProcessFlaggedOpponent(char *line){
 Bool ProcessStartOfGame(char *line){
   char name[30+1],name2[30+1],rating[30+1],rating2[30+1];
   char rated[30+1],variant[30+1];
+  char color[30+1];
   int time, inc;
   if(!runData.loggedIn) return FALSE;
   /*
    *  Detect start of game, find gametype and rating of opponent
    */
-  if (sscanf(line, 
+  if ((sscanf(line, 
 	     "Creating: %30s (%30[^)]) %30s (%30[^)]) %30s %30s %d %d", 
 	     name, 
 	     rating, 
@@ -1367,7 +1368,19 @@ Bool ProcessStartOfGame(char *line){
 	     rated, 
 	     variant, 
 	     &time, 
-	     &inc) == 8) {
+	     &inc) == 8)
+   || (sscanf(line, 
+	     "Creating: %30s (%30[^)]) [%30[^]]] %30s (%30[^)]) %30s %30s %d %d", 
+	     name, 
+	     rating, 
+	     color, 
+	     name2, 
+	     rating2, 
+	     rated, 
+	     variant, 
+	     &time, 
+	     &inc) == 9)
+   ) {
     logme(LOG_DEBUG, "Detected start of game: %s (%s) vs %s (%s) %s %s %d %d", 
 	  name, rating, name2, rating2,rated,variant,time,inc);
     runData.hideFromProxy=TRUE;
