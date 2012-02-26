@@ -1185,7 +1185,7 @@ Bool ProcessTourneyNotifications(char *line){
 
   if(!runData.loggedIn) return FALSE;
   /* join messages */
-  if(strstr(line,"You have joined") && 
+  if(strstr(line,"You have joined") && !strstr(line,"has been changed") &&
      (sscanf(line,"%*[^#]#%d",&tournamentId)==1)){
     /* does this work? */
     if(runData.inTourney || runData.inGame){
