@@ -453,25 +453,29 @@ void ExecCommand(char * command, int mask, int inhibitSet){
       if(mask & (CONSOLE|PROXY)){
       runData.inhibitPrompt=TRUE;
     }
-    if(i==1 && inhibitSet==FALSE){
-      if(!SetOption(key,CLEAR,mask,"%s",value)){
-        StartForwarding(mask);
-	    SendToIcs("set %s\n",key);
-        StopForwarding(mask);
+      if(!inhibitSet){
+	  if(i==1){
+	      if(!SetOption(key,CLEAR,mask,"%s",value)){
+		  StartForwarding(mask);
+		  SendToIcs("set %s\n",key);
+		  StopForwarding(mask);
+	      }else{
+		  runData.inhibitPrompt=FALSE;
+		  Prompt(mask);
+	      }
+	  }else{
+	      if(!SetOption(key,0,mask,"%s",value)){
+		  StartForwarding(mask);
+		  SendToIcs("set %s %s\n",key,value);
+		  StopForwarding(mask);
+	      }else{
+		  runData.inhibitPrompt=FALSE;
+		  Prompt(mask);
+	      }
+	  }
       }else{
-        runData.inhibitPrompt=FALSE;
-        Prompt(mask);
+	  logme(LOG_DEBUG,"Set command \"%s\" inhibited\n",command);
       }
-    }else{
-      if(!SetOption(key,0,mask,"%s",value)){
-        StartForwarding(mask);
-	    SendToIcs("set %s %s\n",key,value);
-        StopForwarding(mask);
-      }else{
-        runData.inhibitPrompt=FALSE;
-        Prompt(mask);
-      }
-    }
   }else if(!strncmp(command,"help",4) && strstr(command,PACKAGE_NAME)){ /*temporary */
     StartMultiFeedback(mask);
     Feedback(mask,"Commands : help set softquit hardquit restart options coptions");
