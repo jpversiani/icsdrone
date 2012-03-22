@@ -233,7 +233,7 @@ void ProcessConsoleLine(char *line, char *queue)
 #ifdef HAVE_LIBREADLINE
     add_history(line);
 #endif
-    ExecCommand(line,CONSOLE);
+    ExecCommand(line,CONSOLE,FALSE);
   }
 #ifdef HAVE_LIBREADLINE
   if(line!=NULL){
@@ -791,7 +791,10 @@ int main(int argc, char *argv[])
                      */
                 if (fp) {
                     while(myfgets(buf, sizeof(buf), fp)){
-                        ExecCommand(buf,0);
+			/* On relogin we do not reexecute set commands
+			 * the user might have changed the variables manually.
+			 */
+			ExecCommand(buf,0,persistentData.firsttime?FALSE:TRUE);
                     }
                     fclose(fp);
                 }

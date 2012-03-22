@@ -363,7 +363,7 @@ int SetOption(char* name, int flags, int mask, char* format, ...){
   return found;
 }
 
-void ExecFile(char * filename, int mask){
+void ExecFile(char * filename, int mask, int inhibitSet){
   FILE *f;
   char buf[256];
   char filenameBuf[256];
@@ -374,7 +374,7 @@ void ExecFile(char * filename, int mask){
     Feedback(mask,"Could not open \"%s\".",filenameBuf);
     return;
   }
-  while(myfgets(buf, sizeof(buf), f)) ExecCommand(buf,0);
+  while(myfgets(buf, sizeof(buf), f)) ExecCommand(buf,0,inhibitSet);
   fclose(f);
   Feedback(mask, "Done loading \"%s\".", filenameBuf);
 }
@@ -403,7 +403,7 @@ void StopForwarding(int mask){
 }
 
 
-void ExecCommand(char * command, int mask){
+void ExecCommand(char * command, int mask, int inhibitSet){
   int i;
   char key[256];
   char value[8192];
@@ -448,12 +448,12 @@ void ExecCommand(char * command, int mask){
   } else if(!strcmp(command,"coptions")){
     SendOptions(1,mask);
   } else if(sscanf(command,"load %8191[^\n\r]",value)==1){
-    ExecFile(value,mask); 
+      ExecFile(value,mask,inhibitSet); 
   } else if(((i=sscanf(command,"set %254[^=\n\r ] %8191[^\n\r]", key,value))==1)  || (i==2)){
       if(mask & (CONSOLE|PROXY)){
       runData.inhibitPrompt=TRUE;
     }
-    if(i==1){
+    if(i==1 && inhibitSet==FALSE){
       if(!SetOption(key,CLEAR,mask,"%s",value)){
         StartForwarding(mask);
 	    SendToIcs("set %s\n",key);
@@ -504,7 +504,7 @@ void ExecCommand(char * command, int mask){
   }
 }
 
-void ExecCommandList(char * command, int mask){
+void ExecCommandList(char * command, int mask, int inhibitSet){
     char *command_c=strdup(command);
     char *command_cc=command_c;
     char *p;
@@ -512,10 +512,10 @@ void ExecCommandList(char * command, int mask){
         p=strstr(command_c,"\\n");
         if(p){
             p[0]='\0';
-            ExecCommand(command_c, mask);
+            ExecCommand(command_c, mask,inhibitSet);
             command_c=p+2;
         }else{
-            ExecCommand(command_c, mask);
+            ExecCommand(command_c, mask,inhibitSet);
             break;
         }
     }
@@ -793,7 +793,7 @@ Bool ProcessLogin(char *line){
     }
     GetTourney();
     if(appData.sendLogin){
-        ExecCommandList(appData.sendLogin,0);
+        ExecCommandList(appData.sendLogin,0,FALSE);
     }
     SendToIcs("resume\n");
     return TRUE;
@@ -1001,7 +1001,7 @@ Bool ProcessTells(char *line){
   }
   if(line[0]!='\\'){
     if (appData.owner && !strcmp(appData.owner, name)){ 
-      ExecCommand(tmp,1);
+	ExecCommand(tmp,1,FALSE);
     } else if (strstr(name,"mamer")){
       /* send away for processing */
       if(strlen(tmp)<8192){
@@ -1242,7 +1242,7 @@ Bool ProcessTourneyNotifications(char *line){
     GetTourney();
     /* Should be sendTourneyEnd... */
     if (appData.sendGameEnd){
-      ExecCommandList(appData.sendGameEnd,0);
+	ExecCommandList(appData.sendGameEnd,0,FALSE);
     }
     if(!runData.inGame){  /* for safety */
       CancelTimers();
@@ -1385,7 +1385,7 @@ Bool ProcessStartOfGame(char *line){
 	  name, rating, name2, rating2,rated,variant,time,inc);
     runData.hideFromProxy=TRUE;
     if(appData.sendGameStart){
-        ExecCommandList(appData.sendGameStart,0);
+        ExecCommandList(appData.sendGameStart,0,FALSE);
     }
     {
         int mask=CONSOLE|SHORTLOG|PROXY;
@@ -1835,7 +1835,7 @@ Bool ProcessCleanUps(char *line){
     if(runData.lastGameWasInTourney==0){
       GetTourney();
       if (appData.sendGameEnd){
-        ExecCommandList(appData.sendGameEnd,0);
+	  ExecCommandList(appData.sendGameEnd,0,FALSE);
       }
       if (appData.issueRematch && (!appData.acceptOnly || 
 				   !strcasecmp(appData.acceptOnly,
