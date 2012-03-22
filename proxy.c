@@ -198,7 +198,7 @@ void ProcessProxyLine(char * line, char * queue){
   if(line[0]=='$'){
       line++;
   }
-  ExecCommand(line,PROXY);
+  ExecCommand(line,PROXY,FALSE);
   //SendMarker(PROXYPROMPT);
   return;
 }

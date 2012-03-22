@@ -394,8 +394,8 @@ extern Bool EvalDraw P((int));
  */
 
 extern void ProcessIcsLine P((char *, char *));
-extern void ExecCommand P((char *, int interactive));
-extern void ExecFile P((char *, int interactive));
+extern void ExecCommand P((char *, int interactive, int inhibitSet));
+extern void ExecFile P((char *, int interactive, int inhibitSet));
 extern void Feedback P((int mask, char *format, ... ));
 extern char *myfgets P((char *s, int size, FILE *stream));
 extern void strip_nts P((char *s, char *strip));
