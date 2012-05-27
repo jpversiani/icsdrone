@@ -550,8 +550,8 @@ void ExitOn(int exitValue, char *errmsg)
   delete_timer(&runData.tellTimer);
   CancelTimers();
   if(exitValue==EXIT_QUITRESTART){
-    if(persistentData.wasLoggedIn){
-      logme(LOG_DEBUG,"We have been logged in so we try to restart\n");
+    if(persistentData.wasLoggedIn && !runData.quitPending){
+      logme(LOG_DEBUG,"We have been logged in and are not quitting so we try to restart\n");
       exitValue=EXIT_RESTART;
     }else{
       logme(LOG_DEBUG,"No succesful login so far so we quit\n");
