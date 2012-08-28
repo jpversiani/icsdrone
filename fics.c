@@ -45,6 +45,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define MAX_FORWARDING 200
 
+/* Max line size of PGN file */
+#define MAX_PGN_FILE_LINE	80
+
 void InternalIcsCommand(char *command){
     SendMarker(STARTINTERNAL);
     SendToIcs("\n%s\n",command);
@@ -1661,6 +1664,7 @@ Bool ProcessMoreTime(char *line){
 Bool ProcessCreatePGN(char *line){
   static int moveNumber=1;
   static char pgnDesc[BUF_SIZE]="";
+  char miniPgnDesc[20]="";
   /*  static char *lastPgnDesc=NULL;*/
   move_t move,move2;
   char result[30+1];
@@ -1685,6 +1689,8 @@ Bool ProcessCreatePGN(char *line){
   static int initial=0;
   static int increment=0;
   static int state=0;
+  static int colNo=0;
+
   /*  static char *lastLine=NULL;*/
   char dummy;
   if(!runData.loggedIn) return FALSE;  
@@ -1692,6 +1698,7 @@ Bool ProcessCreatePGN(char *line){
     logme(LOG_DEBUG,"Start of last move list detected.");
     runData.processingLastMoves=TRUE;
     state=0;
+    colNo=0;
     return TRUE;
   }
   if(!runData.processingLastMoves) return FALSE;
@@ -1757,16 +1764,29 @@ Bool ProcessCreatePGN(char *line){
   if (state==2 && sscanf(line, "%3d. %15s (%*s %15s (%*s", &moveNumber, move, move2) == 3) {
     ConvIcsSanToComp(move);
     ConvIcsSanToComp(move2);
-    snprintf(pgnDesc+strlen(pgnDesc), sizeof(pgnDesc)-strlen(pgnDesc), 
-	     "%d. %s %s ", moveNumber,move, move2);
-    pgnDesc[sizeof(pgnDesc)-1]='\0';  /* paranoia */
+    snprintf(miniPgnDesc, sizeof(miniPgnDesc), "%d. %s %s ", moveNumber, move, move2);
+    if ((colNo + strlen(miniPgnDesc)) > MAX_PGN_FILE_LINE) {
+      snprintf(pgnDesc+strlen(pgnDesc), sizeof(pgnDesc)-strlen(pgnDesc), "\n%s", miniPgnDesc);
+      colNo = 0;
+    }
+    else {
+      snprintf(pgnDesc+strlen(pgnDesc), sizeof(pgnDesc)-strlen(pgnDesc), "%s", miniPgnDesc);
+    }
+    colNo+=strlen(miniPgnDesc);
     return TRUE;
   }
   if (state==2 && sscanf(line, "%3d. %15s (%*s %15s (%*s", &moveNumber, move, move2) == 2) {
     ConvIcsSanToComp(move);
-    snprintf(pgnDesc+strlen(pgnDesc), sizeof(pgnDesc)-strlen(pgnDesc), 
-	     "%d. %s ", moveNumber,move);
-    pgnDesc[sizeof(pgnDesc)-1]='\0';  /* paranoia */
+    snprintf(miniPgnDesc, sizeof(miniPgnDesc), "%d. %s ", moveNumber, move);
+    if ((colNo + strlen(miniPgnDesc)) > MAX_PGN_FILE_LINE) {
+      snprintf(pgnDesc+strlen(pgnDesc), sizeof(pgnDesc)-strlen(pgnDesc), "\n%s", miniPgnDesc);
+      colNo = 0;
+    }
+    else {
+      snprintf(pgnDesc+strlen(pgnDesc), sizeof(pgnDesc)-strlen(pgnDesc), "%s", miniPgnDesc);
+    }
+    colNo+=strlen(miniPgnDesc);
+ 
     return TRUE;
   }  
   memset(result,0,30+1);
@@ -1804,7 +1824,12 @@ Bool ProcessCreatePGN(char *line){
     fprintf(pgnFile,"[Result \"%s\"]\n",result);
     fprintf(pgnFile,"\n");
     fprintf(pgnFile,"%s",pgnDesc);
-    fprintf(pgnFile,"{%s} %s",resultString,result);
+    if((colNo+strlen(resultString)) > MAX_PGN_FILE_LINE) {
+      fprintf(pgnFile,"\n{%s} %s",resultString,result);
+    }
+    else {
+      fprintf(pgnFile,"{%s} %s",resultString,result);
+    }
     fprintf(pgnFile,"\n\n");
     if (appData.pgnFile[0] == '|') {
       pclose(pgnFile);
@@ -1821,6 +1846,7 @@ DOCLEANUPS marker.");
     runData.processingLastMoves=FALSE;
     pgnDesc[0]='\0';
     state=0;
+    colNo=0;
   }
   return FALSE;
 }
