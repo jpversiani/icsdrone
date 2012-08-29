@@ -1081,7 +1081,8 @@ Bool ProcessIncomingMatches(char *line){
        strcmp(variant,"standard") &&
        strcmp(variant,"Bullet") && 
        strcmp(variant,"Blitz") && 
-       strcmp(variant,"Standard") 
+       strcmp(variant,"Standard") &&
+       strcmp(variant,"non-standard") 
        ){
       logme(LOG_INFO,"Rejected variant %s", variant);
       SendToIcs("tell %s Sorry I only play regular chess.\n",name);
