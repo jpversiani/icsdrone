@@ -138,7 +138,7 @@ void InitRunData(){
   runData.proxyLoginState=PROXY_LOGIN_INIT;
   runData.hideFromProxy=FALSE;
   //  runData.noMoveList=FALSE;
-  runData.noMoveList=TRUE;
+  runData.noMoveList=FALSE;
 }
 
 PersistentData persistentData;
