@@ -756,8 +756,10 @@ Bool ProcessLogin(char *line){
       if(!runData.onFICS){ // only FICS has the (undocumented) command "moves l"
 	  logme(LOG_INFO,"We seem to be playing on a different server from FICS.\n");
 	  if (runData.longAlgMoves) {
-	      logme(LOG_WARNING,"Server doesn't support long algebraic move lists. Changing to short mode.\n");
-	      runData.longAlgMoves = FALSE;
+	      logme(LOG_WARNING,"Server doesn't support long algebraic move lists.\n\
+Do not ask for movelist.\n");
+	      //	      runData.longAlgMoves = FALSE;
+	      runData.noMoveList=TRUE;
 	  }
       }
 
@@ -1411,24 +1413,26 @@ Bool ProcessStartOfGame(char *line){
     }
     /* update our state */
     runData.inGame=TRUE;
-    /* reset movelist and ask for the moves */
-    runData.moveList[0] = '\0';
-    SendMarker(ASKSTARTMOVES);
-    if (runData.longAlgMoves)
-      InternalIcsCommand("moves l\n");
-    else
-      InternalIcsCommand("moves\n");
-    /* send opponent name and ratings to computer */
-    if (!strcmp(name, runData.handle)) {
-       SendToComputer("name %s\n", name2);
-       SendToComputer("rating %d %d\n", atoi(rating), atoi(rating2));
-    }
-    if (!strcmp(name2, runData.handle)) {
-       SendToComputer("name %s\n", name);
-       SendToComputer("rating %d %d\n", atoi(rating2), atoi(rating));
+    if(!runData.noMoveList){
+	/* reset movelist and ask for the moves */
+	runData.moveList[0] = '\0';
+	SendMarker(ASKSTARTMOVES);
+	if (runData.longAlgMoves)
+	    InternalIcsCommand("moves l\n");
+	else
+	    InternalIcsCommand("moves\n");
+	/* send opponent name and ratings to computer */
+	if (!strcmp(name, runData.handle)) {
+	    SendToComputer("name %s\n", name2);
+	    SendToComputer("rating %d %d\n", atoi(rating), atoi(rating2));
+	}
+	if (!strcmp(name2, runData.handle)) {
+	    SendToComputer("name %s\n", name);
+	    SendToComputer("rating %d %d\n", atoi(rating2), atoi(rating));
+	}
+	runData.waitingForMoveList =TRUE;
     }
     /* update our state */
-    runData.waitingForMoveList =TRUE;
     runData.waitingForFirstBoard = TRUE;
     return TRUE;
   }
@@ -1546,6 +1550,11 @@ Bool ProcessBoard(char *line){
       runData.numGamesInSeries = 1;
       strcpy(runData.lastPlayer, oppname);
     }
+    if(runData.noMoveList){
+	SendBoardToComputer(&runData.icsBoard);
+	HandleBoard(&(runData.icsBoard),NULL);
+    }
+
     return TRUE;
   }
   if(runData.waitingForMoveList){

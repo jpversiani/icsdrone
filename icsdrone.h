@@ -247,6 +247,7 @@ typedef struct {
   char lastIcsPrompt[10];
   int proxyLoginState;
   Bool hideFromProxy;
+  Bool noMoveList;
 } RunData;
 
 /* AppData */
@@ -376,6 +377,8 @@ extern void SetScoreForWhite P(());
 extern void SendMovesToComputer P((char *));
 extern void SendMoveToComputer P((char *));
 extern void SendTimeToComputer P((int,int));
+extern void SendBoardToComputer P((IcsBoard *));
+
 extern Bool EvalDraw P((int));
 
 #define RESIGN_SCORE -600
@@ -497,6 +500,7 @@ extern void StopLogging P(());
 
 Bool ParseBoard P((IcsBoard *icsBoard, char * line));
 void BoardToString P((char *s, IcsBoard *icsBoard));
+void BoardToFen P((char *fen, IcsBoard *board));
 
 /*
  * Book

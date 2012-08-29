@@ -118,6 +118,15 @@ void EnsureComputerReady(){
   }
 }
 
+void SendBoardToComputer(IcsBoard *board){
+      char tmp[256];
+	tmp[0]='\0';
+	strcat(tmp,"setboard ");
+	BoardToFen(tmp+9,&runData.icsBoard);
+	strcat(tmp,"\n");
+	SendToComputer(tmp);
+}
+
 void SendMovesToComputer(char *moveList){
   char *p;
   move_t move;

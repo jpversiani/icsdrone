@@ -100,6 +100,80 @@ void BoardToString(char *s,IcsBoard *icsBoard){
 	      icsBoard->boardFlipped);
 }
 
+void BoardToFen(char *fen, IcsBoard *board){
+  int r, c, k, castle;
+  char c1;
+  char tmp[256]; /* too lazy to figure out minimum value */
+
+
+  fen[0]=0;
+  for (r = 0; r <=7; r++){
+      k = 0;
+      for (c = 0; c < 8; c++){
+	  if (board->board[c][r] == '-'){ 
+	    k++;
+	  }else{
+	    if (k){
+	      sprintf (tmp, "%1d", k);
+	      strcat(fen,tmp);
+	    }
+	    k = 0;
+	    c1=board->board[c][r];
+	    sprintf (tmp, "%c", isupper(c1)?tolower(c1):toupper(c1));
+	    strcat(fen,tmp);
+	  }
+      }
+      if (k){
+	sprintf (tmp, "%1d", k);
+	strcat(fen,tmp);
+      }
+      if (r < 7){
+	sprintf (tmp, "/");
+	strcat(fen,tmp);
+      }
+  }
+ 
+  /* Other stuff */
+  sprintf (tmp, (board->onMove == 'W' ? " w " : " b "));
+  strcat(fen,tmp);
+  
+  castle=FALSE;
+
+  if (board->whiteCanCastleShort){
+    sprintf (tmp, "K");
+    strcat(fen,tmp);
+    castle=TRUE;
+  }
+  if (board->whiteCanCastleLong){
+    sprintf (tmp, "Q");
+    strcat(fen,tmp);
+    castle=TRUE;
+  }
+  if (board->blackCanCastleShort){
+    sprintf (tmp, "k");
+    strcat(fen,tmp);
+    castle=TRUE;
+  }
+  if (board->blackCanCastleLong){
+    sprintf (tmp, "q");
+    strcat(fen,tmp);
+    castle=TRUE;
+  }
+  if (!castle){
+    sprintf (tmp, "-");
+    strcat(fen,tmp);
+  }
+  sprintf (tmp, " %c", (board->epFile > -1 ? 'a'+board->epFile : '-'));
+  strcat(fen,tmp);
+  sprintf (tmp," %d",board->movesSinceLastIrreversible);
+  strcat(fen,tmp);
+  sprintf (tmp," %d",board->nextMoveNum);
+  strcat(fen,tmp);
+}
+
+ 
+
+
 void PrintBoard(IcsBoard *icsBoard){
   int r,f;
   for(r=0;r<=7;r++){
