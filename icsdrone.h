@@ -452,6 +452,7 @@ extern void ConvIcsSanToComp P((char *));
 extern void ConvIcsSpecialToComp P((char, char *));
 extern void ConvCompToIcs P((char *));
 extern Bool ConvIcsCastlingToLan P((char ,char *));
+extern void ConvIcsTransferPromotionSuffix P((char *, char *));
 extern char* ConvertNewlines P((char *));
 extern char* PromptInput P((char * buf, int bufsize, char * prompt, int echo));
 extern void EchoOn P(());
