@@ -225,6 +225,21 @@ void ConvIcsSanToComp(move_t move)
   
 }
 
+/* Some ICS's (e.g. ICC) do not include promotion suffix in the LAN move 
+ * This is a quick hack to fix that.
+ */
+
+void ConvIcsTransferPromotionSuffix(char *sanMove,char *lanMove){
+    char *s,*ss;
+    if((s=strchr(sanMove,'=')) && !(strchr(lanMove,'='))){
+	ss=lanMove+7;
+	while(*s!='\0'){
+	    *(ss++)=*(s++);
+	}
+	*ss='\0';
+    }
+}
+
 Bool ConvIcsCastlingToLan(char onMove, move_t move){
     /* work around  bug in (undocumented) ICS LAN generation */
     if(!strcasecmp(move,"oo")){

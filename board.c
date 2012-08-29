@@ -38,6 +38,7 @@ Bool ParseBoard(IcsBoard *icsBoard, char *line){
                &(icsBoard->boardFlipped)) == 23){
       tmp[72]='\0';
       if(strcmp(icsBoard->lanMove,"none")){
+	ConvIcsTransferPromotionSuffix(icsBoard->sanMove,icsBoard->lanMove);
         ConvIcsSpecialToComp(icsBoard->onMove=='W'?'B':'W',icsBoard->lanMove);
         ConvIcsSanToComp(icsBoard->sanMove); 
       }
