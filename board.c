@@ -110,7 +110,7 @@ void BoardToFen(char *fen, IcsBoard *board){
   for (r = 0; r <=7; r++){
       k = 0;
       for (c = 0; c < 8; c++){
-	  if (board->board[c][r] == '-'){ 
+	  if (board->board[c][7-r] == '-'){ 
 	    k++;
 	  }else{
 	    if (k){
@@ -118,8 +118,9 @@ void BoardToFen(char *fen, IcsBoard *board){
 	      strcat(fen,tmp);
 	    }
 	    k = 0;
-	    c1=board->board[c][r];
-	    sprintf (tmp, "%c", isupper(c1)?tolower(c1):toupper(c1));
+	    c1=board->board[c][7-r];
+	    //	    sprintf (tmp, "%c", isupper(c1)?tolower(c1):toupper(c1));
+	    sprintf (tmp, "%c", c1);
 	    strcat(fen,tmp);
 	  }
       }
