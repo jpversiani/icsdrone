@@ -308,6 +308,7 @@ typedef struct {
     Bool ownerQuiet;
     char * feedbackCommand;
     Bool engineQuiet;
+    Bool allowWild;
 } AppData;
 
 extern PersistentData  persistentData;

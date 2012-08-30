@@ -1093,10 +1093,14 @@ Bool ProcessIncomingMatches(char *line){
        strcmp(variant,"Blitz") && 
        strcmp(variant,"Standard") &&
        strcmp(variant,"non-standard") &&
-       strcmp(variant,"wild")
+       (strcmp(variant,"wild") || !appData.allowWild)
        ){
       logme(LOG_INFO,"Rejected variant %s", variant);
-      SendToIcs("tell %s Sorry I only play regular chess.\n",name);
+      if(appData.allowWild){
+	  SendToIcs("tell %s Sorry I only play regular chess (and possibly wild).\n",name);
+      }else{
+	  SendToIcs("tell %s Sorry I only play regular chess.\n",name);
+      }
       SendToIcs("decline %s\n", name);    
       return TRUE;
     }

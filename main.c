@@ -207,6 +207,7 @@ AppData appData = {
     FALSE,           /* ownerQuiet */
     NULL,            /* feedbackCommand */
     FALSE,           /* engineQuiet */
+    FALSE,           /* allowWild */
 };
 
 int  ProcessRawInput P((int, char *, int, void (*)(char *, char*)));
