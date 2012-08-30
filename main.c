@@ -105,7 +105,6 @@ void InitRunData(){
   runData.color=-1;
   runData.longAlgMoves=TRUE;
   runData.haveCmdResult=TRUE;
-  runData.calculatedTime=0;
   runData.timeOfLastMove=0;
   runData.idleTimeoutTimer=NULL;
   runData.findChallengeTimer=NULL;

@@ -215,7 +215,6 @@ typedef struct {
   int color;
   Bool longAlgMoves;
   Bool haveCmdResult;
-  int calculatedTime;
   long long timeOfLastMove;
   event_t idleTimeoutTimer;
   event_t findChallengeTimer;

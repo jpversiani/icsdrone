@@ -161,15 +161,6 @@ void SendMoveToComputer(move_t move){
 				   
 
 void SendTimeToComputer(int whitetime, int blacktime){
-  /* time in centiseconds */
-  if(runData.computerIsWhite && (runData.calculatedTime<whitetime)){
-    logme(LOG_INFO,"Reducing computer time to %d\n",runData.calculatedTime);
-    whitetime=runData.calculatedTime;
-  }
-  if(!runData.computerIsWhite && (runData.calculatedTime<blacktime)){
-    logme(LOG_INFO,"Reducing computer time to %d\n",runData.calculatedTime);
-    blacktime=runData.calculatedTime;
-  }
      SendToComputer("time %d\notim %d\n", 
 		    ((runData.computerIsWhite) ? whitetime : blacktime),
 		    ((runData.computerIsWhite) ? blacktime : whitetime));
@@ -391,15 +382,6 @@ void ProcessComputerLine(char *line, char *queue)
 	resignScoreSeen=0;
 	SendToIcs("resign\n");
       }else {
-	struct timeval tv;
-	gettimeofday(&tv,NULL);
-	if(runData.icsBoard.nextMoveNum>1){
-	  runData.calculatedTime=runData.calculatedTime+
-	                    100*runData.icsBoard.inctime-
-      (1000000*((long long)tv.tv_sec)+tv.tv_usec-runData.timeOfLastMove)/10000;
-	              
-	}
-	logme(LOG_DEBUG,"calculatedTime=%d",runData.calculatedTime);
 	ConvCompToIcs(move);
 	if(appData.acceptDraw && 
 	   runData.registeredDrawOffer &&

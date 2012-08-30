@@ -636,10 +636,6 @@ void HandleBoard(IcsBoard * icsBoard, char *moveList, bool ignoreMove){
       }
       SendToIcs("%s\n",bmove.move);
       SendMoveToComputer(bmove.move);
-      if(runData.icsBoard.nextMoveNum>1){
-	runData.calculatedTime+=100*runData.icsBoard.inctime;
-	logme(LOG_DEBUG,"calculatedTime=%d",runData.calculatedTime);
-      }
     }else{
       Go();
     }
@@ -1549,15 +1545,11 @@ Bool ProcessBoard(char *line){
     if (!strcmp(runData.icsBoard.nameOfWhite, runData.handle)) {
       logme(LOG_INFO, "I'm playing white.");
       runData.computerIsWhite = TRUE;
-      runData.calculatedTime=100*runData.icsBoard.whitetime;
-      logme(LOG_DEBUG,"calculatedTime=%d",runData.calculatedTime);
       oppname = runData.icsBoard.nameOfBlack;
       
     } else {
       logme(LOG_INFO, "I'm playing black.");
       runData.computerIsWhite = FALSE;
-      runData.calculatedTime=100*runData.icsBoard.blacktime;
-      logme(LOG_DEBUG,"calculatedTime=%d",runData.calculatedTime);
       oppname = runData.icsBoard.nameOfWhite;
     }
     if (!strcmp(runData.lastPlayer, oppname)) {
@@ -1653,7 +1645,6 @@ Bool ProcessGameEnd(char *line){
     SendMarker(DOCLEANUPS);
     runData.gameID = -1;
     runData.moveNum = -1;
-    runData.calculatedTime=0;
     runData.timeOfLastGame = time(0);
     if (runData.sigint) {
       InterruptComputer();
