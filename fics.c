@@ -715,6 +715,17 @@ Bool ProcessForwardingMarkers(char *line){
   return FALSE;
 }
 
+Bool UseMoveList(){
+    int ret;
+    ret=TRUE;
+    /* only FICS has the (undocumented) command "moves l" */
+    if (runData.longAlgMoves && !runData.onFICS) {
+	logme(LOG_WARNING,"Server doesn't support long algebraic move lists.\n\
+Do not ask for movelist.\n");
+	ret=FALSE;
+    }
+}
+
 Bool ProcessLogin(char *line){
   /*
    *  Detect our nickname - this is needed when 1) it was given in the 
@@ -753,14 +764,8 @@ Bool ProcessLogin(char *line){
 	  logme(LOG_INFO,"We seem to be playing on FICS.\n");
       }
 
-      if(!runData.onFICS){ // only FICS has the (undocumented) command "moves l"
+      if(!runData.onFICS){ 
 	  logme(LOG_INFO,"We seem to be playing on a different server from FICS.\n");
-	  if (runData.longAlgMoves) {
-	      logme(LOG_WARNING,"Server doesn't support long algebraic move lists.\n\
-Do not ask for movelist.\n");
-	      //	      runData.longAlgMoves = FALSE;
-	      runData.noMoveList=TRUE;
-	  }
       }
 
       if (strcmp(runData.handle, name)) {
@@ -1414,7 +1419,8 @@ Bool ProcessStartOfGame(char *line){
     }
     /* update our state */
     runData.inGame=TRUE;
-    if(!runData.noMoveList){
+    runData.useMoveList=UseMoveList();
+    if(runData.useMoveList){
 	/* reset movelist and ask for the moves */
 	runData.moveList[0] = '\0';
 	SendMarker(ASKSTARTMOVES);
@@ -1551,7 +1557,7 @@ Bool ProcessBoard(char *line){
       runData.numGamesInSeries = 1;
       strcpy(runData.lastPlayer, oppname);
     }
-    if(runData.noMoveList){
+    if(runData.useMoveList){
 	SendBoardToComputer(&runData.icsBoard);
 	HandleBoard(&(runData.icsBoard),NULL);
     }

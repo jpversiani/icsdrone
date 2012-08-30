@@ -247,7 +247,7 @@ typedef struct {
   char lastIcsPrompt[10];
   int proxyLoginState;
   Bool hideFromProxy;
-  Bool noMoveList;
+  Bool useMoveList;
 } RunData;
 
 /* AppData */
