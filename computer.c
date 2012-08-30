@@ -455,8 +455,12 @@ void ProcessComputerLine(char *line, char *queue)
       SendToComputer("ics %s\n", appData.icsHost);  /* zippy v2 */
     }
     if (strstr(line, " san=1")) {
-      logme(LOG_DEBUG,"Selecting standard notation");
+      logme(LOG_DEBUG,"Selecting short algebraic notation");
       runData.longAlgMoves=FALSE;  /* zippy v2 */
+    }
+    if (strstr(line, " san=0")) {
+      logme(LOG_DEBUG,"Selecting long algebraic notation");
+      runData.longAlgMoves=TRUE;  /* zippy v2 */
     }
     if (strstr(line, " usermove=1")) {
       logme(LOG_DEBUG,"Prefixing moves with \"usermove\"");
