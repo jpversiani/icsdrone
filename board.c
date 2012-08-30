@@ -164,7 +164,13 @@ void BoardToFen(char *fen, IcsBoard *board){
     sprintf (tmp, "-");
     strcat(fen,tmp);
   }
-  sprintf (tmp, " %c", (board->epFile > -1 ? 'a'+board->epFile : '-'));
+  if(board->epFile>-1){
+      sprintf (tmp, " %c%c", 
+	       'a'+board->epFile,
+	       (board->onMove=='B'?'3':'6'));
+  }else{
+      sprintf (tmp, " -");
+  }
   strcat(fen,tmp);
   sprintf (tmp," %d",board->movesSinceLastIrreversible);
   strcat(fen,tmp);

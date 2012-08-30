@@ -574,7 +574,7 @@ Bool EngineToMove(IcsBoard * icsBoard){
 }
 
 
-void HandleBoard(IcsBoard * icsBoard, char *moveList){
+void HandleBoard(IcsBoard * icsBoard, char *moveList, bool ignoreMove){
   move_t move;
   book_move_t bmove;
   int whitetime,blacktime;
@@ -620,11 +620,12 @@ void HandleBoard(IcsBoard * icsBoard, char *moveList){
     } else {
       strcpy(move, icsBoard->sanMove);
     }
-    if(strcmp(move,"none") && !moveList){
+    if(strcmp(move,"none") && !moveList && !ignoreMove){
       logme(LOG_INFO, "Move from ICS: %s %s", 
                      icsBoard->lanMove,icsBoard->sanMove);
       SendMoveToComputer(move);
     }
+    runData.waitingForFirstBoard=FALSE;
     if(strcmp(bmove.move,"none")){
       logme(LOG_INFO,"Bookmove: %s score=%d\n",bmove.move,bmove.score);
       if(appData.feedback && appData.feedbackCommand){
@@ -1515,7 +1516,7 @@ Bool ProcessMoveList(char *line){
             logme(LOG_INFO, "Found end of movelist; %c on move", 
                   runData.icsBoard.onMove);
             SetupEngineOptions(&(runData.icsBoard));
-            HandleBoard(&(runData.icsBoard),runData.moveList);
+            HandleBoard(&(runData.icsBoard),runData.moveList,FALSE);
             runData.parsingMoveList=FALSE;
             runData.waitingForMoveList=FALSE;
             return TRUE;
@@ -1537,7 +1538,6 @@ Bool ProcessBoard(char *line){
       return TRUE;
   }
   if(runData.waitingForFirstBoard){
-    runData.waitingForFirstBoard = FALSE;
     if (!strcmp(runData.icsBoard.nameOfWhite, runData.handle)) {
       logme(LOG_INFO, "I'm playing white.");
       runData.computerIsWhite = TRUE;
@@ -1560,8 +1560,9 @@ Bool ProcessBoard(char *line){
     }
     if(!runData.useMoveList){
 	SendBoardToComputer(&runData.icsBoard);
-	HandleBoard(&(runData.icsBoard),NULL);
+	HandleBoard(&(runData.icsBoard),NULL,TRUE);
     }
+    runData.waitingForFirstBoard = FALSE;
 
     return TRUE;
   }
@@ -1572,7 +1573,7 @@ Bool ProcessBoard(char *line){
      */
       return TRUE;
   }
-  HandleBoard(&(runData.icsBoard),NULL);
+  HandleBoard(&(runData.icsBoard),NULL,FALSE);
   return TRUE;
 }
 
