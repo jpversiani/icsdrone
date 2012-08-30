@@ -719,10 +719,13 @@ Bool ProcessForwardingMarkers(char *line){
 Bool UseMoveList(){
     int ret;
     ret=TRUE;
-    /* only FICS has the (undocumented) command "moves l" */
     if (runData.longAlgMoves && !runData.onFICS) {
+	/* only FICS has the (undocumented) command "moves l" */
 	logme(LOG_WARNING,"Server doesn't support long algebraic move lists.\n\
 Do not ask for movelist.\n");
+	ret=FALSE;
+    }else if(!strncmp(runData.variant,"wild",4)){
+	/* getting the initial position in a wild game is tricky */
 	ret=FALSE;
     }
     return ret;
@@ -1089,7 +1092,8 @@ Bool ProcessIncomingMatches(char *line){
        strcmp(variant,"Bullet") && 
        strcmp(variant,"Blitz") && 
        strcmp(variant,"Standard") &&
-       strcmp(variant,"non-standard") 
+       strcmp(variant,"non-standard") &&
+       strcmp(variant,"wild")
        ){
       logme(LOG_INFO,"Rejected variant %s", variant);
       SendToIcs("tell %s Sorry I only play regular chess.\n",name);
@@ -1369,7 +1373,7 @@ Bool ProcessFlaggedOpponent(char *line){
 
 Bool ProcessStartOfGame(char *line){
   char name[30+1],name2[30+1],rating[30+1],rating2[30+1];
-  char rated[30+1],variant[30+1];
+  char rated[30+1];
   char color[30+1];
   int time, inc;
   if(!runData.loggedIn) return FALSE;
@@ -1383,7 +1387,7 @@ Bool ProcessStartOfGame(char *line){
 	     name2, 
 	     rating2, 
 	     rated, 
-	     variant, 
+	     runData.variant, 
 	     &time, 
 	     &inc) == 8)
    || (sscanf(line, 
@@ -1394,12 +1398,12 @@ Bool ProcessStartOfGame(char *line){
 	     name2, 
 	     rating2, 
 	     rated, 
-	     variant, 
+	     runData.variant, 
 	     &time, 
 	     &inc) == 9)
    ) {
     logme(LOG_DEBUG, "Detected start of game: %s (%s) vs %s (%s) %s %s %d %d", 
-	  name, rating, name2, rating2,rated,variant,time,inc);
+	  name, rating, name2, rating2,rated,runData.variant,time,inc);
     runData.hideFromProxy=TRUE;
     if(appData.sendGameStart){
         ExecCommandList(appData.sendGameStart,0,FALSE);
@@ -1411,11 +1415,11 @@ Bool ProcessStartOfGame(char *line){
         }
         if(!runData.inTourney){
             Feedback(mask,"%s %s vs %s %s %s %s %d %d started.", 
-                     name, rating, name2, rating2,rated,variant,time,inc);
+                     name, rating, name2, rating2,rated,runData.variant,time,inc);
         }else{
             Feedback(mask,
                      "%s %s vs %s %s %s %s %d %d started (tourney #%d).", 
-                     name, rating, name2, rating2,rated,variant,time,inc,
+                     name, rating, name2, rating2,rated,runData.variant,time,inc,
                      runData.currentTourney);
         }
     }

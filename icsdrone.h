@@ -250,6 +250,7 @@ typedef struct {
   int proxyLoginState;
   Bool hideFromProxy;
   Bool useMoveList;
+  char variant[30+1]; 
 } RunData;
 
 /* AppData */
