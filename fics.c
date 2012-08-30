@@ -724,6 +724,7 @@ Bool UseMoveList(){
 Do not ask for movelist.\n");
 	ret=FALSE;
     }
+    return ret;
 }
 
 Bool ProcessLogin(char *line){
