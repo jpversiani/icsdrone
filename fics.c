@@ -1557,7 +1557,7 @@ Bool ProcessBoard(char *line){
       runData.numGamesInSeries = 1;
       strcpy(runData.lastPlayer, oppname);
     }
-    if(runData.useMoveList){
+    if(!runData.useMoveList){
 	SendBoardToComputer(&runData.icsBoard);
 	HandleBoard(&(runData.icsBoard),NULL);
     }
