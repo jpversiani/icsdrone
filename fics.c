@@ -1568,6 +1568,7 @@ Bool ProcessBoard(char *line){
     }
     if(!runData.useMoveList){
 	SendBoardToComputer(&runData.icsBoard);
+	SetupEngineOptions(&(runData.icsBoard));
 	HandleBoard(&(runData.icsBoard),NULL,TRUE);
     }
     runData.waitingForFirstBoard = FALSE;

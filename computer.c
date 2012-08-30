@@ -59,7 +59,12 @@ void Go(){
   /* Avoid sending go several times.
    * This seems to disturb some engines.
    */
-  if(forceMode) SendToComputer("go\n");
+    if(forceMode){
+	  struct timeval tv;
+	  gettimeofday(&tv,NULL);
+	  runData.timeOfLastMove=1000000*((long long)tv.tv_sec)+tv.tv_usec;
+	  SendToComputer("go\n");
+    }
   forceMode=FALSE;
 }
 
