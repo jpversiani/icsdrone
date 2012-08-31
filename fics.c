@@ -574,7 +574,7 @@ Bool EngineToMove(IcsBoard * icsBoard){
 }
 
 
-void HandleBoard(IcsBoard * icsBoard, char *moveList, bool ignoreMove){
+void HandleBoard(IcsBoard * icsBoard, char *moveList, Bool ignoreMove){
   move_t move;
   book_move_t bmove;
   int whitetime,blacktime;
