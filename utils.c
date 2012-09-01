@@ -106,17 +106,19 @@ void SetTimeZone(){
     return;
   }
 #endif
-//  if(dst && tzname[1] && tzname[1][0]){
-//    SendToIcs("set tzone %s\n",tzname[1]); 
-//    return;
-//  }
-//  if(tzname[0] && tzname[0][0]){
-//    SendToIcs("set tzone %s\n",tzname[0]); 
-//    return;
-//  }
   /* Sorry: no timezones with fractions. They don't seem to work, despite
    * what the helpfile says.
    */
+  /*  
+      if(dst && tzname[1] && tzname[1][0]){
+      SendToIcs("set tzone %s\n",tzname[1]); 
+      return;
+      }
+      if(tzname[0] && tzname[0][0]){
+      SendToIcs("set tzone %s\n",tzname[0]); 
+      return;
+      }
+  */
 #ifdef __FreeBSD__
   tz=r->tm_gmtoff/3600;
 #else
