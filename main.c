@@ -57,6 +57,51 @@ jmp_buf stackPointer;
 
 RunData runData;
 
+/**************************************
+ *
+ * This function modifies its argument
+ *
+ **************************************/
+
+void ParseVariantList(char *variants){
+    char *saveptr1;
+    char *saveptr2;
+    char *pair;
+    char *icsvariant;
+    char *chessvariant;
+    char *list;
+    int vix;
+    vix=0;
+
+    if(!variants){
+	runData.variantCount=0;
+	goto finish;
+    }
+    list=strdup(variants);
+    pair=strtok_r(list," ,",&saveptr1);
+    while(pair){
+	if(vix>=MAXVARIANTS){
+	    return;
+	}
+	icsvariant=strtok_r(pair," =", &saveptr2);
+	chessvariant=strtok_r(NULL," ", &saveptr2);
+	if(!chessvariant){
+	    chessvariant="chess";
+	}
+	//	printf("ics=[%s], chess=[%s]\n",icsvariant,chessvariant);
+	strncpy(runData.variants[vix][0],icsvariant,30);
+	runData.variants[vix][0][30]='\0';
+	strncpy(runData.variants[vix][1],chessvariant,30);
+	runData.variants[vix++][1][30]='\0';
+	pair=strtok_r(NULL," ,",&saveptr1);
+    }
+    free(list);
+ finish:
+    runData.variantCount=vix;
+    //    printf("variant count=%d\n",runData.variantCount);
+}
+
+
 void InitRunData(){
   runData.computerActive=FALSE;
   runData.computerIsWhite=FALSE;
@@ -137,6 +182,8 @@ void InitRunData(){
   runData.proxyLoginState=PROXY_LOGIN_INIT;
   runData.hideFromProxy=FALSE;
   runData.useMoveList=TRUE;
+  runData.variantCount=0;
+  ParseVariantList(appData.variants);
 }
 
 PersistentData persistentData;

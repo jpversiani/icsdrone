@@ -94,7 +94,8 @@ ArgList argList = {
     {"-ownerQuiet",           ArgBool,   &appData.ownerQuiet        , 1 },
     {"-feedbackCommand",      ArgString, &appData.feedbackCommand   , 1 },
     {"-engineQuiet",          ArgBool,   &appData.engineQuiet       , 1 },
-    {"-allowWild",            ArgBool,   &appData.allowWild         , 1 },
+    {"-allowWild",            ArgBool,   &appData.allowWild         , 0 },
+    {"-variants",             ArgString, &appData.variants          , 0 },
     {NULL,                    ArgNull,   NULL                       , 0 } 
 };
 

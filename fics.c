@@ -48,6 +48,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* Max line size of PGN file */
 #define MAX_PGN_FILE_LINE	80
 
+
+
 void InternalIcsCommand(char *command){
     SendMarker(STARTINTERNAL);
     SendToIcs("\n%s\n",command);

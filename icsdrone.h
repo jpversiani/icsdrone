@@ -110,6 +110,8 @@ extern jmp_buf stackPointer;
 #define MS 15
 typedef char move_t[MS+1];
 
+#define MAXVARIANTS 10
+
 /* Mock boolean type */
 
 #undef FALSE
@@ -250,6 +252,9 @@ typedef struct {
   Bool hideFromProxy;
   Bool useMoveList;
   char variant[30+1]; 
+  int variantCount;
+  char variants[MAXVARIANTS][2][30+1];
+  
 } RunData;
 
 /* AppData */
@@ -308,6 +313,7 @@ typedef struct {
     char * feedbackCommand;
     Bool engineQuiet;
     Bool allowWild;
+    char * variants;
 } AppData;
 
 extern PersistentData  persistentData;
