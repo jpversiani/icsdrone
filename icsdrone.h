@@ -313,7 +313,6 @@ typedef struct {
     Bool ownerQuiet;
     char * feedbackCommand;
     Bool engineQuiet;
-    Bool allowWild;
     char * variants;
 } AppData;
 

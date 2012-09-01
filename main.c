@@ -255,7 +255,6 @@ AppData appData = {
     FALSE,           /* ownerQuiet */
     NULL,            /* feedbackCommand */
     FALSE,           /* engineQuiet */
-    FALSE,           /* allowWild */
     NULL             /* variants */
 };
 
