@@ -1090,7 +1090,14 @@ Bool ProcessIncomingMatches(char *line){
       }
       for(i=0;i<runData.variantCount;i++){
 	  if(!strcmp(runData.variants[i][0],variant)){
-	      found=TRUE;
+	      int j;
+	      for(j=0;j<runData.engineVariantCount;j++){
+		  if(!strcmp(runData.variants[i][1],
+			     runData.engineVariants[j])){
+		      found=TRUE;
+		      break;
+		  }
+	      }
 	      break;
 	  }
       }
