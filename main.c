@@ -184,6 +184,8 @@ void InitRunData(){
   runData.useMoveList=TRUE;
   runData.variantCount=0;
   ParseVariantList(appData.variants);
+  runData.engineVariantCount=1;
+  strncpy(runData.engineVariants[0],"normal",strlen("normal"));
 }
 
 PersistentData persistentData;

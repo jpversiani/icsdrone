@@ -354,6 +354,35 @@ void PVFeedback(){
     }
 }
 
+void ParseEngineVariants(char *line){
+    int evc;
+    char *line1;
+    char *token;
+    evc=0;
+    line1=strdup(line);
+    token=strtok(line1," ");
+    if(strcmp(token,"feature")){
+	goto finish;
+    }
+    token=strtok(NULL," =\"");
+    if(strcmp(token,"variants")){
+	goto finish;
+    }
+    evc=0;
+    token=strtok(NULL," ,\"");
+    while(token){
+	if(evc==MAXVARIANTS){
+	    goto finish;
+	}
+	strncpy(runData.engineVariants[evc++],token,30);
+	logme(LOG_DEBUG,"engine supports variant \"%s\"",token);
+	token=strtok(NULL," ,\"");
+    }
+    runData.engineVariantCount=evc;
+ finish:
+    free(line1);
+}
+
 void ProcessComputerLine(char *line, char *queue) 
 {
   move_t move;
@@ -456,6 +485,9 @@ void ProcessComputerLine(char *line, char *queue)
     if (strstr(line, " draw=0")) {
       logme(LOG_DEBUG,"draw offers will not be passed to engine");
       runData.engineDrawFeature=FALSE;  /* zippy v2 */
+    }
+    if (strstr(line," variants")){
+	ParseEngineVariants(line);
     }
     if (strstr(line, " done=1")) {
       logme(LOG_DEBUG,"Computer is ready");
