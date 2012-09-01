@@ -98,7 +98,7 @@ void ParseVariantList(char *variants){
     free(list);
  finish:
     runData.variantCount=vix;
-    //    printf("variant count=%d\n",runData.variantCount);
+    //printf("variant count=%d\n",runData.variantCount);
 }
 
 
@@ -254,6 +254,7 @@ AppData appData = {
     NULL,            /* feedbackCommand */
     FALSE,           /* engineQuiet */
     FALSE,           /* allowWild */
+    NULL             /* variants */
 };
 
 int  ProcessRawInput P((int, char *, int, void (*)(char *, char*)));
@@ -687,6 +688,7 @@ int main(int argc, char *argv[])
     SetOption("program",LOGIN,0,"%s","gnuchess");
     SetOption("sendTimeout",LOGIN,0,"%s","resume");
     SetOption("feedbackCommand",LOGIN,0,"%s","whisper");
+    SetOption("variants",LOGIN,0,"lightning,blitz,standard,Bullet,Blitz,Standard");
     if (ParseArgs(argc, argv) == ERROR)
         Usage();
     signal(SIGINT, TerminateProc);
