@@ -86,7 +86,7 @@ void ParseVariantList(char *variants){
 	icsvariant=strtok_r(pair," =", &saveptr2);
 	chessvariant=strtok_r(NULL," ", &saveptr2);
 	if(!chessvariant){
-	    chessvariant="chess";
+	    chessvariant="normal";
 	}
 	//	printf("ics=[%s], chess=[%s]\n",icsvariant,chessvariant);
 	strncpy(runData.variants[vix][0],icsvariant,30);

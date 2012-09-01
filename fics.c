@@ -1377,6 +1377,7 @@ Bool ProcessStartOfGame(char *line){
   char rated[30+1];
   char color[30+1];
   int time, inc;
+  int i;
   if(!runData.loggedIn) return FALSE;
   /*
    *  Detect start of game, find gametype and rating of opponent
@@ -1439,6 +1440,12 @@ Bool ProcessStartOfGame(char *line){
 	if (!strcmp(name, runData.handle)) {
 	    SendToComputer("name %s\n", name2);
 	    SendToComputer("rating %d %d\n", atoi(rating), atoi(rating2));
+	}
+	/* send variant to computer */
+	for(i=0;i<MAXVARIANTS;i++){
+	    if(!strcmp(runData.variant,runData.variants[i][0])){
+		SendToComputer("variant %s\n",runData.variant);
+	    }
 	}
 	if (!strcmp(name2, runData.handle)) {
 	    SendToComputer("name %s\n", name);
