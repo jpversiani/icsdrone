@@ -1080,28 +1080,26 @@ Bool ProcessIncomingMatches(char *line){
 	      name,rating,name2,rating2,rated,variant) == 6)
       ||
       (sscanf(line,"Challenge: %30s (%30[^)]) [%30[^]]] %30s (%30[^)])%30s%30s",
-              name,rating,color,name2,rating2,rated,variant)==7)
-  ) {
-      // ICC and FICS have different variant names; we need a more generic
-      // solution for this...
-    if(strcmp(variant,"lightning") && 
-       strcmp(variant,"blitz") && 
-       strcmp(variant,"standard") &&
-       strcmp(variant,"Bullet") && 
-       strcmp(variant,"Blitz") && 
-       strcmp(variant,"Standard") &&
-       strcmp(variant,"non-standard") &&
-       (strcmp(variant,"wild") || !appData.allowWild)
-       ){
-      logme(LOG_INFO,"Rejected variant %s", variant);
-      if(appData.allowWild){
-	  SendToIcs("tell %s Sorry I only play regular chess (and possibly wild).\n",name);
-      }else{
-	  SendToIcs("tell %s Sorry I only play regular chess.\n",name);
+              name,rating,color,name2,rating2,rated,variant)==7)){
+      int i;
+      Bool found=FALSE;
+      /* More specific variant */
+      char *line1;
+      if((line1=strstr(line,"Loaded"))){
+	  sscanf(line1,"Loaded from %30[^.]",variant);
       }
-      SendToIcs("decline %s\n", name);    
-      return TRUE;
-    }
+      for(i=0;i<runData.variantCount;i++){
+	  if(!strcmp(runData.variants[i][0],variant)){
+	      found=TRUE;
+	      break;
+	  }
+      }
+      if(!found){
+	  SendToIcs("tell %s Sorry I do not play variant %s.\n",name,variant);
+	  SendToIcs("decline %s\n",name);
+	  return TRUE;
+      }
+
     if(!runData.inTourney && IsNoPlay(name)){
         logme(LOG_DEBUG,"Ignoring %s as he is on our noplay list.",name);
         SendToIcs("decline %s\n",name);
@@ -1117,6 +1115,7 @@ Bool ProcessIncomingMatches(char *line){
       SendToIcs("decline %s\n", name);
       return TRUE;
     }
+
     if (runData.quitPending) {
       SendToIcs("tell %s Sorry I have to go.\n", name);
       SendToIcs("decline %s\n", name);
@@ -1141,7 +1140,7 @@ Bool ProcessIncomingMatches(char *line){
     } 
     SendToIcs("accept %s\n", name);
     return TRUE;
-  }
+}
   return FALSE;
 }
 
