@@ -1101,6 +1101,9 @@ Bool ProcessIncomingMatches(char *line){
 		      break;
 		  }
 	      }
+	      if(!found){
+		  logme(LOG_DEBUG,"Variant rejected by engine");
+	      }
 	      break;
 	  }
       }
