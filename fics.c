@@ -1448,11 +1448,10 @@ Bool ProcessStartOfGame(char *line){
     }
     /* send variant to computer */
     runData.frc=FALSE;
-    for(i=0;i<MAXVARIANTS;i++){
-	printf("variant=[%s], stored=[%s]\n",runData.variant,runData.variants[i][0]);
+    for(i=0;i<runData.variantCount;i++){
 	if(!strcmp(runData.variant,runData.variants[i][0])){
 	    SendToComputer("variant %s\n",runData.variants[i][1]);
-	    if(!strcmp(runData.variants[i][1],"fisherandom")){
+	    if(!strcmp(runData.variants[i][1],"fischerandom")){
 		runData.frc=TRUE;
 		logme(LOG_DEBUG,"Enabling FRC castling.");
 	    }
