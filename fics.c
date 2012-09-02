@@ -1091,6 +1091,9 @@ Bool ProcessIncomingMatches(char *line){
       for(i=0;i<runData.variantCount;i++){
 	  if(!strcmp(runData.variants[i][0],variant)){
 	      int j;
+	      logme(LOG_DEBUG,"ICS variant=%s Engine variant=%s\n",
+		    runData.variants[i][0],
+		    runData.variants[i][1]);
 	      for(j=0;j<runData.engineVariantCount;j++){
 		  if(!strcmp(runData.variants[i][1],
 			     runData.engineVariants[j])){
