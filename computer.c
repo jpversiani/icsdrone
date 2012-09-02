@@ -369,14 +369,14 @@ void ParseEngineVariants(char *line){
 	goto finish;
     }
     evc=0;
-    token=strtok(NULL," ,\"");
+    token=strtok(NULL," ,\"\r\n");
     while(token){
 	if(evc==MAXVARIANTS){
 	    goto finish;
 	}
 	strncpy(runData.engineVariants[evc++],token,30);
 	logme(LOG_DEBUG,"engine supports variant \"%s\"",token);
-	token=strtok(NULL," ,\"");
+	token=strtok(NULL," ,\"\r\n");
     }
     runData.engineVariantCount=evc;
  finish:
