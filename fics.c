@@ -723,6 +723,7 @@ Bool UseMoveList(){
 Do not ask for movelist.\n");
 	ret=FALSE;
     }else if(!strncmp(runData.variant,"wild",4)){
+	/* this needs a more generic solution */
 	/* getting the initial position in a wild game is tricky */
 	ret=FALSE;
     }
@@ -1086,7 +1087,7 @@ Bool ProcessIncomingMatches(char *line){
       /* More specific variant */
       char *line1;
       if((line1=strstr(line,"Loaded"))){
-	  sscanf(line1,"Loaded from %30[^.]",variant);
+	  sscanf(line1,"Loaded from %30[^. ]",variant);
       }
       for(i=0;i<runData.variantCount;i++){
 	  if(!strcmp(runData.variants[i][0],variant)){
@@ -1108,7 +1109,7 @@ Bool ProcessIncomingMatches(char *line){
 	  }
       }
       if(!found){
-	  SendToIcs("tell %s Sorry I do not play variant %s.\n",name,variant);
+	  SendToIcs("tell %s Sorry I do not play variant \"%s\".\n",name,variant);
 	  SendToIcs("decline %s\n",name);
 	  return TRUE;
       }
@@ -1457,7 +1458,7 @@ Bool ProcessStartOfGame(char *line){
 	/* send variant to computer */
 	for(i=0;i<MAXVARIANTS;i++){
 	    if(!strcmp(runData.variant,runData.variants[i][0])){
-		SendToComputer("variant %s\n",runData.variant);
+		SendToComputer("variant %s\n",runData.variants[i][1]);
 	    }
 	}
 	if (!strcmp(name2, runData.handle)) {

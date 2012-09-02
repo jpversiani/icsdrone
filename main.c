@@ -88,7 +88,7 @@ void ParseVariantList(char *variants){
 	if(!chessvariant){
 	    chessvariant="normal";
 	}
-	//	printf("ics=[%s], chess=[%s]\n",icsvariant,chessvariant);
+	printf("ics=[%s], chess=[%s]\n",icsvariant,chessvariant);
 	strncpy(runData.variants[vix][0],icsvariant,30);
 	runData.variants[vix][0][30]='\0';
 	strncpy(runData.variants[vix][1],chessvariant,30);
@@ -98,7 +98,7 @@ void ParseVariantList(char *variants){
     free(list);
  finish:
     runData.variantCount=vix;
-    //printf("variant count=%d\n",runData.variantCount);
+    printf("variant count=%d\n",runData.variantCount);
 }
 
 
