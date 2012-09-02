@@ -689,7 +689,7 @@ int main(int argc, char *argv[])
     SetOption("program",LOGIN,0,"%s","gnuchess");
     SetOption("sendTimeout",LOGIN,0,"%s","resume");
     SetOption("feedbackCommand",LOGIN,0,"%s","whisper");
-    SetOption("variants",LOGIN,0,"lightning,blitz,standard,wild/fr=fischerandom,suicide=suicide,losers=losers,Bullet,Blitz,Standard");
+    SetOption("variants",LOGIN,0,"lightning,blitz,standard,wild/2,wild/3,wild/4,wild/5,wild/8,wild/8a,wild/fr=fischerandom,suicide=suicide,losers=losers,Bullet,Blitz,Standard");
     if (ParseArgs(argc, argv) == ERROR)
         Usage();
     signal(SIGINT, TerminateProc);
