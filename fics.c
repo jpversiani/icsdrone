@@ -1418,7 +1418,7 @@ Bool ProcessStartOfGame(char *line){
 	     &time, 
 	     &inc) == 9)
    ) {
-    logme(LOG_DEBUG, "Detected start of game: %s (%s) vs %s (%s) %s %s %d %d", 
+    logme(LOG_DEBUG, "Detected start of game: [%s] (%s) vs [%s] (%s) [%s] [%s] %d %d", 
 	  name, rating, name2, rating2,rated,runData.variant,time,inc);
     runData.hideFromProxy=TRUE;
     if(appData.sendGameStart){
@@ -1441,7 +1441,28 @@ Bool ProcessStartOfGame(char *line){
     }
     /* update our state */
     runData.inGame=TRUE;
+    /* send opponent name and ratings to computer */
+    if (!strcmp(name, runData.handle)) {
+	SendToComputer("name %s\n", name2);
+	SendToComputer("rating %d %d\n", atoi(rating), atoi(rating2));
+    }
+    /* send variant to computer */
+    runData.frc=FALSE;
+    for(i=0;i<MAXVARIANTS;i++){
+	printf("variant=[%s], stored=[%s]\n",runData.variant,runData.variants[i][0]);
+	if(!strcmp(runData.variant,runData.variants[i][0])){
+	    SendToComputer("variant %s\n",runData.variants[i][1]);
+	    if(!strcmp(runData.variants[i][1],"fisherandom")){
+		runData.frc=TRUE;
+		logme(LOG_DEBUG,"Enabling FRC castling.");
+	    }
+	}
+    }
     runData.useMoveList=UseMoveList();
+    if (!strcmp(name2, runData.handle)) {
+	SendToComputer("name %s\n", name);
+	SendToComputer("rating %d %d\n", atoi(rating2), atoi(rating));
+    }
     if(runData.useMoveList){
 	/* reset movelist and ask for the moves */
 	runData.moveList[0] = '\0';
@@ -1450,26 +1471,6 @@ Bool ProcessStartOfGame(char *line){
 	    InternalIcsCommand("moves l\n");
 	else
 	    InternalIcsCommand("moves\n");
-	/* send opponent name and ratings to computer */
-	if (!strcmp(name, runData.handle)) {
-	    SendToComputer("name %s\n", name2);
-	    SendToComputer("rating %d %d\n", atoi(rating), atoi(rating2));
-	}
-	/* send variant to computer */
-	runData.frc=FALSE;
-	for(i=0;i<MAXVARIANTS;i++){
-	    if(!strcmp(runData.variant,runData.variants[i][0])){
-		SendToComputer("variant %s\n",runData.variants[i][1]);
-		if(!strcmp(runData.variants[i][1],"fisherandom")){
-		    runData.frc=TRUE;
-		    logme(LOG_DEBUG,"Enabling FRC castling.");
-		}
-	    }
-	}
-	if (!strcmp(name2, runData.handle)) {
-	    SendToComputer("name %s\n", name);
-	    SendToComputer("rating %d %d\n", atoi(rating2), atoi(rating));
-	}
 	runData.waitingForMoveList =TRUE;
     }
     /* update our state */
