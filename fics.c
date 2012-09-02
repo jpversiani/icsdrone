@@ -1456,9 +1456,14 @@ Bool ProcessStartOfGame(char *line){
 	    SendToComputer("rating %d %d\n", atoi(rating), atoi(rating2));
 	}
 	/* send variant to computer */
+	runData.frc=FALSE;
 	for(i=0;i<MAXVARIANTS;i++){
 	    if(!strcmp(runData.variant,runData.variants[i][0])){
 		SendToComputer("variant %s\n",runData.variants[i][1]);
+		if(!strcmp(runData.variants[i][1],"fisherandom")){
+		    runData.frc=TRUE;
+		    logme(LOG_DEBUG,"Enabling FRC castling.");
+		}
 	    }
 	}
 	if (!strcmp(name2, runData.handle)) {

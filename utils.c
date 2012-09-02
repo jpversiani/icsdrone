@@ -250,19 +250,35 @@ Bool ConvIcsCastlingToLan(char onMove, move_t move){
         strcpy(move,"o-o-o");
     }
     if(!strcasecmp(move,"o-o") && onMove=='W'){
-      strcpy(move,"e1g1");
+	if(runData.frc){
+	    strcpy(move,"O-O");
+	}else{
+	    strcpy(move,"e1g1");
+	}
       return TRUE;
     }
     if(!strcasecmp(move,"o-o-o") && onMove=='W'){
-      strcpy(move,"e1c1");
+	if(runData.frc){
+	    strcpy(move,"O-O-O");
+	}else{
+	    strcpy(move,"e1c1");
+	}
       return TRUE;
     }
     if(!strcasecmp(move,"o-o") && onMove=='B'){
-      strcpy(move,"e8g8");
+	if(runData.frc){
+	    strcpy(move,"O-O");
+	}else{
+	    strcpy(move,"e8g8");
+	}
       return TRUE;
     }
     if(!strcasecmp(move,"o-o-o") && onMove=='B'){
-      strcpy(move,"e8c8");
+	if(runData.frc){
+	    strcpy(move,"O-O-O");
+	}else{
+	    strcpy(move,"e8c8");
+	}
       return TRUE;
     }
     return FALSE;

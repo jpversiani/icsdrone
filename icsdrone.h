@@ -256,6 +256,7 @@ typedef struct {
   char variants[MAXVARIANTS][2][30+1];
   int engineVariantCount; 
   char engineVariants[MAXVARIANTS][30+1];
+  Bool frc;
 } RunData;
 
 /* AppData */
