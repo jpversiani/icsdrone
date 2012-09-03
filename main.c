@@ -57,50 +57,6 @@ jmp_buf stackPointer;
 
 RunData runData;
 
-/**************************************
- *
- * This function modifies its argument
- *
- **************************************/
-
-void ParseVariantList(char *variants){
-    char *saveptr1;
-    char *saveptr2;
-    char *pair;
-    char *icsvariant;
-    char *chessvariant;
-    char *list;
-    int vix;
-    vix=0;
-
-    if(!variants){
-	runData.variantCount=0;
-	goto finish;
-    }
-    list=strdup(variants);
-    pair=strtok_r(list," ,",&saveptr1);
-    while(pair){
-	if(vix>=MAXVARIANTS){
-	    return;
-	}
-	icsvariant=strtok_r(pair," =", &saveptr2);
-	chessvariant=strtok_r(NULL," ", &saveptr2);
-	if(!chessvariant){
-	    chessvariant="normal";
-	}
-	//	printf("ics=[%s], chess=[%s]\n",icsvariant,chessvariant);
-	strncpy(runData.variants[vix][0],icsvariant,30);
-	runData.variants[vix][0][30]='\0';
-	strncpy(runData.variants[vix][1],chessvariant,30);
-	runData.variants[vix++][1][30]='\0';
-	pair=strtok_r(NULL," ,",&saveptr1);
-    }
-    free(list);
- finish:
-    runData.variantCount=vix;
-    //    printf("variant count=%d\n",runData.variantCount);
-}
-
 
 void InitRunData(){
   runData.computerActive=FALSE;
@@ -183,7 +139,8 @@ void InitRunData(){
   runData.hideFromProxy=FALSE;
   runData.useMoveList=TRUE;
   runData.variantCount=0;
-  ParseVariantList(appData.variants);
+  /* This done after server detection */
+  /* ParseVariantList(appData.variants); */
   runData.engineVariantCount=1;
   strncpy(runData.engineVariants[0],"normal",strlen("normal"));
   runData.frc=FALSE;
@@ -690,7 +647,6 @@ int main(int argc, char *argv[])
     SetOption("program",LOGIN,0,"%s","gnuchess");
     SetOption("sendTimeout",LOGIN,0,"%s","resume");
     SetOption("feedbackCommand",LOGIN,0,"%s","whisper");
-    SetOption("variants",LOGIN,0,"lightning,blitz,standard,wild/2,wild/3,wild/4,wild/5,wild/8,wild/8a,wild/fr=fischerandom,suicide=suicide,losers=losers,Bullet,Blitz,Standard");
     if (ParseArgs(argc, argv) == ERROR)
         Usage();
     signal(SIGINT, TerminateProc);

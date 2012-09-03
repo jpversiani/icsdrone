@@ -725,10 +725,51 @@ Do not ask for movelist.\n");
     }else if(!strncmp(runData.variant,"wild",4)){
 	/* this needs a more generic solution */
 	/* getting the initial position in a wild game is tricky */
+	logme(LOG_DEBUG,"Do not ask for movelist since this is a wild game.\n");
 	ret=FALSE;
     }
     return ret;
 }
+
+void ParseVariantList(char *variants){
+    char *saveptr1;
+    char *saveptr2;
+    char *pair;
+    char *icsvariant;
+    char *chessvariant;
+    char *list;
+    int vix;
+    vix=0;
+
+    if(!variants){
+	runData.variantCount=0;
+	goto finish;
+    }
+    list=strdup(variants);
+    pair=strtok_r(list," ,",&saveptr1);
+    while(pair){
+	if(vix>=MAXVARIANTS){
+	    return;
+	}
+	icsvariant=strtok_r(pair," =", &saveptr2);
+	chessvariant=strtok_r(NULL," ", &saveptr2);
+	if(!chessvariant){
+	    chessvariant="normal";
+	}
+	logme(LOG_DEBUG,"ics=[%s], chess=[%s]\n",icsvariant,chessvariant);
+	strncpy(runData.variants[vix][0],icsvariant,30);
+	runData.variants[vix][0][30]='\0';
+	strncpy(runData.variants[vix][1],chessvariant,30);
+	runData.variants[vix++][1][30]='\0';
+	pair=strtok_r(NULL," ,",&saveptr1);
+    }
+    free(list);
+ finish:
+    runData.variantCount=vix;
+    logme(LOG_DEBUG,"variant count=%d\n",runData.variantCount);
+}
+
+
 
 Bool ProcessLogin(char *line){
   /*
@@ -782,6 +823,29 @@ Bool ProcessLogin(char *line){
   }
   if(!runData.loggedIn && IsMarker(ENDLOGIN,line)){
     logme(LOG_INFO,"It seems we are succesfully logged in!");
+    if(appData.variants==NULL){
+	char *variants;
+	switch(runData.icsType){
+	case ICS_FICS:
+	    variants="lightning,blitz,standard,wild/1=wildcastle,wild/2,wild/3,wild/4,wild/5,wild/8,wild/8a,wild/fr=fischerandom,suicide=suicide,losers=losers";
+	    break;
+	case ICS_ICC:
+	    /* This is currently not tested! */
+	    variants="Bullet,Blitz,Standard,wild/1=wildcastle,wild/2,wild/3,wild/4,wild/5,wild/7,wild/8,wild/9=twokings,wild/10,wild/11,wild/12,wild/13,wild/14,wild/15,wild/16=kriegspiel,wild/17,wild/18,wild/19,wild/22=fischerandom,wild/25=3check,wild/26=giveaway";
+	    SetOption("variants",LOGIN,0,variants);
+	    logme(LOG_DEBUG,"Enabling variants: %s",variants);
+	    break;
+	case ICS_VARIANT:
+	    variants="lightning,blitz,standard,wild/1=wildcastle,wild/2,wild/3,wild/4,wild/5";
+	    break;
+	default:
+	    variants="lightning,blitz,standard,wild/1=wildcastle,wild/2,wild/3,wild/4,wild/5";
+	    break;
+	}
+	SetOption("variants",LOGIN,0,variants);
+    }
+    logme(LOG_DEBUG,"Enabling variants: %s",appData.variants);
+    ParseVariantList(appData.variants); 
     StartComputer();
     if(appData.proxy && StartProxy()){
 	logme(LOG_INFO,"Proxy started.");

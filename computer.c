@@ -371,7 +371,7 @@ void ParseEngineVariants(char *line){
     evc=0;
     token=strtok(NULL," ,\"\r\n");
     while(token){
-	if(evc==MAXVARIANTS){
+	if(evc==MAXENGINEVARIANTS){
 	    goto finish;
 	}
 	strncpy(runData.engineVariants[evc++],token,30);
