@@ -1511,12 +1511,12 @@ Bool ProcessStartOfGame(char *line){
 	SendToComputer("rating %d %d\n", atoi(rating), atoi(rating2));
     }
     /* send variant to computer */
-    runData.frc=FALSE;
+    strcpy(runData.chessVariant,"normal");
     for(i=0;i<runData.variantCount;i++){
 	if(!strcmp(runData.variant,runData.variants[i][0])){
-	    SendToComputer("variant %s\n",runData.variants[i][1]);
-	    if(!strcmp(runData.variants[i][1],"fischerandom")){
-		runData.frc=TRUE;
+	    strcpy(runData.chessVariant,runData.variants[i][1]);
+	    SendToComputer("variant %s\n",runData.chessVariant);
+	    if(!strcmp(runData.chessVariant,"fischerandom")){
 		logme(LOG_DEBUG,"Enabling FRC castling.");
 	    }
 	}

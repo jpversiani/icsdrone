@@ -142,8 +142,8 @@ void InitRunData(){
   /* This done after server detection */
   /* ParseVariantList(appData.variants); */
   runData.engineVariantCount=1;
-  strncpy(runData.engineVariants[0],"normal",strlen("normal"));
-  runData.frc=FALSE;
+  strcpy(runData.engineVariants[0],"normal");
+  strcpy(runData.chessVariant,"normal");
 }
 
 PersistentData persistentData;

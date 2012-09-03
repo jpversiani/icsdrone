@@ -244,13 +244,15 @@ void ConvIcsTransferPromotionSuffix(char *sanMove,char *lanMove){
 
 Bool ConvIcsCastlingToLan(char onMove, move_t move){
     /* work around  bug in (undocumented) ICS LAN generation */
+    Bool frc;
     if(!strcasecmp(move,"oo")){
          strcpy(move,"o-o");
     } else if(!strcasecmp(move,"ooo")) {
         strcpy(move,"o-o-o");
     }
+    frc=!strcmp(runData.chessVariant,"fischerandom");
     if(!strcasecmp(move,"o-o") && onMove=='W'){
-	if(runData.frc){
+	if(frc){
 	    strcpy(move,"O-O");
 	}else{
 	    strcpy(move,"e1g1");
@@ -258,7 +260,7 @@ Bool ConvIcsCastlingToLan(char onMove, move_t move){
       return TRUE;
     }
     if(!strcasecmp(move,"o-o-o") && onMove=='W'){
-	if(runData.frc){
+	if(frc){
 	    strcpy(move,"O-O-O");
 	}else{
 	    strcpy(move,"e1c1");
@@ -266,7 +268,7 @@ Bool ConvIcsCastlingToLan(char onMove, move_t move){
       return TRUE;
     }
     if(!strcasecmp(move,"o-o") && onMove=='B'){
-	if(runData.frc){
+	if(frc){
 	    strcpy(move,"O-O");
 	}else{
 	    strcpy(move,"e8g8");
@@ -274,7 +276,7 @@ Bool ConvIcsCastlingToLan(char onMove, move_t move){
       return TRUE;
     }
     if(!strcasecmp(move,"o-o-o") && onMove=='B'){
-	if(runData.frc){
+	if(frc){
 	    strcpy(move,"O-O-O");
 	}else{
 	    strcpy(move,"e8c8");

@@ -294,7 +294,7 @@ The default for a generic ics is
       wild/3,wild/4,wild/5"
 
 This means that almost all ics variants translate to
-the engine variant "normal" except "wild/1" which
+the chess variant "normal" except "wild/1" which
 translates to "wildcastle".
 
 =item B<-colorTell>
