@@ -118,6 +118,7 @@ typedef char move_t[MS+1];
 #undef TRUE
 
 typedef enum { FALSE = 0, TRUE = 1 } Bool;
+typedef enum {ICS_ICC, ICS_FICS, ICS_VARIANT, ICS_GENERIC} IcsType;
 
 /* Events */
 
@@ -243,7 +244,7 @@ typedef struct {
   char tellQueue[TELLQUEUESIZE];
   event_t tellTimer;
   Bool lastGameWasAbortOrAdjourn;
-  Bool onFICS;
+  IcsType icsType;
   Bool parsingMoveList;
   Bool processingLastMoves;
   int internalIcsCommand;

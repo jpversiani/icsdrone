@@ -174,7 +174,7 @@ void InitRunData(){
   runData.tellTimer=NULL;
   runData.tellQueue[0]='\0';
   runData.lastGameWasAbortOrAdjourn=FALSE;
-  runData.onFICS=FALSE;
+  runData.icsType=ICS_GENERIC;
   runData.parsingMoveList=FALSE;
   runData.processingLastMoves=FALSE;
   runData.internalIcsCommand=0;
@@ -296,8 +296,8 @@ void ProcessConsoleLine(char *line, char *queue)
 void SetInterface(){
   char *uptime=strdup(asctime(gmtime(&persistentData.startTime)));
   uptime=strtok(uptime,"\r\n");
-  logme(LOG_DEBUG,"Setting interface. runData.onFICS=%d\n",runData.onFICS);
-  if(runData.onFICS){
+  logme(LOG_DEBUG,"Setting interface. runData.icsType=%d\n",runData.icsType);
+  if(runData.icsType==ICS_FICS){
       if(runData.myname[0]){
 	  SendToIcs("set interface %s-%s + %s. Online since %s GMT (%d games played).\n",PACKAGE_NAME,VERSION,runData.myname,uptime,persistentData.games);
       }else{

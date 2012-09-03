@@ -717,7 +717,7 @@ Bool ProcessForwardingMarkers(char *line){
 Bool UseMoveList(){
     int ret;
     ret=TRUE;
-    if (runData.longAlgMoves && !runData.onFICS) {
+    if (runData.longAlgMoves && runData.icsType==ICS_FICS) {
 	/* only FICS has the (undocumented) command "moves l" */
 	logme(LOG_WARNING,"Server doesn't support long algebraic move lists.\n\
 Do not ask for movelist.\n");
@@ -738,7 +738,6 @@ Bool ProcessLogin(char *line){
    */
   char name[30+1];
   char dummy;
-  Bool onFICS;
   if(runData.loggedIn) return FALSE;
   if (strstr(line,"Invalid password")){
     ExitOn(EXIT_HARDQUIT,"Invalid password!");
@@ -756,22 +755,23 @@ Bool ProcessLogin(char *line){
       return TRUE;
     }
   }
-  onFICS=FALSE;
+  if(strstr(line,"freechess.org")){
+      runData.icsType=ICS_FICS;
+      logme(LOG_DEBUG,"We are playing on FICS.");
+  }
+  if(strstr(line,"chessclub.com")){
+      runData.icsType=ICS_ICC;
+      logme(LOG_DEBUG,"We are playing on ICC.");
+  }
+  if(strstr(line,"Variant-ICS")){
+      runData.icsType=ICS_VARIANT;
+      logme(LOG_DEBUG,"We are playing on H.G. Muller's variant ICS.");
+  }
   if (!runData.loggedIn &&
       (sscanf(line, "Statistics for %30[^( ]", name) == 1 ||
-       (onFICS=   (sscanf(line, "Finger of %30[^:( ]",name)==1)   ))&&
+       (sscanf(line, "Finger of %30[^:( ]",name)==1)   )&&
       !strncasecmp(runData.handle, name, strlen(runData.handle))) {
       
-      runData.onFICS|=onFICS;
-      
-      if(runData.onFICS){
-	  logme(LOG_INFO,"We seem to be playing on FICS.\n");
-      }
-
-      if(!runData.onFICS){ 
-	  logme(LOG_INFO,"We seem to be playing on a different server from FICS.\n");
-      }
-
       if (strcmp(runData.handle, name)) {
 	  logme(LOG_WARNING, "Nickname was corrected to: %s", name);
 	  strncpy(runData.handle,name,sizeof(runData.handle));
