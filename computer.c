@@ -123,11 +123,15 @@ void EnsureComputerReady(){
   }
 }
 
-void SendBoardToComputer(IcsBoard *board){
+void SendBoardToComputer(IcsBoard *board, Bool ignoreStartBoard){
       char tmp[256];
 	tmp[0]='\0';
 	strcat(tmp,"setboard ");
 	BoardToFen(tmp+9,&runData.icsBoard);
+	if(!strcmp(tmp+9,StartFen) && ignoreStartBoard){
+	    logme(LOG_DEBUG,"Do not send the board, since it is the start board for variant normal.");
+	    return;
+	}
 	strcat(tmp,"\n");
 	SendToComputer(tmp);
 }

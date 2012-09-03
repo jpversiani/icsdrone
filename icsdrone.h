@@ -389,7 +389,7 @@ extern void SetScoreForWhite P(());
 extern void SendMovesToComputer P((char *));
 extern void SendMoveToComputer P((char *));
 extern void SendTimeToComputer P((int,int));
-extern void SendBoardToComputer P((IcsBoard *));
+extern void SendBoardToComputer P((IcsBoard *, Bool));
 
 extern Bool EvalDraw P((int));
 

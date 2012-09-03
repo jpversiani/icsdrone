@@ -717,7 +717,7 @@ Bool ProcessForwardingMarkers(char *line){
 Bool UseMoveList(){
     int ret;
     ret=TRUE;
-    if (runData.longAlgMoves && runData.icsType==ICS_FICS) {
+    if (runData.longAlgMoves && runData.icsType!=ICS_FICS) {
 	/* only FICS has the (undocumented) command "moves l" */
 	logme(LOG_WARNING,"Server doesn't support long algebraic move lists.\n\
 Do not ask for movelist.\n");
@@ -1650,7 +1650,12 @@ Bool ProcessBoard(char *line){
       strcpy(runData.lastPlayer, oppname);
     }
     if(!runData.useMoveList){
-	SendBoardToComputer(&runData.icsBoard);
+	Bool ignoreStartBoard;
+	ignoreStartBoard=FALSE;
+	if(!strcmp(runData.chessVariant,"normal")){
+	    ignoreStartBoard=TRUE;
+	}
+	SendBoardToComputer(&runData.icsBoard,ignoreStartBoard);
 	SetupEngineOptions(&(runData.icsBoard));
 	HandleBoard(&(runData.icsBoard),NULL,TRUE);
     }
