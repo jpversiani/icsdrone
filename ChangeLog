@@ -95,3 +95,8 @@ do not work but playing games seems to be ok!
 - Act as a local proxy for the remote ICS. 
 - Fix for different "Creating" message for tourney at ICC (M v Kervinck).
 0.26	
+- Enable wrapping in generated pgn file (Gautam Mani).
+- Add autogen.sh.
+- Transfer to sourceforge.
+0.27
+- Wild support.

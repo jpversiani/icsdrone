@@ -1,6 +1,17 @@
+icsdroneng (0.27) unstable; urgency=low
+
+  * Wild support.
+
+ -- Michel Van den Bergh <michel.vandenbergh@uhasselt.be>  Sun, 2 Sept 2012 19:00:00 +0200
+	
+
 icsdroneng (0.26) unstable; urgency=low
 
-  * Place holder.
+  * Enable wrapping in generated pgn file (Gautam Mani).
+
+  * Add autogen.sh.
+
+  * Transfer to sourceforge.
 
  -- Michel Van den Bergh <michel.vandenbergh@uhasselt.be>  Sun, 26 Feb 2012 19:00:00 +0200
 	
