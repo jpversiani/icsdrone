@@ -253,11 +253,11 @@ typedef struct {
   int proxyLoginState;
   Bool hideFromProxy;
   Bool useMoveList;
-  char variant[30+1]; 
-  int variantCount;
-  char variants[MAXVARIANTS][2][30+1];
-  int engineVariantCount; 
-  char engineVariants[MAXVARIANTS][30+1];
+  char icsVariant[30+1]; 
+  int icsVariantCount;
+  char icsVariants[MAXVARIANTS][2][30+1];
+  int chessVariantCount; 
+  char chessVariants[MAXVARIANTS][30+1];
   char chessVariant[30+1];
 } RunData;
 

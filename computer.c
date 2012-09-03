@@ -378,11 +378,11 @@ void ParseEngineVariants(char *line){
 	if(evc==MAXENGINEVARIANTS){
 	    goto finish;
 	}
-	strncpy(runData.engineVariants[evc++],token,30);
+	strncpy(runData.chessVariants[evc++],token,30);
 	logme(LOG_DEBUG,"engine supports variant \"%s\"",token);
 	token=strtok(NULL," ,\"\r\n");
     }
-    runData.engineVariantCount=evc;
+    runData.chessVariantCount=evc;
  finish:
     free(line1);
 }

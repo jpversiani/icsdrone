@@ -138,11 +138,11 @@ void InitRunData(){
   runData.proxyLoginState=PROXY_LOGIN_INIT;
   runData.hideFromProxy=FALSE;
   runData.useMoveList=TRUE;
-  runData.variantCount=0;
+  runData.icsVariantCount=0;
   /* This done after server detection */
   /* ParseVariantList(appData.variants); */
-  runData.engineVariantCount=1;
-  strcpy(runData.engineVariants[0],"normal");
+  runData.chessVariantCount=1;
+  strcpy(runData.chessVariants[0],"normal");
   strcpy(runData.chessVariant,"normal");
 }
 

@@ -722,7 +722,7 @@ Bool UseMoveList(){
 	logme(LOG_WARNING,"Server doesn't support long algebraic move lists.\n\
 Do not ask for movelist.\n");
 	ret=FALSE;
-    }else if(!strncmp(runData.variant,"wild",4)){
+    }else if(!strncmp(runData.icsVariant,"wild",4)){
 	/* this needs a more generic solution */
 	/* getting the initial position in a wild game is tricky */
 	logme(LOG_DEBUG,"Do not ask for movelist since this is a wild game.\n");
@@ -742,7 +742,7 @@ void ParseVariantList(char *variants){
     vix=0;
 
     if(!variants){
-	runData.variantCount=0;
+	runData.icsVariantCount=0;
 	goto finish;
     }
     list=strdup(variants);
@@ -757,16 +757,16 @@ void ParseVariantList(char *variants){
 	    chessvariant="normal";
 	}
 	logme(LOG_DEBUG,"ics=[%s], chess=[%s]\n",icsvariant,chessvariant);
-	strncpy(runData.variants[vix][0],icsvariant,30);
-	runData.variants[vix][0][30]='\0';
-	strncpy(runData.variants[vix][1],chessvariant,30);
-	runData.variants[vix++][1][30]='\0';
+	strncpy(runData.icsVariants[vix][0],icsvariant,30);
+	runData.icsVariants[vix][0][30]='\0';
+	strncpy(runData.icsVariants[vix][1],chessvariant,30);
+	runData.icsVariants[vix++][1][30]='\0';
 	pair=strtok_r(NULL," ,",&saveptr1);
     }
     free(list);
  finish:
-    runData.variantCount=vix;
-    logme(LOG_DEBUG,"variant count=%d\n",runData.variantCount);
+    runData.icsVariantCount=vix;
+    logme(LOG_DEBUG,"variant count=%d\n",runData.icsVariantCount);
 }
 
 
@@ -1153,15 +1153,15 @@ Bool ProcessIncomingMatches(char *line){
       if((line1=strstr(line,"Loaded"))){
 	  sscanf(line1,"Loaded from %30[^. ]",variant);
       }
-      for(i=0;i<runData.variantCount;i++){
-	  if(!strcmp(runData.variants[i][0],variant)){
+      for(i=0;i<runData.icsVariantCount;i++){
+	  if(!strcmp(runData.icsVariants[i][0],variant)){
 	      int j;
 	      logme(LOG_DEBUG,"ICS variant=%s Engine variant=%s\n",
-		    runData.variants[i][0],
-		    runData.variants[i][1]);
-	      for(j=0;j<runData.engineVariantCount;j++){
-		  if(!strcmp(runData.variants[i][1],
-			     runData.engineVariants[j])){
+		    runData.icsVariants[i][0],
+		    runData.icsVariants[i][1]);
+	      for(j=0;j<runData.chessVariantCount;j++){
+		  if(!strcmp(runData.icsVariants[i][1],
+			     runData.chessVariants[j])){
 		      found=TRUE;
 		      break;
 		  }
@@ -1467,7 +1467,7 @@ Bool ProcessStartOfGame(char *line){
 	     name2, 
 	     rating2, 
 	     rated, 
-	     runData.variant, 
+	     runData.icsVariant, 
 	     &time, 
 	     &inc) == 8)
    || (sscanf(line, 
@@ -1478,12 +1478,12 @@ Bool ProcessStartOfGame(char *line){
 	     name2, 
 	     rating2, 
 	     rated, 
-	     runData.variant, 
+	     runData.icsVariant, 
 	     &time, 
 	     &inc) == 9)
    ) {
     logme(LOG_DEBUG, "Detected start of game: [%s] (%s) vs [%s] (%s) [%s] [%s] %d %d", 
-	  name, rating, name2, rating2,rated,runData.variant,time,inc);
+	  name, rating, name2, rating2,rated,runData.icsVariant,time,inc);
     runData.hideFromProxy=TRUE;
     if(appData.sendGameStart){
         ExecCommandList(appData.sendGameStart,0,FALSE);
@@ -1495,11 +1495,11 @@ Bool ProcessStartOfGame(char *line){
         }
         if(!runData.inTourney){
             Feedback(mask,"%s %s vs %s %s %s %s %d %d started.", 
-                     name, rating, name2, rating2,rated,runData.variant,time,inc);
+                     name, rating, name2, rating2,rated,runData.icsVariant,time,inc);
         }else{
             Feedback(mask,
                      "%s %s vs %s %s %s %s %d %d started (tourney #%d).", 
-                     name, rating, name2, rating2,rated,runData.variant,time,inc,
+                     name, rating, name2, rating2,rated,runData.icsVariant,time,inc,
                      runData.currentTourney);
         }
     }
@@ -1512,9 +1512,9 @@ Bool ProcessStartOfGame(char *line){
     }
     /* send variant to computer */
     strcpy(runData.chessVariant,"normal");
-    for(i=0;i<runData.variantCount;i++){
-	if(!strcmp(runData.variant,runData.variants[i][0])){
-	    strcpy(runData.chessVariant,runData.variants[i][1]);
+    for(i=0;i<runData.icsVariantCount;i++){
+	if(!strcmp(runData.icsVariant,runData.icsVariants[i][0])){
+	    strcpy(runData.chessVariant,runData.icsVariants[i][1]);
 	    SendToComputer("variant %s\n",runData.chessVariant);
 	    if(!strcmp(runData.chessVariant,"fischerandom")){
 		logme(LOG_DEBUG,"Enabling FRC castling.");
