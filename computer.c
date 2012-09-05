@@ -383,7 +383,9 @@ void ParseEngineVariants(char *line){
 	token=strtok(NULL," ,\"\r\n");
     }
     runData.chessVariantCount=evc;
+	
  finish:
+    logme(LOG_DEBUG,"engine supports %d variants",runData.chessVariantCount);
     free(line1);
 }
 

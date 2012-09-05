@@ -731,6 +731,32 @@ Do not ask for movelist.\n");
     return ret;
 }
 
+char * CheckChessVariantSupport(char * variant){
+    Bool found=FALSE;
+    char *variant1;
+    char *chessVariant;
+    int j;
+    logme(LOG_DEBUG,"Testing variant \"%s\"\n",variant);
+    for(j=0;j<runData.chessVariantCount;j++){
+	chessVariant=runData.chessVariants[j];
+	logme(LOG_DEBUG,"against chess variant \"%s\"\n",chessVariant);
+	if(!strncmp(chessVariant,"8x8",3) && 
+	   (variant1=strchr(chessVariant,'_'))){
+	    chessVariant=variant1+1;
+	}
+	logme(LOG_DEBUG,"normalized as \"%s\"\n",chessVariant);
+	if(!strcmp(variant,chessVariant)){
+	    found=TRUE;
+	    break;
+	}
+    }
+    if(found){
+	return runData.chessVariants[j];
+    }else{
+	return NULL;
+    }
+}
+
 void ParseVariantList(char *variants){
     char *saveptr1;
     char *saveptr2;
@@ -1147,27 +1173,22 @@ Bool ProcessIncomingMatches(char *line){
       (sscanf(line,"Challenge: %30s (%30[^)]) [%30[^]]] %30s (%30[^)])%30s%30s",
               name,rating,color,name2,rating2,rated,variant)==7)){
       int i;
-      Bool found=FALSE;
       /* More specific variant */
       char *line1;
+      int found;
       if((line1=strstr(line,"Loaded"))){
 	  sscanf(line1,"Loaded from %30[^. ]",variant);
       }
+      found=FALSE;
       for(i=0;i<runData.icsVariantCount;i++){
 	  if(!strcmp(runData.icsVariants[i][0],variant)){
-	      int j;
-	      logme(LOG_DEBUG,"ICS variant=%s Engine variant=%s\n",
+	      logme(LOG_DEBUG,"ICS variant=\"%s\" Engine variant=\"%s\"\n",
 		    runData.icsVariants[i][0],
 		    runData.icsVariants[i][1]);
-	      for(j=0;j<runData.chessVariantCount;j++){
-		  if(!strcmp(runData.icsVariants[i][1],
-			     runData.chessVariants[j])){
-		      found=TRUE;
-		      break;
-		  }
-	      }
-	      if(!found){
+	      if(!CheckChessVariantSupport(runData.icsVariants[i][1])){
 		  logme(LOG_DEBUG,"Variant rejected by engine");
+	      }else{
+		  found=TRUE;
 	      }
 	      break;
 	  }
@@ -1514,12 +1535,20 @@ Bool ProcessStartOfGame(char *line){
     strcpy(runData.chessVariant,"normal");
     for(i=0;i<runData.icsVariantCount;i++){
 	if(!strcmp(runData.icsVariant,runData.icsVariants[i][0])){
-	    strcpy(runData.chessVariant,runData.icsVariants[i][1]);
-	    SendToComputer("variant %s\n",runData.chessVariant);
-	    if(!strcmp(runData.chessVariant,"fischerandom")){
-		logme(LOG_DEBUG,"Enabling FRC castling.");
-	    }
-	}
+	   char *variant1;
+	   variant1=CheckChessVariantSupport(runData.icsVariants[i][1]);
+	   if(variant1){
+	       strcpy(runData.chessVariant,runData.icsVariants[1][1]);	   
+	       SendToComputer("variant %s\n",variant1);
+	       if(!strcmp(runData.chessVariant,"fischerandom")){
+		   logme(LOG_DEBUG,"Enabling FRC castling.");
+	       }
+	   }else{
+	       logme(LOG_DEBUG,"Something went badly wrong...\n");
+	       SendToIcs("abort\n");
+	       return TRUE;
+	   }
+    	}
     }
     runData.useMoveList=UseMoveList();
     if (!strcmp(name2, runData.handle)) {

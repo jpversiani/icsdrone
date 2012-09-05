@@ -111,7 +111,7 @@ extern jmp_buf stackPointer;
 typedef char move_t[MS+1];
 
 #define MAXVARIANTS 35
-#define MAXENGINEVARIANTS 10
+#define MAXENGINEVARIANTS 35
 
 /* Mock boolean type */
 
