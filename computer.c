@@ -362,13 +362,9 @@ void ParseEngineVariants(char *line){
     int evc;
     char *line1;
     char *token;
-    char *token1;
     evc=0;
     line1=strdup(line);
     token=strtok(line1," ");
-    /* this is wrong; there may be more than one 
-     * feature on a line 
-     */
     if(strcmp(token,"feature")){
 	goto finish;
     }
@@ -381,10 +377,6 @@ void ParseEngineVariants(char *line){
     while(token){
 	if(evc==MAXENGINEVARIANTS){
 	    goto finish;
-	}
-	if((token1=strchr(token,'_'))){
-	    /* We don't deal with boards */
-	    token=token1+1;
 	}
 	strncpy(runData.chessVariants[evc++],token,30);
 	logme(LOG_DEBUG,"engine supports variant \"%s\"",token);
