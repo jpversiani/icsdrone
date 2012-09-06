@@ -853,11 +853,11 @@ Bool ProcessLogin(char *line){
 	char *variants;
 	switch(runData.icsType){
 	case ICS_FICS:
-	    variants="lightning,blitz,standard,wild/1=wildcastle,wild/2,wild/3,wild/4,wild/5,wild/8,wild/8a,wild/fr=fischerandom,suicide=suicide,losers=losers";
+	    variants="lightning,blitz,standard,wild/1=wildcastle,wild/2,wild/3,wild/4,wild/5,wild/8,wild/8a,wild/fr=fischerandom,suicide=suicide,losers=losers,atomic=atomic,crazyhouse=crazyhouse";
 	    break;
 	case ICS_ICC:
 	    /* This is currently not tested! */
-	    variants="Bullet,Blitz,Standard,wild/1=wildcastle,wild/2,wild/3,wild/4,wild/5,wild/7,wild/8,wild/9=twokings,wild/10,wild/11,wild/12,wild/13,wild/14,wild/15,wild/16=kriegspiel,wild/17,wild/18,wild/19,wild/22=fischerandom,wild/25=3check,wild/26=giveaway";
+	    variants="Bullet,Blitz,Standard,wild/1=wildcastle,wild/2,wild/3,wild/4,wild/5,wild/7,wild/8,wild/9=twokings,wild/10,wild/11,wild/12,wild/13,wild/14,wild/15,wild/16=kriegspiel,wild/17,wild/18,wild/19,wild/22=fischerandom,wild/23=crazyhouse,wild/25=3check,wild/26=giveaway,wild/27=atomic,wild/28=shatranj";
 	    SetOption("variants",LOGIN,0,variants);
 	    logme(LOG_DEBUG,"Enabling variants: %s",variants);
 	    break;
