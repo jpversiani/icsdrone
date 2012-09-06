@@ -441,6 +441,9 @@ void ProcessComputerLine(char *line, char *queue)
       logme(LOG_WARNING, 
 	    "Move received from engine but we're not playing anymore!"); 
     }
+  }else if(!strncasecmp(line,"Illegal move",12)){
+      	logme(LOG_DEBUG,"Something bad happened. Bailing out.");
+	SendToIcs("resign\n");
   } else if (!strncmp(line, "pong ", 5)) {
     if (runData.waitingForPingID == atoi(line + 5)) {
       runData.waitingForPingID = 0;

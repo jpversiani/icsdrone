@@ -1654,6 +1654,7 @@ Bool ProcessBoard(char *line){
   IcsBoard icsBoardCopy;
   if(!runData.loggedIn) return FALSE;
   if(!ParseBoard(&(runData.icsBoard),line)) return FALSE;
+  if(!runData.inGame) return TRUE;
   memcpy(&icsBoardCopy,&runData.icsBoard,sizeof(IcsBoard));
   if(runData.icsBoard.status==1 /* my move */ || runData.icsBoard.status==-1 /* your move */){      icsBoardCopy.status=0; // observing
   }      
@@ -2045,7 +2046,15 @@ Bool ProcessCleanUps(char *line){
   return FALSE;
 }
 
-
+Bool ProcessIllegalMove(char *line){
+    if(!runData.loggedIn) return FALSE;  
+    if(!strncasecmp(line,"Illegal move",12)){
+	logme(LOG_DEBUG,"Something bad happened. Bailing out.");
+	SendToIcs("resign\n");
+	return TRUE;
+    }
+    return FALSE;
+}
 
 void ProcessIcsLine(char *line, char *queue){
   char *old_line;
@@ -2071,6 +2080,7 @@ void ProcessIcsLine(char *line, char *queue){
   if(ProcessStandings(line)) goto finish;
   if(ProcessFlaggedOpponent(line))goto finish;
   if(ProcessStartOfGame(line))goto finish;
+  if(ProcessIllegalMove(line))goto finish;
   if(ProcessMoreTime(line))goto finish;
   if(ProcessMoveList(line))goto finish;
   if(ProcessBoard(line))goto finish;
