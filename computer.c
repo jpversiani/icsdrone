@@ -361,14 +361,21 @@ void PVFeedback(){
 void ParseEngineVariants(char *line){
     int evc;
     char *line1;
+    char *line2;
+    char *line_save;
     char *token;
     evc=0;
     line1=strdup(line);
-    token=strtok(line1," ");
-    if(strcmp(token,"feature")){
-	goto finish;
+    line_save=line1;
+    line2=strstr(line1,"variant");
+    if(line2){
+	line1=line2;
     }
-    token=strtok(NULL," =\"");
+    //    token=strtok(line1," ");
+    //    if(strcmp(token,"feature")){
+    //	goto finish;
+    //    }
+    token=strtok(line1," =\"");
     if(strcmp(token,"variants")){
 	goto finish;
     }
@@ -386,7 +393,7 @@ void ParseEngineVariants(char *line){
 	
  finish:
     logme(LOG_DEBUG,"engine supports %d variants",runData.chessVariantCount);
-    free(line1);
+    free(line_save);
 }
 
 void ProcessComputerLine(char *line, char *queue) 
