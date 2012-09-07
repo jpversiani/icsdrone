@@ -209,10 +209,6 @@ void ConvIcsLanToComp(char onMove, move_t move)
     if(ConvIcsCastlingToLan(onMove,move)){
 	return;
     }
-    /*  frfr=P --> frfr=p  */
-    /*  XXX this is probably wrong (there shouldn't be an '=') 
-    if (move[4] == '=') 
-	move[5] = tolower(move[5]);  */
     /*  frfr=P --> frfrp  */
     if (move[4] == '='){ 
 	move[4] = tolower(move[5]);  
@@ -292,19 +288,14 @@ void ConvIcsSpecialToComp(char onMove, move_t move)
     if(ConvIcsCastlingToLan(onMove,move)){
 	return;
     }
-    /*  P/fr-fr=P --> frfr=p  */
-    /*  XXX this is probably wrong (there shouldn't be an '=') 
-    move[0] = move[2];
-    move[1] = move[3];
-    move[2] = move[5];
-    move[3] = move[6];
-    if (move[7] == '=') {
-	move[4] = move[7];
-	move[5] = tolower(move[8]);
-	move[6] = '\0';
-    } else {
-	move[4] = '\0';
-    } */
+    /* P/@@-fr --> P@fr */
+    if(!strncmp(move+1,"/@@",3)){
+	move[1]='@';
+	move[2]=move[5];
+	move[3]=move[6];
+	move[4]='\0';
+	return;
+    }
     /*  P/fr-fr=P --> frfrp  */
     move[0] = move[2];
     move[1] = move[3];
