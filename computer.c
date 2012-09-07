@@ -363,31 +363,29 @@ void ParseEngineVariants(char *line){
     char *line1;
     char *line2;
     char *line_save;
-    char *token;
+    char *variant;
+    char *variant_list;
+
     evc=0;
     line1=strdup(line);
     line_save=line1;
-    line2=strstr(line1,"variant");
+    line2=strstr(line1,"variants");
     if(line2){
 	line1=line2;
+    }else{
+	return;
     }
-    //    token=strtok(line1," ");
-    //    if(strcmp(token,"feature")){
-    //	goto finish;
-    //    }
-    token=strtok(line1," =\"");
-    if(strcmp(token,"variants")){
-	goto finish;
-    }
+    variant_list=strtok(line1," =\"");     /* NO */
+    variant_list=strtok(NULL,"\""); /* Again! */
     evc=0;
-    token=strtok(NULL," ,\"\r\n");
-    while(token){
+    variant=strtok(variant_list," ,");
+    while(variant){
 	if(evc==MAXENGINEVARIANTS){
 	    goto finish;
 	}
-	strncpy(runData.chessVariants[evc++],token,30);
-	logme(LOG_DEBUG,"engine supports variant \"%s\"",token);
-	token=strtok(NULL," ,\"\r\n");
+	strncpy(runData.chessVariants[evc++],variant,30);
+	logme(LOG_DEBUG,"engine supports variant \"%s\"",variant);
+	variant=strtok(NULL," ,");
     }
     runData.chessVariantCount=evc;
 	
