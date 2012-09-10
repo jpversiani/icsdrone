@@ -714,6 +714,31 @@ Bool ProcessForwardingMarkers(char *line){
   return FALSE;
 }
 
+Bool IsFicsShuffle(char *icsvariant){
+    if(!strncmp(icsvariant,"wild",4)){
+	return TRUE;
+    }
+    if(!strncmp(icsvariant,"odds",4)){
+	return TRUE;
+    }
+    if(!strncmp(icsvariant,"eco",3)){
+	return TRUE;
+    }
+    if(!strncmp(icsvariant,"nic",3)){
+	return TRUE;
+    }
+    if(!strncmp(icsvariant,"uwild",5)){
+	return TRUE;
+    }    
+    if(!strncmp(icsvariant,"misc",4)){
+	return TRUE;
+    }
+    if(!strncmp(icsvariant,"pawns",5)){
+	return TRUE;
+    }
+    return FALSE;
+}
+
 Bool UseMoveList(){
     int ret;
     ret=TRUE;
@@ -722,7 +747,7 @@ Bool UseMoveList(){
 	logme(LOG_WARNING,"Server doesn't support long algebraic move lists.\n\
 Do not ask for movelist.\n");
 	ret=FALSE;
-    }else if(!strncmp(runData.icsVariant,"wild",4)){
+    }else if(IsFicsShuffle(runData.icsVariant)){
 	/* this needs a more generic solution */
 	/* getting the initial position in a wild game is tricky */
 	logme(LOG_DEBUG,"Do not ask for movelist since this is a wild game.\n");
@@ -757,6 +782,26 @@ char * CheckChessVariantSupport(char * variant){
     }
 }
 
+Bool IsVariant(char *icsvariant, char* category){
+    int i=0;
+    char ich,cch;
+    while(true){
+	ich=icsvariant[i];
+	cch=category[i];
+	if(ich=='\0' || cch=='\0'){
+	    return TRUE;
+	}
+	if(cch=='\0' && ich=='/'){
+	    return TRUE;
+	}
+	if(cch!=ich){
+	    return FALSE;
+	}
+	i++;
+	
+    }
+}
+
 void ParseVariantList(char *variants){
     char *saveptr1;
     char *saveptr2;
@@ -775,6 +820,7 @@ void ParseVariantList(char *variants){
     pair=strtok_r(list," ,",&saveptr1);
     while(pair){
 	if(vix>=MAXVARIANTS){
+	    logme(LOG_DEBUG,"Maximal icsvariant count %d reached.",MAXVARIANTS);
 	    return;
 	}
 	icsvariant=strtok_r(pair," =", &saveptr2);
@@ -853,7 +899,7 @@ Bool ProcessLogin(char *line){
 	char *variants;
 	switch(runData.icsType){
 	case ICS_FICS:
-	    variants="lightning,blitz,standard,wild/1=wildcastle,wild/2,wild/3,wild/4,wild/5,wild/8,wild/8a,wild/fr=fischerandom,suicide=suicide,losers=losers,atomic=atomic,crazyhouse=crazyhouse";
+	    variants="lightning,blitz,standard,wild/1=wildcastle,wild/fr=fischerandom,wild,suicide=suicide,losers=losers,atomic=atomic,crazyhouse=crazyhouse,odds,eco,nic,uwild,pawns,misc";
 	    break;
 	case ICS_ICC:
 	    /* This is currently not tested! */
@@ -1181,7 +1227,7 @@ Bool ProcessIncomingMatches(char *line){
       }
       found=FALSE;
       for(i=0;i<runData.icsVariantCount;i++){
-	  if(!strcmp(runData.icsVariants[i][0],variant)){
+	  if(IsVariant(variant,runData.icsVariants[i][0])){
 	      logme(LOG_DEBUG,"ICS variant=\"%s\" Engine variant=\"%s\"\n",
 		    runData.icsVariants[i][0],
 		    runData.icsVariants[i][1]);
@@ -1534,7 +1580,7 @@ Bool ProcessStartOfGame(char *line){
     /* send variant to computer */
     strcpy(runData.chessVariant,"normal");
     for(i=0;i<runData.icsVariantCount;i++){
-	if(!strcmp(runData.icsVariant,runData.icsVariants[i][0])){
+	if(IsVariant(runData.icsVariant,runData.icsVariants[i][0])){
 	   char *variant1;
 	   variant1=CheckChessVariantSupport(runData.icsVariants[i][1]);
 	   if(variant1){
