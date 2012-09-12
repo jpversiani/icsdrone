@@ -144,6 +144,7 @@ void InitRunData(){
   runData.chessVariantCount=1;
   strcpy(runData.chessVariants[0],"normal");
   strcpy(runData.chessVariant,"normal");
+  runData.noCastle=FALSE;
 }
 
 PersistentData persistentData;

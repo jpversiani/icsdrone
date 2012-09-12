@@ -756,6 +756,10 @@ char * CheckChessVariantSupport(char * variant){
     char *chessVariant;
     int j;
     logme(LOG_DEBUG,"Testing variant \"%s\"\n",variant);
+    if(!strcmp(variant,"nocastle")){
+	variant="normal";
+    }
+    logme(LOG_DEBUG,"normalized as \"%s\"\n",variant);    
     for(j=0;j<runData.chessVariantCount;j++){
 	chessVariant=runData.chessVariants[j];
 	logme(LOG_DEBUG,"against chess variant \"%s\"\n",chessVariant);
@@ -893,7 +897,7 @@ Bool ProcessLogin(char *line){
 	char *variants;
 	switch(runData.icsType){
 	case ICS_FICS:
-	    variants="lightning,blitz,standard,wild/1=wildcastle,wild/fr=fischerandom,wild,suicide=suicide,losers=losers,atomic=atomic,crazyhouse=crazyhouse,odds,eco,nic,uwild,pawns,misc";
+	    variants="lightning,blitz,standard,wild/1=wildcastle,wild/fr=fischerandom,wild=nocastle,suicide=suicide,losers=losers,atomic=atomic,crazyhouse=crazyhouse,odds,eco,nic,uwild=nocastle,pawns,misc";
 	    break;
 	case ICS_ICC:
 	    /* This is currently not tested! */
@@ -902,10 +906,10 @@ Bool ProcessLogin(char *line){
 	    logme(LOG_DEBUG,"Enabling variants: %s",variants);
 	    break;
 	case ICS_VARIANT:
-	    variants="lightning,blitz,standard,wild/1=wildcastle,wild/2,wild/3,wild/4,wild/5";
+	    variants="lightning,blitz,standard,wild/1=wildcastle,wild=nocastle";
 	    break;
 	default:
-	    variants="lightning,blitz,standard,wild/1=wildcastle,wild/2,wild/3,wild/4,wild/5";
+	    variants="lightning,blitz,standard,wild/1=wildcastle,wild=nocastle";
 	    break;
 	}
 	SetOption("variants",LOGIN,0,variants);
@@ -1573,13 +1577,21 @@ Bool ProcessStartOfGame(char *line){
     }
     /* send variant to computer */
     strcpy(runData.chessVariant,"normal");
+    runData.noCastle=FALSE;
     for(i=0;i<runData.icsVariantCount;i++){
 	if(IsVariant(runData.icsVariant,runData.icsVariants[i][0])){
 	   char *variant1;
 	   variant1=CheckChessVariantSupport(runData.icsVariants[i][1]);
 	   if(variant1){
+	       if(!strcmp(runData.icsVariants[i][1],"nocastle")){
+		   runData.noCastle=TRUE;
+	       }
 	       strcpy(runData.chessVariant,runData.icsVariants[1][1]);	   
-	       SendToComputer("variant %s\n",variant1);
+	       if(!strcmp(variant1,"nocastle")){
+		   SendToComputer("variant normal\n");
+	       }else{
+		   SendToComputer("variant %s\n",variant1);
+	       }
 	       if(!strcmp(runData.chessVariant,"fischerandom")){
 		   logme(LOG_DEBUG,"Enabling FRC castling.");
 	       }
@@ -1590,6 +1602,7 @@ Bool ProcessStartOfGame(char *line){
 	   }
     	}
     }
+    logme(LOG_DEBUG,"Chess variant is now set to \"%s\"",runData.chessVariant);
     runData.useMoveList=UseMoveList();
     if (!strcmp(name2, runData.handle)) {
 	SendToComputer("name %s\n", name);

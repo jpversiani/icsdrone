@@ -47,6 +47,19 @@ Bool ParseBoard(IcsBoard *icsBoard, char *line){
 	  logme(LOG_ERROR,"Invalid ep file. Correcting it.");
 	  icsBoard->epFile=-1;
       }
+      // another fix for HGM's ICS
+      if(runData.noCastle){
+	  if(icsBoard->whiteCanCastleShort || 
+	     icsBoard->whiteCanCastleLong ||
+	     icsBoard->blackCanCastleShort ||
+	     icsBoard->blackCanCastleLong){
+	      logme(LOG_ERROR,"Invalid castling flags. Correcting.");
+	      icsBoard->whiteCanCastleShort=0;
+	      icsBoard->whiteCanCastleLong=0;
+	      icsBoard->blackCanCastleShort=0;
+	      icsBoard->blackCanCastleLong=0;
+	  }
+      }
       for(f=0;f<=7;f++){
 	for(r=0;r<=7;r++){
 	  (icsBoard->board)[f][r]=tmp[(7-r)*9+f];

@@ -259,6 +259,7 @@ typedef struct {
   int chessVariantCount; 
   char chessVariants[MAXVARIANTS][30+1];
   char chessVariant[30+1];
+  Bool noCastle;
 } RunData;
 
 /* AppData */
