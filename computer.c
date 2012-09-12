@@ -261,15 +261,11 @@ void ResetComputer(){
   validKibitzSeen=0;
 }
 
-void KillComputer()
-{
+void RawKillComputer(){
     int status;
     int elapsed_time;
     int exited;
     int ret;
-    logme(LOG_INFO, "Killing computer");
-    if (runData.sigint) InterruptComputer();
-    SendToComputer("quit\nexit\n");
     elapsed_time=0;
     exited=FALSE;
     ret=0;
@@ -300,6 +296,14 @@ void KillComputer()
     runData.computerActive = FALSE;
     close(runData.computerReadFd);
     close(runData.computerWriteFd);
+} 
+
+void KillComputer()
+{
+    logme(LOG_INFO, "Killing computer");
+    if (runData.sigint) InterruptComputer();
+    SendToComputer("quit\nexit\n");
+    RawKillComputer();
 }
 
 

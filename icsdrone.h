@@ -374,6 +374,7 @@ extern int ParseArgs(int argc, char* argv[]);
 extern void NewGame P(());
 extern void StartComputer P(());
 extern void KillComputer P(());
+extern void RawKillComputer P(());
 extern void InterruptComputer P(());
 extern void EnsureComputerReady P(());
 extern void ProcessComputerLine P((char *line, char *queue)); 

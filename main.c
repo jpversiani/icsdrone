@@ -434,7 +434,12 @@ void MainLoop()
     if (runData.computerActive && FD_ISSET(runData.computerReadFd, &readfds)){
       if (ProcessRawInput(runData.computerReadFd, cBuf, sizeof(cBuf), 
 			  ProcessComputerLine) == ERROR){
-	ExitOn(EXIT_HARDQUIT,"Lost contact with computer.");
+	  //	ExitOn(EXIT_HARDQUIT,"Lost contact with computer.");
+	  logme(LOG_DEBUG,"Lost contact with computer.");
+	  logme(LOG_DEBUG,"Bailing out.");
+	  SendToIcs("resign\n");
+	  RawKillComputer();
+	  StartComputer();
       }
     }
     if (runData.proxyFd!=-1 && FD_ISSET(runData.proxyFd, &readfds)){
