@@ -727,6 +727,9 @@ Bool IsShuffle(char *chessvariant){
     if(!strcmp(chessvariant,"atomic")){
 	return TRUE;
     }
+    if(!strcmp(chessvariant,"crazyhouse")){
+	return TRUE;
+    }
     return FALSE;
 }
 
