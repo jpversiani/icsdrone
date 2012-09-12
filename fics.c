@@ -714,26 +714,17 @@ Bool ProcessForwardingMarkers(char *line){
   return FALSE;
 }
 
-Bool IsFicsShuffle(char *icsvariant){
-    if(!strncmp(icsvariant,"wild",4)){
-	return TRUE;
+Bool IsShuffle(char *chessvariant){
+    if(!strcmp(chessvariant,"normal")){
+	return FALSE;
     }
-    if(!strncmp(icsvariant,"odds",4)){
-	return TRUE;
+    if(!strcmp(chessvariant,"suicide")){
+	return FALSE;
     }
-    if(!strncmp(icsvariant,"eco",3)){
-	return TRUE;
+    if(!strcmp(chessvariant,"losers")){
+	return FALSE;
     }
-    if(!strncmp(icsvariant,"nic",3)){
-	return TRUE;
-    }
-    if(!strncmp(icsvariant,"uwild",5)){
-	return TRUE;
-    }    
-    if(!strncmp(icsvariant,"misc",4)){
-	return TRUE;
-    }
-    if(!strncmp(icsvariant,"pawns",5)){
+    if(!strcmp(chessvariant,"atomic")){
 	return TRUE;
     }
     return FALSE;
@@ -747,10 +738,10 @@ Bool UseMoveList(){
 	logme(LOG_WARNING,"Server doesn't support long algebraic move lists.\n\
 Do not ask for movelist.\n");
 	ret=FALSE;
-    }else if(IsFicsShuffle(runData.icsVariant)){
-	/* this needs a more generic solution */
-	/* getting the initial position in a wild game is tricky */
-	logme(LOG_DEBUG,"Do not ask for movelist since this is a wild game.\n");
+    }else if(IsShuffle(runData.chessVariant)){
+	/* Getting the initial position in a shuffle game is tricky */
+	/* For now ignore this problem */
+	logme(LOG_DEBUG,"Do not ask for movelist since this is a shuffle game.\n");
 	ret=FALSE;
     }
     return ret;
@@ -1728,7 +1719,7 @@ Bool ProcessBoard(char *line){
     if(!runData.useMoveList){
 	Bool ignoreStartBoard;
 	ignoreStartBoard=FALSE;
-	if(!strcmp(runData.chessVariant,"normal")){
+	if(!IsShuffle(runData.chessVariant)){
 	    ignoreStartBoard=TRUE;
 	}
 	SendBoardToComputer(&runData.icsBoard,ignoreStartBoard);
