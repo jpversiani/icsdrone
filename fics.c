@@ -733,6 +733,32 @@ Bool IsShuffle(char *chessvariant){
     return TRUE;
 }
 
+Bool IsFicsShuffle(char *icsvariant){
+    if(!strncmp(icsvariant,"wild",4)){
+	return TRUE;
+    }
+    if(!strncmp(icsvariant,"odds",4)){
+	return TRUE;
+    }
+    if(!strncmp(icsvariant,"eco",3)){
+	return TRUE;
+    }
+    if(!strncmp(icsvariant,"nic",3)){
+	return TRUE;
+    }
+    if(!strncmp(icsvariant,"uwild",5)){
+	return TRUE;
+    }    
+    if(!strncmp(icsvariant,"misc",4)){
+	return TRUE;
+    }
+    if(!strncmp(icsvariant,"pawns",5)){
+	return TRUE;
+    }
+    return FALSE;
+}
+
+
 Bool UseMoveList(){
     int ret;
     ret=TRUE;
@@ -741,7 +767,7 @@ Bool UseMoveList(){
 	logme(LOG_WARNING,"Server doesn't support long algebraic move lists.\n\
 Do not ask for movelist.\n");
 	ret=FALSE;
-    }else if(IsShuffle(runData.chessVariant)){
+    }else if(IsFicsShuffle(runData.icsVariant)){
 	/* Getting the initial position in a shuffle game is tricky */
 	/* For now ignore this problem */
 	logme(LOG_DEBUG,"Do not ask for movelist since this is a shuffle game.\n");
