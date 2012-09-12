@@ -1621,6 +1621,7 @@ Bool ProcessStartOfGame(char *line){
 	       if(!strcmp(runData.chessVariant,"fischerandom")){
 		   logme(LOG_DEBUG,"Enabling FRC castling.");
 	       }
+	       break;
 	   }else{
 	       logme(LOG_DEBUG,"Something went badly wrong...\n");
 	       SendToIcs("abort\n");
