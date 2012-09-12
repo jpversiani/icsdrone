@@ -725,12 +725,12 @@ Bool IsShuffle(char *chessvariant){
 	return FALSE;
     }
     if(!strcmp(chessvariant,"atomic")){
-	return TRUE;
+	return FALSE;
     }
     if(!strcmp(chessvariant,"crazyhouse")){
-	return TRUE;
+	return FALSE;
     }
-    return FALSE;
+    return TRUE;
 }
 
 Bool UseMoveList(){
