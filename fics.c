@@ -923,7 +923,7 @@ Bool ProcessLogin(char *line){
 	char *variants;
 	switch(runData.icsType){
 	case ICS_FICS:
-	    variants="lightning,blitz,standard,wild/1=wildcastle,wild/fr=fischerandom,wild=nocastle,suicide=suicide,losers=losers,atomic=atomic,crazyhouse=crazyhouse,odds,eco,nic,uwild=nocastle,pawns,misc";
+	    variants="lightning,blitz,standard,wild/0=wildcastle,wild/1=wildcastle,wild/fr=fischerandom,wild=nocastle,suicide=suicide,losers=losers,atomic=atomic,crazyhouse=crazyhouse,odds,eco,nic,uwild=nocastle,pawns,misc";
 	    break;
 	case ICS_ICC:
 	    /* This is currently not tested! */
@@ -1612,7 +1612,7 @@ Bool ProcessStartOfGame(char *line){
 	       if(!strcmp(runData.icsVariants[i][1],"nocastle")){
 		   runData.noCastle=TRUE;
 	       }
-	       strcpy(runData.chessVariant,runData.icsVariants[1][1]);	   
+	       strcpy(runData.chessVariant,runData.icsVariants[i][1]);	
 	       if(!strcmp(variant1,"nocastle")){
 		   SendToComputer("variant normal\n");
 	       }else{
