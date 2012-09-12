@@ -1613,7 +1613,7 @@ Bool ProcessStartOfGame(char *line){
 		   runData.noCastle=TRUE;
 	       }
 	       strcpy(runData.chessVariant,runData.icsVariants[i][1]);	
-	       if(!strcmp(variant1,"nocastle")){
+	       if(runData.noCastle){
 		   SendToComputer("variant normal\n");
 	       }else{
 		   SendToComputer("variant %s\n",variant1);
