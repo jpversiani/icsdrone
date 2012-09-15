@@ -1734,11 +1734,11 @@ Bool ProcessBoard(char *line){
   IcsBoard icsBoardCopy;
   if(!runData.loggedIn) return FALSE;
   if(!ParseBoard(&(runData.icsBoard),line)) return FALSE;
-  if(!runData.inGame) return TRUE;
   memcpy(&icsBoardCopy,&runData.icsBoard,sizeof(IcsBoard));
   if(runData.icsBoard.status==1 /* my move */ || runData.icsBoard.status==-1 /* your move */){      icsBoardCopy.status=0; // observing
   }      
   BoardToString(runData.lineBoard, &icsBoardCopy);
+  if(!runData.inGame) return TRUE;
   if(runData.icsBoard.status!=1 &&  runData.icsBoard.status!=-1){
       return TRUE;
   }
