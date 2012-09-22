@@ -809,7 +809,7 @@ char * CheckChessVariantSupport(char * variant){
 Bool IsVariant(char *icsvariant, char* category){
     int i=0;
     char ich,cch;
-    while(true){
+    while(TRUE){
 	ich=icsvariant[i];
 	cch=category[i];
 	if(ich=='\0' || cch=='\0'){
