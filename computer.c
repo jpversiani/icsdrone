@@ -407,6 +407,7 @@ void ProcessComputerLine(char *line, char *queue)
   if (sscanf(line, "%*s ... %15s", move) == 1 ||
       sscanf(line, "move %15s", move) == 1) {
     if (runData.gameID != -1) {
+      runData.engineMovesPlayed++;
       if((appData.feedback || appData.proxyFeedback) && validKibitzSeen){
 	PVFeedback();
       }
@@ -446,8 +447,16 @@ void ProcessComputerLine(char *line, char *queue)
   }else if(line[0]=='#'){
     /* Comment! Ignore. */
   }else if(!strncasecmp(line,"Illegal move",12) && runData.inGame){
+      /* 
+       * We have the problem that the illegal move might be from a previous game.
+       * It is not completely clear that this is the right test though.
+       */
+      if(runData.engineMovesPlayed>0){
       	logme(LOG_DEBUG,"Something bad happened. Bailing out.");
 	SendToIcs("resign\n");
+      }else{
+	logme(LOG_DEBUG,"Not bailing out since we are at the start of the game.");
+      }
   } else if (!strncmp(line, "pong ", 5)) {
     if (runData.waitingForPingID == atoi(line + 5)) {
       runData.waitingForPingID = 0;
