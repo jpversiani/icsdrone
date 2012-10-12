@@ -320,6 +320,7 @@ typedef struct {
     char * feedbackCommand;
     Bool engineQuiet;
     char * variants;
+    char *tourneyFilter;
 } AppData;
 
 extern PersistentData  persistentData;

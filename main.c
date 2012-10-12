@@ -215,7 +215,8 @@ AppData appData = {
     FALSE,           /* ownerQuiet */
     NULL,            /* feedbackCommand */
     FALSE,           /* engineQuiet */
-    NULL             /* variants */
+    NULL,            /* variants */
+    NULL             /* tourneyFilter */
 };
 
 int  ProcessRawInput P((int, char *, int, void (*)(char *, char*)));
@@ -654,6 +655,9 @@ int main(int argc, char *argv[])
     SetOption("program",LOGIN,0,"%s","gnuchess");
     SetOption("sendTimeout",LOGIN,0,"%s","resume");
     SetOption("feedbackCommand",LOGIN,0,"%s","whisper");
+    SetOption("tourneyFilter",
+	      LOGIN,0,"%s",
+	      "ct.variant==\"lightning\" || ct.variant==\"blitz\" || ct.variant==\"standard\"");
     if (ParseArgs(argc, argv) == ERROR)
         Usage();
     signal(SIGINT, TerminateProc);

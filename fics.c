@@ -1425,8 +1425,11 @@ Bool ProcessTourneyNotifications(char *line){
   char date[30+1];
   char color[30+1];
   char name[30+1];
-  value_t value[1];
+  value_t value[1], value1[1];
   char *token;
+  int inc;
+  int time_;
+  int etime;
 
   if(hideFromProxy){
       runData.hideFromProxy=TRUE;
@@ -1554,22 +1557,29 @@ Bool ProcessTourneyNotifications(char *line){
       return TRUE;
     }
     /* inject things in interpreter */
-    /* drop leading and trailing spaces from TM */
-    logme(LOG_DEBUG,"Setting ct.tm to \"%s\"",TM);
-    value_init(value,V_STRING,TM);
+
+    token=strtok(TM," ");
+    logme(LOG_DEBUG,"Setting ct.tm to \"%s\"",token);
+    value_init(value,V_STRING,token);
     eval_set("ct.tm",value,SY_RO);
 
-    token=strtok(type," \\");
+    token=strtok(type," (\\)");
     logme(LOG_DEBUG,"Setting ct.time to %d",atoi(token));
-    value_init(value,V_NUMERIC,atoi(token));
+    value_init(value,V_NUMERIC,time_=atoi(token));
     eval_set("ct.time",value,SY_RO);
 
-    token=strtok(NULL," \\");
+    token=strtok(NULL," (\\)");
     logme(LOG_DEBUG,"Setting ct.inc to %d",atoi(token));
-    value_init(value,V_NUMERIC,atoi(token));
+    value_init(value,V_NUMERIC,inc=atoi(token));
     eval_set("ct.inc",value,SY_RO);
 
-    token=strtok(NULL," \\");
+    // compute a dependent variable
+    etime=60*time_+40*inc;
+    logme(LOG_DEBUG,"Setting ct.etime to %d",etime);
+    value_init(value,V_NUMERIC,etime);
+    eval_set("ct.etime",value,SY_RO);
+
+    token=strtok(NULL," (\\)");
     if(!strcmp(token,"r")){
 	logme(LOG_DEBUG,"Setting ct.rated to true");
 	value_init(value,V_BOOLEAN,1);
@@ -1579,22 +1589,38 @@ Bool ProcessTourneyNotifications(char *line){
     }
     eval_set("ct.rated",value,SY_RO);
 
-    token=strtok(NULL," \\");
+    value_init(value1,V_BOOLEAN,0);
+    eval_set("ct.lightning",value1,SY_RO);
+    eval_set("ct.blitz",value1,SY_RO);
+    eval_set("ct.standard",value1,SY_RO);
+    eval_set("ct.chess",value1,SY_RO);
+    eval_set("ct.atomic",value1,SY_RO);
+    eval_set("ct.suicide",value1,SY_RO);
+    eval_set("ct.losers",value1,SY_RO);
+    eval_set("ct.crazyhouse",value1,SY_RO);
+    eval_set("ct.wild",value1,SY_RO);
+    value_init(value1,V_BOOLEAN,1);
+
+    token=strtok(NULL," (\\)");
     if(!strcmp(token,"wild") || !strcmp(token,"los") || !strcmp(token,"sui") 
        || !strcmp(token,"atom") || !strcmp(token,"zh")){
 	logme(LOG_DEBUG,"This is a variant tourney.");
 	if(!strcmp(token,"los")){
 	    logme(LOG_DEBUG,"Setting ct.variant to \"losers\"");
 	    value_init(value,V_STRING,"losers");
+	    eval_set("ct.losers",value1,SY_RO);
 	}else if(!strcmp(token,"sui")){
 	    logme(LOG_DEBUG,"Setting ct.variant to \"suicide\"");
 	    value_init(value,V_STRING,"suicide");
+	    eval_set("ct.suicide",value1,SY_RO);
 	}else if(!strcmp(token,"atom")){
 	    logme(LOG_DEBUG,"Setting ct.variant to \"atomic\"");
 	    value_init(value,V_STRING,"atomic");
+	    eval_set("ct.atomic",value1,SY_RO);
 	}else if(!strcmp(token,"zh")){
 	    logme(LOG_DEBUG,"Setting ct.variant to \"crazyhouse\"");
 	    value_init(value,V_STRING,"crazyhouse");
+	    eval_set("ct.crazyhouse",value1,SY_RO);
 	}else if(!strcmp(token,"wild")){
 	    char buffer[256];
 	    int i;
@@ -1609,32 +1635,61 @@ Bool ProcessTourneyNotifications(char *line){
 	    }
 	    logme(LOG_DEBUG,"Setting ct.variant to %s",buffer);
 	    value_init(value,V_STRING,buffer);
+	    eval_set("ct.wild",value1,SY_RO);
 	}
-	eval_set("ct.variant",value,SY_RO);
-	token=strtok(NULL," \\");
+	token=strtok(NULL," (\\)");
+    }else{
+	eval_set("ct.chess",value1,SY_RO);
+	if(etime<180){
+	    logme(LOG_DEBUG,"Setting ct.variant to lightning");
+	    value_init(value,V_STRING,"lightning");
+	    eval_set("ct.lightning",value1,SY_RO);
+	}else if(etime<900){
+	    logme(LOG_DEBUG,"Setting ct.variant to blitz");
+	    eval_set("ct.blitz",value1,SY_RO);
+	    value_init(value,V_STRING,"blitz");
+	}else{
+	    logme(LOG_DEBUG,"Setting ct.variant to standard");
+	    eval_set("ct.standard",value1,SY_RO);
+	    value_init(value,V_STRING,"standard");
+	}
     }
+    eval_set("ct.variant",value,SY_RO);
+
 
     logme(LOG_DEBUG,"Setting ct.type to \"%s\"",token);
     value_init(value,V_STRING,token);
     eval_set("ct.type",value,SY_RO);
 
-    token=strtok(NULL," ");
-    if(token){
-	logme(LOG_DEBUG,"Setting ct.rounds to \"%d\"",atoi(token));
-	value_init(value,V_NUMERIC,atoi(token));    
+    if(!(!strcasecmp(token,"drr") || !strcasecmp(token,"rr"))){
+	// non RR or DDR have rounds
+	token=strtok(NULL," (\\)");
+	if(token){
+	    logme(LOG_DEBUG,"Setting ct.rounds to \"%d\"",atoi(token));
+	    value_init(value,V_NUMERIC,atoi(token));    
+	}else{
+	    logme(LOG_DEBUG,"Setting ct.rounds to 0");
+	    value_init(value,V_NUMERIC,0);    
+	}
     }else{
-	logme(LOG_DEBUG,"Setting ct.rounds to 0");
-	value_init(value,V_NUMERIC,0);    
+	    logme(LOG_DEBUG,"Setting ct.rounds to 0");
+	    value_init(value,V_NUMERIC,0);    
     }
     eval_set("ct.rounds",value,SY_RO);
+    
 
     int ret;
-    char *command="log(\"ct.tm=\"+str(ct.tm)+\" ct.time=\"+str(ct.time)+\" ct.inc=\"+str(ct.inc)+\" ct.rated=\"+str(ct.rated)+\" ct.variant=\"+str(ct.variant)+\" ct.type=\"+str(ct.type)+\" ct.rounds=\"+str(ct.rounds))";
-    //    char *command="log(\"ct.tm=\"+str(ct.tm))";
-    logme(LOG_DEBUG,"Trying to execute command\n%s",command);
+    char *command="log(\"ct.tm=\"+str(ct.tm)+\" ct.time=\"+str(ct.time)+\" ct.inc=\"+str(ct.inc)+\" ct.etime=\"+str(ct.etime)+\" ct.rated=\"+str(ct.rated)+\" ct.variant=\"+str(ct.variant)+\" ct.type=\"+str(ct.type)+\" ct.rounds=\"+str(ct.rounds))";
+    char *command1="log(\"ct.lightning=\"+str(ct.lightning)+\" ct.blitz=\"+str(ct.blitz)+\" ct.standard=\"+str(ct.standard)+\" ct.chess=\"+str(ct.chess)+\" ct.atomic=\"+str(ct.atomic)+\" ct.suicide=\"+str(ct.suicide)+\" ct.losers=\"+str(ct.losers)+\" ct.crazyhouse=\"+str(ct.crazyhouse)+\" ct.wild=\"+str(ct.wild))";
 
+
+    logme(LOG_DEBUG,"Trying to execute command\n%s",command);
     ret=eval(command,value);
-    logme(LOG_DEBUG,"return code=%d\n");
+    logme(LOG_DEBUG,"return code=%d\n",ret);
+
+    logme(LOG_DEBUG,"Trying to execute command\n%s",command1);
+    ret=eval(command1,value);
+    logme(LOG_DEBUG,"return code=%d\n",ret);
     
     if(strstr(type,"wild") || strstr(type,"los") || strstr(type,"sui") 
        || strstr(type,"atom") || strstr(type,"zh") || strstr(type,"cra")){
