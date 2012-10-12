@@ -97,7 +97,7 @@ void SendToIcs(char *format, ... )
   vsnprintf(buf, sizeof(buf), format, ap);
   buf[sizeof(buf)-1]='\0';
   // make sure we end with a newline
-  if(buf[strlen(buf)]!='\n'){
+  if(strlen(buf)>0 && buf[strlen(buf)-1]!='\n'){
       strcat(buf,"\n");
   }
   logcomm("icsdrone","ics", buf);
