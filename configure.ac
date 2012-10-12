@@ -57,7 +57,7 @@ AS_IF([test "x$with_zlib" != xno],
 # Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([arpa/inet.h arpa/telnet.h curses.h fcntl.h netdb.h netinet/in.h readline/readline.h readline/history.h stdlib.h string.h sys/ioctl.h sys/socket.h sys/time.h sys/wait.h term.h ncurses/term.h termios.h unistd.h zlib.h])
+AC_CHECK_HEADERS([arpa/inet.h arpa/telnet.h ncurses.h fcntl.h netdb.h netinet/in.h readline/readline.h readline/history.h stdlib.h string.h sys/ioctl.h sys/socket.h sys/time.h sys/wait.h term.h ncurses/term.h termios.h unistd.h zlib.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
