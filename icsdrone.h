@@ -71,7 +71,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef HAVE_LIBREADLINE
 #include <readline/readline.h>
 #include <readline/history.h>
-#include <curses.h>
+//#include <curses.h>
 // the following is for cygwin
 #ifdef HAVE_TERM_H
 #include <term.h>
@@ -544,7 +544,8 @@ void book_move P((IcsBoard *icsBoard, book_move_t * bmove, Bool random));
 void ProcessConsoleLine P((char *, char *));
 void Prompt P(());
 
-#ifndef HAVE_LIBREADLINE
+//#ifndef HAVE_LIBREADLINE
+#ifdef HAVE_CURSES_H
 #define COLOR_DEFAULT 0
 #define COLOR_ALERT 0
 #define COLOR_TELL 0
