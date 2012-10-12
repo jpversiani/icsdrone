@@ -96,6 +96,10 @@ void SendToIcs(char *format, ... )
   va_start(ap, format);
   vsnprintf(buf, sizeof(buf), format, ap);
   buf[sizeof(buf)-1]='\0';
+  // make sure we end with a newline
+  if(buf[strlen(buf)]!='\n'){
+      strcat(buf,"\n");
+  }
   logcomm("icsdrone","ics", buf);
   WRITE(runData.icsWriteFd, buf); 
   va_end(ap);
