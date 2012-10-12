@@ -618,10 +618,12 @@ void GetTourney(){
     logme(LOG_DEBUG,"We have already a ListTourneys command running.");
     return;
   }
-  if(runData.registered && appData.autoJoin &&
+  // XXXX
+  if(/* runData.registered && */ appData.autoJoin &&
      (!appData.acceptOnly || appData.acceptOnly[0]=='\0')){
     runData.parsingListTourneys=TRUE;
-    SendToIcs("td ListTourneys -j\n");
+    // XXX    SendToIcs("td ListTourneys -j\n");
+    SendToIcs("td ListTourneys\n");
   }
 }
 
@@ -1423,6 +1425,8 @@ Bool ProcessTourneyNotifications(char *line){
   char date[30+1];
   char color[30+1];
   char name[30+1];
+  value_t value[1];
+  char *token;
 
   if(hideFromProxy){
       runData.hideFromProxy=TRUE;
@@ -1549,6 +1553,89 @@ Bool ProcessTourneyNotifications(char *line){
       logme(LOG_DEBUG,"Not joining tourney since we are already in a tourney.");
       return TRUE;
     }
+    /* inject things in interpreter */
+    /* drop leading and trailing spaces from TM */
+    logme(LOG_DEBUG,"Setting ct.tm to \"%s\"",TM);
+    value_init(value,V_STRING,TM);
+    eval_set("ct.tm",value,SY_RO);
+
+    token=strtok(type," \\");
+    logme(LOG_DEBUG,"Setting ct.time to %d",atoi(token));
+    value_init(value,V_NUMERIC,atoi(token));
+    eval_set("ct.time",value,SY_RO);
+
+    token=strtok(NULL," \\");
+    logme(LOG_DEBUG,"Setting ct.inc to %d",atoi(token));
+    value_init(value,V_NUMERIC,atoi(token));
+    eval_set("ct.inc",value,SY_RO);
+
+    token=strtok(NULL," \\");
+    if(!strcmp(token,"r")){
+	logme(LOG_DEBUG,"Setting ct.rated to true");
+	value_init(value,V_BOOLEAN,1);
+    }else{
+	logme(LOG_DEBUG,"Setting ct.rated to false");
+	value_init(value,V_BOOLEAN,0);
+    }
+    eval_set("ct.rated",value,SY_RO);
+
+    token=strtok(NULL," \\");
+    if(!strcmp(token,"wild") || !strcmp(token,"los") || !strcmp(token,"sui") 
+       || !strcmp(token,"atom") || !strcmp(token,"zh")){
+	logme(LOG_DEBUG,"This is a variant tourney.");
+	if(!strcmp(token,"los")){
+	    logme(LOG_DEBUG,"Setting ct.variant to \"losers\"");
+	    value_init(value,V_STRING,"losers");
+	}else if(!strcmp(token,"sui")){
+	    logme(LOG_DEBUG,"Setting ct.variant to \"suicide\"");
+	    value_init(value,V_STRING,"suicide");
+	}else if(!strcmp(token,"atom")){
+	    logme(LOG_DEBUG,"Setting ct.variant to \"atomic\"");
+	    value_init(value,V_STRING,"atomic");
+	}else if(!strcmp(token,"zh")){
+	    logme(LOG_DEBUG,"Setting ct.variant to \"crazyhouse\"");
+	    value_init(value,V_STRING,"crazyhouse");
+	}else if(!strcmp(token,"wild")){
+	    char buffer[256];
+	    int i;
+	    // wild needs special treatment
+	    token=strtok(NULL," ");
+	    snprintf(buffer,255,"wild/%s",token);
+	    buffer[255]='\0';
+	    for(i=0;i<strlen(buffer);i++){
+		if(isupper(buffer[i])){
+		    buffer[i]=tolower(buffer[i]);
+		}
+	    }
+	    logme(LOG_DEBUG,"Setting ct.variant to %s",buffer);
+	    value_init(value,V_STRING,buffer);
+	}
+	eval_set("ct.variant",value,SY_RO);
+	token=strtok(NULL," \\");
+    }
+
+    logme(LOG_DEBUG,"Setting ct.type to \"%s\"",token);
+    value_init(value,V_STRING,token);
+    eval_set("ct.type",value,SY_RO);
+
+    token=strtok(NULL," ");
+    if(token){
+	logme(LOG_DEBUG,"Setting ct.rounds to \"%d\"",atoi(token));
+	value_init(value,V_NUMERIC,atoi(token));    
+    }else{
+	logme(LOG_DEBUG,"Setting ct.rounds to 0");
+	value_init(value,V_NUMERIC,0);    
+    }
+    eval_set("ct.rounds",value,SY_RO);
+
+    int ret;
+    char *command="log(\"ct.tm=\"+str(ct.tm)+\" ct.time=\"+str(ct.time)+\" ct.inc=\"+str(ct.inc)+\" ct.rated=\"+str(ct.rated)+\" ct.variant=\"+str(ct.variant)+\" ct.type=\"+str(ct.type)+\" ct.rounds=\"+str(ct.rounds))";
+    //    char *command="log(\"ct.tm=\"+str(ct.tm))";
+    logme(LOG_DEBUG,"Trying to execute command\n%s",command);
+
+    ret=eval(command,value);
+    logme(LOG_DEBUG,"return code=%d\n");
+    
     if(strstr(type,"wild") || strstr(type,"los") || strstr(type,"sui") 
        || strstr(type,"atom") || strstr(type,"zh") || strstr(type,"cra")){
       logme(LOG_DEBUG,"Not joining tourney since it is a nonstandard variant.");
