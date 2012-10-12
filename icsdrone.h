@@ -89,6 +89,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <netinet/in.h>
 #endif
 
+#include "eval.h"
 
 /*
  * Main data structures
@@ -483,6 +484,7 @@ extern int  MonthNumber P((char *));
 extern void BlockSignals P(());
 extern void UnblockSignals P(());
 extern int  SetOption P((char *,int,int, char *, ...));
+extern int GetOption(char*, char *);
 extern struct timeval time_diff P((struct timeval,struct timeval));
 extern Bool time_ge P((struct timeval,struct timeval));
 extern Bool time_gt P((struct timeval,struct timeval));
@@ -600,6 +602,9 @@ extern Bool IsAMarker P((char *));
 #define NETNEWLINE "\r\n"
 #define PID_T pid_t
 
+/*
+ * Virtual machine
+ */ 
 
-
+void ics_wrap_init();
 

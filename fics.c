@@ -368,6 +368,42 @@ int SetOption(char* name, int flags, int mask, char* format, ...){
   return found;
 }
 
+int GetOption(char* name, char * value){
+  ArgTuple *a=argList;	
+  int found=0;
+  value[0]='\0';
+  while(a->argName){
+      if(!strcasecmp((a->argName)+1,name)){
+      found=1;
+      switch(a->argType){
+      case ArgString:
+	  // returning the empty string is not really right...
+	  if(*((char **) a->argValue)){
+	      strcat(value,*((char **) a->argValue));
+	  }
+	  break;
+      case ArgInt:
+	  snprintf(value,99,"%d",*((int *) a->argValue));
+	  break;
+      case ArgBool:
+	  if( *((int *) a->argValue) == TRUE){
+	      strcat(value,"true");
+	  }else{
+	      strcat(value,"false");
+	  }
+	break;
+      case ArgNull:
+	logme(LOG_ERROR,"Internal error");
+	break;
+      }
+      break;
+    }
+    a++;
+  }
+  return found;
+}
+
+
 void ExecFile(char * filename, int mask, int inhibitSet){
   FILE *f;
   char buf[256];
@@ -411,6 +447,7 @@ void StopForwarding(int mask){
 void ExecCommand(char * command, int mask, int inhibitSet){
   int i;
   char key[256];
+  value_t result[1];
   char value[8192];
   char *strip_command;
   /* delete white space */
@@ -454,7 +491,24 @@ void ExecCommand(char * command, int mask, int inhibitSet){
     SendOptions(1,mask);
   } else if(sscanf(command,"load %8191[^\n\r]",value)==1){
       ExecFile(value,mask,inhibitSet); 
-  } else if(((i=sscanf(command,"set %254[^=\n\r ] %8191[^\n\r]", key,value))==1)  || (i==2)){
+  } else if(sscanf(command,"exec %8191[^\n\r]",value)==1) {
+      eval(value, result);
+      // temporary
+      if(0){
+      }else if(result->type==V_STRING){
+	  Feedback(mask,"\"%s\"",result->string_value->data);
+      }else if(result->type==V_BOOLEAN){
+	  Feedback(mask,"%s",result->value?"true":"false");
+      }else if(result->type==V_CFUNC){
+	  Feedback(mask,"<C function: %p>",result->cfunc_value);
+      }else if(result->type==V_NONE){
+	  Feedback(mask,"none");
+      }else if(result->type==V_ERROR){
+	  Feedback(mask,"<error:%d>",result->value);
+      }else{
+	  Feedback(mask,"%d",result->value);
+      }
+  }else if(((i=sscanf(command,"set %254[^=\n\r ] %8191[^\n\r]", key,value))==1)  || (i==2)){
       if(mask & (CONSOLE|PROXY)){
       runData.inhibitPrompt=TRUE;
     }

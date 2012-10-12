@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Leave for now as things seem to work.
  
 static int validKibitzSeen=0;
-static int depth=0,eval=0,time_=0,nodes=0;
+static int depth=0,eval_=0,time_=0,nodes=0;
 static int resignScoreSeen=0;
 static char pv[256]="";
 static Bool forceMode=FALSE;
@@ -348,7 +348,7 @@ void PVFeedback(){
     if(!appData.feedback && !appData.proxyFeedback) return;
     snprintf(feedbackBuffer,sizeof(feedbackBuffer)-1,"depth=%d score=%0.2f time=%0.2f node=%d speed=%d pv=%s",
               depth,
-              (eval+0.0)/100,
+              (eval_+0.0)/100,
               (time_+0.0)/100,
               nodes,
               time_?(int)(100*(nodes+0.0)/time_):0,
@@ -411,9 +411,9 @@ void ProcessComputerLine(char *line, char *queue)
       if((appData.feedback || appData.proxyFeedback) && validKibitzSeen){
 	PVFeedback();
       }
-      if(appData.resign && validKibitzSeen && eval<RESIGN_SCORE){
+      if(appData.resign && validKibitzSeen && eval_<RESIGN_SCORE){
 	resignScoreSeen++;
-        logme(LOG_DEBUG,"Resign score %d < %d seen.",eval,RESIGN_SCORE);
+        logme(LOG_DEBUG,"Resign score %d < %d seen.",eval_,RESIGN_SCORE);
 	logme(LOG_DEBUG,"Resign score seen %d consecutive times.",
 	      resignScoreSeen);
       }else{
@@ -431,7 +431,7 @@ void ProcessComputerLine(char *line, char *queue)
 	if(appData.acceptDraw && 
 	   runData.registeredDrawOffer &&
 	   validKibitzSeen &&
-	   EvalDraw(eval)){
+	   EvalDraw(eval_)){
 	   SendToIcs("draw\n");
 	}else if(runData.registeredDrawOffer){
 	  SendToComputer("draw\n");
@@ -557,8 +557,8 @@ void ProcessComputerLine(char *line, char *queue)
     SendToIcs("%s\n", line);
   } else {
     if(sscanf(line,"%d%*[ .+]%d %d %d %254[^\r\n]",
-	      &depth,&eval,&time_,&nodes,pv)==5){
-        if(appData.scoreForWhite && !runData.computerIsWhite)eval=-eval;
+	      &depth,&eval_,&time_,&nodes,pv)==5){
+        if(appData.scoreForWhite && !runData.computerIsWhite)eval_=-eval_;
       validKibitzSeen=1;
       if(time_>=500 && appData.feedback && !appData.feedbackOnlyFinal){
 	PVFeedback();

@@ -660,6 +660,12 @@ int main(int argc, char *argv[])
     signal(SIGTERM, TerminateProc);
     signal(SIGHUP, TerminateProc);
     signal(SIGPIPE, BrokenPipe);
+
+    /*
+     * Initialize virtual machine :-)
+     */
+
+    ics_wrap_init();
     
     while(exitValue==EXIT_RESTART){
         switch(setjmp(stackPointer)){
