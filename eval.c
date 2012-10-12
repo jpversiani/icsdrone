@@ -78,6 +78,7 @@ const char * eval_errmsg[]={
 #define S_MINUS_          9
 #define S_QUOTE_         10
 #define S_NEG_           11
+#define S_QUOTE_QUOTE_   12
 
 // exit states (token types)
 
@@ -197,11 +198,17 @@ static void init_tokenizer(){
 	if(input=='\"'){
 	    tok[S_START][input]=S_QUOTE_;
 	    tok[S_QUOTE_][input]=T_STRING;
+	    tok[S_QUOTE_QUOTE_][input]=S_QUOTE_;
+	}else if(input=='\\'){
+	    tok[S_QUOTE_][input]=S_QUOTE_QUOTE_;
+	    tok[S_QUOTE_QUOTE_][input]=S_QUOTE_;
 	}else if(input=='\0'){
 	    tok[S_QUOTE_][input]=T_INVALID;
+	    tok[S_QUOTE_QUOTE_][input]=T_INVALID;
 	    pushback[S_QUOTE_][input]=1;
 	}else{
 	    tok[S_QUOTE_][input]=S_QUOTE_;
+	    tok[S_QUOTE_QUOTE_][input]=S_QUOTE_;
 	}
     }
 
@@ -460,6 +467,63 @@ static string_t * string_create(char *data, int size){
     }
     ret->data[i]='\0';
     return ret;
+}
+
+static void string_dequote(string_t *string){
+    char *in;
+    char *out;
+    char c;
+    int quote=0;
+    in=string->data;
+    out=string->data;
+    while((c=*(in++))){
+	switch(c){
+	case '\\':
+	    if(quote){
+		quote=0;
+		*(out++)='\\';
+	    }else{
+		quote=1;
+	    }
+	    break;
+	case 'n':
+	    if(quote){
+		quote=0;
+		*(out++)='\n';
+	    }else{
+		*(out++)=c;
+	    }
+	    break;
+	case 'r':
+	    if(quote){
+		quote=0;
+		*(out++)='\r';
+	    }else{
+		*(out++)=c;
+	    }
+	    break;	    
+	case 't':
+	    if(quote){
+		quote=0;
+		*(out++)='\t';
+	    }else{
+		*(out++)=c;
+	    }
+	    break;
+	case '"':
+	    if(quote){
+		quote=0;
+		*(out++)='"';
+	    }else{
+		// this should be impossible
+		*(out++)=c;
+	    }
+	    break;
+	default:
+	    *(out++)=c;
+	}
+    }
+    *out='\0';
 }
 
 static void string_decref(string_t *string){
@@ -983,6 +1047,7 @@ static int eval_factor(char **line, value_t *value){
 	return 0;
     case T_STRING:
 	value1->string_value=string_create(token->data+1,token->length-2);
+	string_dequote(value1->string_value);
 	value1->type=V_STRING;
 	break;
     case T_VAR:
