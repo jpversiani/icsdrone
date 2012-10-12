@@ -1559,32 +1559,32 @@ Bool ProcessTourneyNotifications(char *line){
     /* inject things in interpreter */
 
     token=strtok(TM," ");
-    logme(LOG_DEBUG,"Setting ct.tm to \"%s\"",token);
+    //    logme(LOG_DEBUG,"Setting ct.tm to \"%s\"",token);
     value_init(value,V_STRING,token);
     eval_set("ct.tm",value,SY_RO);
 
     token=strtok(type," (\\)");
-    logme(LOG_DEBUG,"Setting ct.time to %d",atoi(token));
+    //    logme(LOG_DEBUG,"Setting ct.time to %d",atoi(token));
     value_init(value,V_NUMERIC,time_=atoi(token));
     eval_set("ct.time",value,SY_RO);
 
     token=strtok(NULL," (\\)");
-    logme(LOG_DEBUG,"Setting ct.inc to %d",atoi(token));
+    //    logme(LOG_DEBUG,"Setting ct.inc to %d",atoi(token));
     value_init(value,V_NUMERIC,inc=atoi(token));
     eval_set("ct.inc",value,SY_RO);
 
     // compute a dependent variable
     etime=60*time_+40*inc;
-    logme(LOG_DEBUG,"Setting ct.etime to %d",etime);
+    //    logme(LOG_DEBUG,"Setting ct.etime to %d",etime);
     value_init(value,V_NUMERIC,etime);
     eval_set("ct.etime",value,SY_RO);
 
     token=strtok(NULL," (\\)");
     if(!strcmp(token,"r")){
-	logme(LOG_DEBUG,"Setting ct.rated to true");
+	//	logme(LOG_DEBUG,"Setting ct.rated to true");
 	value_init(value,V_BOOLEAN,1);
     }else{
-	logme(LOG_DEBUG,"Setting ct.rated to false");
+	//	logme(LOG_DEBUG,"Setting ct.rated to false");
 	value_init(value,V_BOOLEAN,0);
     }
     eval_set("ct.rated",value,SY_RO);
@@ -1606,19 +1606,19 @@ Bool ProcessTourneyNotifications(char *line){
        || !strcmp(token,"atom") || !strcmp(token,"zh")){
 	logme(LOG_DEBUG,"This is a variant tourney.");
 	if(!strcmp(token,"los")){
-	    logme(LOG_DEBUG,"Setting ct.variant to \"losers\"");
+	    //	    logme(LOG_DEBUG,"Setting ct.variant to \"losers\"");
 	    value_init(value,V_STRING,"losers");
 	    eval_set("ct.losers",value1,SY_RO);
 	}else if(!strcmp(token,"sui")){
-	    logme(LOG_DEBUG,"Setting ct.variant to \"suicide\"");
+	    //	    logme(LOG_DEBUG,"Setting ct.variant to \"suicide\"");
 	    value_init(value,V_STRING,"suicide");
 	    eval_set("ct.suicide",value1,SY_RO);
 	}else if(!strcmp(token,"atom")){
-	    logme(LOG_DEBUG,"Setting ct.variant to \"atomic\"");
+	    //	    logme(LOG_DEBUG,"Setting ct.variant to \"atomic\"");
 	    value_init(value,V_STRING,"atomic");
 	    eval_set("ct.atomic",value1,SY_RO);
 	}else if(!strcmp(token,"zh")){
-	    logme(LOG_DEBUG,"Setting ct.variant to \"crazyhouse\"");
+	    //	    logme(LOG_DEBUG,"Setting ct.variant to \"crazyhouse\"");
 	    value_init(value,V_STRING,"crazyhouse");
 	    eval_set("ct.crazyhouse",value1,SY_RO);
 	}else if(!strcmp(token,"wild")){
@@ -1633,7 +1633,7 @@ Bool ProcessTourneyNotifications(char *line){
 		    buffer[i]=tolower(buffer[i]);
 		}
 	    }
-	    logme(LOG_DEBUG,"Setting ct.variant to %s",buffer);
+	    //	    logme(LOG_DEBUG,"Setting ct.variant to %s",buffer);
 	    value_init(value,V_STRING,buffer);
 	    eval_set("ct.wild",value1,SY_RO);
 	}
@@ -1641,15 +1641,15 @@ Bool ProcessTourneyNotifications(char *line){
     }else{
 	eval_set("ct.chess",value1,SY_RO);
 	if(etime<180){
-	    logme(LOG_DEBUG,"Setting ct.variant to lightning");
+	    //	    logme(LOG_DEBUG,"Setting ct.variant to lightning");
 	    value_init(value,V_STRING,"lightning");
 	    eval_set("ct.lightning",value1,SY_RO);
 	}else if(etime<900){
-	    logme(LOG_DEBUG,"Setting ct.variant to blitz");
+	    //	    logme(LOG_DEBUG,"Setting ct.variant to blitz");
 	    eval_set("ct.blitz",value1,SY_RO);
 	    value_init(value,V_STRING,"blitz");
 	}else{
-	    logme(LOG_DEBUG,"Setting ct.variant to standard");
+	    //	    logme(LOG_DEBUG,"Setting ct.variant to standard");
 	    eval_set("ct.standard",value1,SY_RO);
 	    value_init(value,V_STRING,"standard");
 	}
@@ -1657,7 +1657,7 @@ Bool ProcessTourneyNotifications(char *line){
     eval_set("ct.variant",value,SY_RO);
 
 
-    logme(LOG_DEBUG,"Setting ct.type to \"%s\"",token);
+    //    logme(LOG_DEBUG,"Setting ct.type to \"%s\"",token);
     value_init(value,V_STRING,token);
     eval_set("ct.type",value,SY_RO);
 
@@ -1665,14 +1665,14 @@ Bool ProcessTourneyNotifications(char *line){
 	// non RR or DDR have rounds
 	token=strtok(NULL," (\\)");
 	if(token){
-	    logme(LOG_DEBUG,"Setting ct.rounds to \"%d\"",atoi(token));
+	    //	    logme(LOG_DEBUG,"Setting ct.rounds to \"%d\"",atoi(token));
 	    value_init(value,V_NUMERIC,atoi(token));    
 	}else{
-	    logme(LOG_DEBUG,"Setting ct.rounds to 0");
+	    //	    logme(LOG_DEBUG,"Setting ct.rounds to 0");
 	    value_init(value,V_NUMERIC,0);    
 	}
     }else{
-	    logme(LOG_DEBUG,"Setting ct.rounds to 0");
+	//	    logme(LOG_DEBUG,"Setting ct.rounds to 0");
 	    value_init(value,V_NUMERIC,0);    
     }
     eval_set("ct.rounds",value,SY_RO);
@@ -1683,14 +1683,32 @@ Bool ProcessTourneyNotifications(char *line){
     char *command1="log(\"ct.lightning=\"+str(ct.lightning)+\" ct.blitz=\"+str(ct.blitz)+\" ct.standard=\"+str(ct.standard)+\" ct.chess=\"+str(ct.chess)+\" ct.atomic=\"+str(ct.atomic)+\" ct.suicide=\"+str(ct.suicide)+\" ct.losers=\"+str(ct.losers)+\" ct.crazyhouse=\"+str(ct.crazyhouse)+\" ct.wild=\"+str(ct.wild))";
 
 
-    logme(LOG_DEBUG,"Trying to execute command\n%s",command);
-    ret=eval(command,value);
-    logme(LOG_DEBUG,"return code=%d\n",ret);
+    //    logme(LOG_DEBUG,"Executing command:\n%s",command);
+          ret=eval(command,value);
+    //    logme(LOG_DEBUG,"Return code=%d\n",ret);
+    //
+    //    logme(LOG_DEBUG,"Executing command\n%s",command1);
+          ret=eval(command1,value);
+    //    logme(LOG_DEBUG,"Return code=%d\n",ret);
 
-    logme(LOG_DEBUG,"Trying to execute command\n%s",command1);
-    ret=eval(command1,value);
-    logme(LOG_DEBUG,"return code=%d\n",ret);
-    
+    logme(LOG_DEBUG,"Executing tourneyFilter command: \"%s\"",appData.tourneyFilter);
+    ret=eval(appData.tourneyFilter,value);
+    logme(LOG_DEBUG,"Return code=%d\n",ret);
+
+    if(!ret){
+	if(value->type!=V_BOOLEAN){
+	    logme(LOG_ERROR,"tourneyFilter does not return a boolean value...");
+	}else{
+	    logme(LOG_DEBUG,"Return value=%d\n",value->value);
+	    if(value->value){
+		logme(LOG_DEBUG,"Trying to join tourney %d\n",tournamentId);
+		SendToIcs("td join %d\n",tournamentId);
+	    }else{
+		logme(LOG_DEBUG,"Not joining tourney as tourneyFilter=false\n");
+	    }
+	}
+    }
+ #if 0
     if(strstr(type,"wild") || strstr(type,"los") || strstr(type,"sui") 
        || strstr(type,"atom") || strstr(type,"zh") || strstr(type,"cra")){
       logme(LOG_DEBUG,"Not joining tourney since it is a nonstandard variant.");
@@ -1698,6 +1716,7 @@ Bool ProcessTourneyNotifications(char *line){
     }
     logme(LOG_DEBUG,"Trying to join tourney %d\n",tournamentId);
     SendToIcs("td join %d\n",tournamentId);
+#endif
     return TRUE;
   }
   

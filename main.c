@@ -655,9 +655,7 @@ int main(int argc, char *argv[])
     SetOption("program",LOGIN,0,"%s","gnuchess");
     SetOption("sendTimeout",LOGIN,0,"%s","resume");
     SetOption("feedbackCommand",LOGIN,0,"%s","whisper");
-    SetOption("tourneyFilter",
-	      LOGIN,0,"%s",
-	      "ct.variant==\"lightning\" || ct.variant==\"blitz\" || ct.variant==\"standard\"");
+    SetOption("tourneyFilter",LOGIN,0,"%s","ct.chess");
     if (ParseArgs(argc, argv) == ERROR)
         Usage();
     signal(SIGINT, TerminateProc);
