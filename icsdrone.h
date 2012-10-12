@@ -71,7 +71,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef HAVE_LIBREADLINE
 #include <readline/readline.h>
 #include <readline/history.h>
-//#include <curses.h>
+#ifdef HAVE_CURSES_H
+#include <curses.h>
+#endif
 // the following is for cygwin
 #ifdef HAVE_TERM_H
 #include <term.h>
@@ -545,7 +547,7 @@ void ProcessConsoleLine P((char *, char *));
 void Prompt P(());
 
 //#ifndef HAVE_LIBREADLINE
-#ifdef HAVE_CURSES_H
+#ifndef HAVE_CURSES_H
 #define COLOR_DEFAULT 0
 #define COLOR_ALERT 0
 #define COLOR_TELL 0
