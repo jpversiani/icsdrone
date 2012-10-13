@@ -325,6 +325,7 @@ typedef struct {
     Bool engineQuiet;
     char * variants;
     char *tourneyFilter;
+    char *matchFilter;
 } AppData;
 
 extern PersistentData  persistentData;

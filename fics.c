@@ -929,6 +929,8 @@ Bool ProcessLogin(char *line){
    */
   char name[30+1];
   char dummy;
+  value_t value[1];
+  char *command;
   if(runData.loggedIn) return FALSE;
   if (strstr(line,"Invalid password")){
     ExitOn(EXIT_HARDQUIT,"Invalid password!");
@@ -1028,6 +1030,26 @@ Bool ProcessLogin(char *line){
         ExecCommandList(appData.sendLogin,0,FALSE);
     }
     SendToIcs("resume\n");
+    // injecting in interpreter
+    eval_set("sys.handle",V_STRING,SY_RO,runData.handle);
+    eval_set("sys.registered",V_BOOLEAN,SY_RO,runData.registered);
+    switch(runData.icsType){
+    case ICS_FICS:
+	eval_set("sys.ics_type",V_STRING,SY_RO,"fics");
+	break;
+    case ICS_ICC:
+	eval_set("sys.ics_type",V_STRING,SY_RO,"ics");
+	break;
+    case ICS_VARIANT:
+	eval_set("sys.ics_type",V_STRING,SY_RO,"variant");
+	break;
+    default:
+	eval_set("sys.ics_type",V_STRING,SY_RO,"generic");
+	break;
+
+    }
+    command="log(\"sys.handle=\"+str(sys.handle)+\" sys.registered=\"+str(sys.registered)+\" sys.ics_type=\"+str(sys.ics_type))";
+    eval(value,command);
     return TRUE;
   }
   if(!runData.loggedIn && (
@@ -1279,6 +1301,39 @@ Bool ProcessNotifications(char *line){
   return FALSE;
 }
 
+void InjectChallenge(char *name, 
+		     char *rating, 
+		     int has_color, 
+		     char *color, 
+		     char *name2, 
+		     char *rating2, 
+		     char *rated, 
+		     char *variant,
+		     char *time_, 
+		     char *inc){
+    char *command;
+    value_t value[1];
+    // Inject in interpreter
+    eval_set("co.oppname",V_STRING,SY_RO,name);
+    eval_set("co.opprating",V_NUMERIC,SY_RO,atoi(rating));
+    eval_set("co.rating",V_NUMERIC,SY_RO,atoi(rating2));
+    if(!strcmp(rated,"rated")){
+	eval_set("co.rated",V_BOOLEAN,SY_RO,1);
+    }else{
+	eval_set("co.rated",V_BOOLEAN,SY_RO,0);
+    }
+    eval_set("co.variant",V_STRING,SY_RO,variant);
+    if(has_color){
+	eval_set("co.color",V_STRING,SY_RO,color);
+    }else{
+	eval_set("co.color",V_NONE,SY_RO);
+    }
+    eval_set("co.time",V_NUMERIC,SY_RO,atoi(time_));
+    eval_set("co.inc",V_NUMERIC,SY_RO,atoi(inc));
+    command="log(\"co.oppname=\"+str(co.oppname)+\" co.opprating=\"+str(co.opprating)+\" co.rating=\"+str(co.rating)+\" co.rated=\"+str(co.rated)+\" co.variant=\"+str(co.variant)+\" co.color=\"+str(co.color)+\" co.time=\"+str(co.time)+\" co.inc=\"+str(co.inc))";
+    eval(value,command);
+}
+
 Bool ProcessIncomingMatches(char *line){
   char name[30+1];
   char name2[30+1];
@@ -1287,15 +1342,23 @@ Bool ProcessIncomingMatches(char *line){
   char rated[30+1];
   char variant[30+1];
   char color[30+1];
+  char time_[30+1];
+  char inc[30+1];
+  int has_color=FALSE;
+  int ret;
+  value_t value[1];
+
   if(!runData.loggedIn) return FALSE;
   /*
    *  Accept incoming matches
    */
-  if ((sscanf(line, "Challenge: %30s (%30[^)])%30s (%30[^)])%30s%30s", 
-	      name,rating,name2,rating2,rated,variant) == 6)
+  // a preliminary initialization
+  eval_set("co.color",V_NONE,SY_RO);
+  if ((sscanf(line, "Challenge: %30s (%30[^)])%30s (%30[^)])%30s %30s %30s %30s", 
+	      name,rating,name2,rating2,rated,variant,time_,inc) == 8)
       ||
-      (sscanf(line,"Challenge: %30s (%30[^)]) [%30[^]]] %30s (%30[^)])%30s%30s",
-              name,rating,color,name2,rating2,rated,variant)==7)){
+      (has_color=(sscanf(line,"Challenge: %30s (%30[^)]) [%30[^]]] %30s (%30[^)])%30s%30s %30s %30s",
+			 name,rating,color,name2,rating2,rated,variant,time_,inc)==9))){
       int i;
       /* More specific variant */
       char *line1;
@@ -1303,6 +1366,18 @@ Bool ProcessIncomingMatches(char *line){
       if((line1=strstr(line,"Loaded"))){
 	  sscanf(line1,"Loaded from %30[^. ]",variant);
       }
+
+      InjectChallenge(name, 
+		      rating, 
+		      has_color, 
+		      color, 
+		      name2, 
+		      rating2, 
+		      rated,
+		      variant,
+		      time_, 
+		      inc);
+
       found=FALSE;
       for(i=0;i<runData.icsVariantCount;i++){
 	  if(IsVariant(variant,runData.icsVariants[i][0])){
@@ -1321,6 +1396,24 @@ Bool ProcessIncomingMatches(char *line){
 	  SendToIcs("tell %s Sorry I do not play variant \"%s\".\n",name,variant);
 	  SendToIcs("decline %s\n",name);
 	  return TRUE;
+      }
+
+      if(!runData.inTourney){
+	  logme(LOG_DEBUG,"Executing matchFilter command: \"%s\"",appData.matchFilter);
+	  ret=eval(value,"%s",appData.matchFilter);
+	  logme(LOG_DEBUG,"Error code=%d\n",ret);
+	  if(!ret){
+	      if(value->type!=V_BOOLEAN){
+		  logme(LOG_ERROR,"matchFilter does not return a boolean value...");
+	      }else{
+		  logme(LOG_DEBUG,"Return value=%s\n",value->value?"true":"false");
+		  if(!value->value){
+		      logme(LOG_DEBUG,"Rejecting match as matchFilter=false\n");
+		      SendToIcs("decline %s",name);
+		      return TRUE;
+		  }
+	      }
+	  }
       }
 
     if(!runData.inTourney && IsNoPlay(name)){
@@ -1361,6 +1454,9 @@ Bool ProcessIncomingMatches(char *line){
       create_timer(&(runData.findChallengeTimer),FINDCHALLENGETIMEOUT,FindChallenge,NULL);
       return TRUE;
     } 
+
+
+
     SendToIcs("accept %s\n", name);
     return TRUE;
 }

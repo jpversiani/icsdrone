@@ -216,7 +216,8 @@ AppData appData = {
     NULL,            /* feedbackCommand */
     FALSE,           /* engineQuiet */
     NULL,            /* variants */
-    NULL             /* tourneyFilter */
+    NULL,            /* tourneyFilter */
+    NULL             /* matchFilter */
 };
 
 int  ProcessRawInput P((int, char *, int, void (*)(char *, char*)));
@@ -656,6 +657,7 @@ int main(int argc, char *argv[])
     SetOption("sendTimeout",LOGIN,0,"%s","resume");
     SetOption("feedbackCommand",LOGIN,0,"%s","whisper");
     SetOption("tourneyFilter",LOGIN,0,"%s","ct.chess");
+    SetOption("matchFilter",LOGIN,0,"%s","true");
     if (ParseArgs(argc, argv) == ERROR)
         Usage();
     signal(SIGINT, TerminateProc);
