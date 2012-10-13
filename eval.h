@@ -78,12 +78,12 @@ void eval_init();
  * This call transfers the ownership of the contents of value to
  * the interpreter. Do not use value_clear on it afterwards!
  */
-int (*eval_set)(char *name, value_t *value, char flags);
+int eval_set(char *name, int type, char flags,...);
 
 /*
  * The contents of value remains owned by the interpreter.
  */
-int eval(char *line, value_t *value);
+int eval(value_t *value, char *line, ...);
 
 void (*eval_clear)();
 

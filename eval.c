@@ -425,8 +425,43 @@ static int symbol_table_set(char *name, value_t *value, char flags){
 
 // external interface
 
-int (*eval_set)(char *, value_t *, char)=symbol_table_set;
+int eval_set(char *name, int type, char flags, ...){
+    value_t value[1];
+    va_list a_list;
+    int ret;
+    va_start(a_list,flags);
+    switch(type){
+    case V_NUMERIC:
+	value->value=va_arg(a_list,int);
+	ret=value_init(value,type,value->value);
+	break;
+    case V_BOOLEAN:
+	value->value=va_arg(a_list,int);
+	ret=value_init(value,type,value->value);
+	break;
+    case V_NONE:
+	value->value=0;
+	ret=value_init(value,type,value->value);
+	break;
+    case V_ERROR:
+	value->value=va_arg(a_list,int);
+	ret=value_init(value,type,value->value);
+	break;
+    case V_STRING:
+	value->string_value=string_create(va_arg(a_list,char *),-1);
+	ret=value_init(value,type,value->string_value);
+	break;
+    case V_CFUNC:
+	value->cfunc_value=va_arg(a_list,cfunc);
+	ret=value_init(value,type,value->cfunc_value);
+	break;
+    default:
+	ret=E_UNKNOWN_TYPE;
+    }
+    va_end(a_list);
+    return ret;
 
+}
 
 int symbol_table_get(char *name, value_t *value){
     int i;
@@ -1856,12 +1891,21 @@ static int parse_commaexp(char **line){
 // A string_value returned lives in the symbol table
 // so it should not be freed externally.
 
-int eval(char *line, value_t *value){
+int eval(value_t *value, char *format, ... ){
     token_t token[1];
     int ret;
+    va_list alist;
+    char *line;
+    char buf[8192]; // make this dynamic
     if(eval_debug){
 	printf("eval(): line=[%s]\n",line);
     }
+    va_start(alist,format);
+    ret=vsnprintf(buf,sizeof(buf)-1,format,alist);
+    va_end(alist);
+    buf[sizeof(buf)-1]='\0';
+    line=buf;
+
     if((ret=eval_commaexp(&line,value))){
 	value->type=V_ERROR;
 	value->value=ret;
@@ -2062,7 +2106,7 @@ static int eval_wrap(value_t *result,value_t **value){
     if(value[0]->type!=V_STRING){
 	return E_INVALID_SIGNATURE;
     }
-    if((ret=eval(value[0]->string_value->data,result))){
+    if((ret=eval(result,"%s",value[0]->string_value->data))){
 	return ret;
     }
     incref(result);
