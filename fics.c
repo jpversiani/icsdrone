@@ -492,7 +492,7 @@ void ExecCommand(char * command, int mask, int inhibitSet){
   } else if(sscanf(command,"load %8191[^\n\r]",value)==1){
       ExecFile(value,mask,inhibitSet); 
   } else if(sscanf(command,"exec %8191[^\n\r]",value)==1) {
-      eval(value, result);
+      eval(result,"%s",value);
       // temporary
       if(0){
       }else if(result->type==V_STRING){
@@ -1423,7 +1423,7 @@ Bool ProcessTourneyNotifications(char *line){
   char date[30+1];
   char color[30+1];
   char name[30+1];
-  value_t value[1], value1[1];
+  value_t value[1];
   char *token;
   int inc;
   int time_;
@@ -1557,58 +1557,51 @@ Bool ProcessTourneyNotifications(char *line){
     /* inject things in interpreter */
 
     token=strtok(TM," ");
-    value_init(value,V_STRING,token);
-    eval_set("ct.tm",value,SY_RO);
+    eval_set("ct.tm",V_STRING,SY_RO,token);
 
     token=strtok(type," (\\)");
-    value_init(value,V_NUMERIC,time_=atoi(token));
-    eval_set("ct.time",value,SY_RO);
+    eval_set("ct.time",V_NUMERIC,SY_RO,time_=atoi(token));
 
     token=strtok(NULL," (\\)");
-    value_init(value,V_NUMERIC,inc=atoi(token));
-    eval_set("ct.inc",value,SY_RO);
+    eval_set("ct.inc",V_NUMERIC,SY_RO,inc=atoi(token));
 
     // compute a dependent variable
     etime=60*time_+40*inc;
-    value_init(value,V_NUMERIC,etime);
-    eval_set("ct.etime",value,SY_RO);
+    eval_set("ct.etime",V_NUMERIC,SY_RO,etime);
 
     token=strtok(NULL," (\\)");
     if(!strcmp(token,"r")){
-	value_init(value,V_BOOLEAN,1);
+	eval_set("ct.rated",V_BOOLEAN,SY_RO,1);
     }else{
-	value_init(value,V_BOOLEAN,0);
+	eval_set("ct.rated",V_BOOLEAN,SY_RO,0);
     }
-    eval_set("ct.rated",value,SY_RO);
 
-    value_init(value1,V_BOOLEAN,0);
-    eval_set("ct.lightning",value1,SY_RO);
-    eval_set("ct.blitz",value1,SY_RO);
-    eval_set("ct.standard",value1,SY_RO);
-    eval_set("ct.chess",value1,SY_RO);
-    eval_set("ct.atomic",value1,SY_RO);
-    eval_set("ct.suicide",value1,SY_RO);
-    eval_set("ct.losers",value1,SY_RO);
-    eval_set("ct.crazyhouse",value1,SY_RO);
-    eval_set("ct.wild",value1,SY_RO);
-    value_init(value1,V_BOOLEAN,1);
+    eval_set("ct.lightning",V_BOOLEAN,SY_RO,0);
+    eval_set("ct.blitz",V_BOOLEAN,SY_RO,0);
+    eval_set("ct.standard",V_BOOLEAN,SY_RO,0);
+    eval_set("ct.chess",V_BOOLEAN,SY_RO,0);
+    eval_set("ct.atomic",V_BOOLEAN,SY_RO,0);
+    eval_set("ct.suicide",V_BOOLEAN,SY_RO,0);
+    eval_set("ct.losers",V_BOOLEAN,SY_RO,0);
+    eval_set("ct.crazyhouse",V_BOOLEAN,SY_RO,0);
+    eval_set("ct.wild",V_BOOLEAN,SY_RO,0);
 
     token=strtok(NULL," (\\)");
     if(!strcmp(token,"wild") || !strcmp(token,"los") || !strcmp(token,"sui") 
        || !strcmp(token,"atom") || !strcmp(token,"zh")){
 	logme(LOG_DEBUG,"This is a variant tourney.");
 	if(!strcmp(token,"los")){
-	    value_init(value,V_STRING,"losers");
-	    eval_set("ct.losers",value1,SY_RO);
+	    eval_set("ct.variant",V_STRING,SY_RO,"losers");
+	    eval_set("ct.losers",V_BOOLEAN,SY_RO,1);
 	}else if(!strcmp(token,"sui")){
-	    value_init(value,V_STRING,"suicide");
-	    eval_set("ct.suicide",value1,SY_RO);
+	    eval_set("ct.variant",V_STRING,SY_RO,"suicide");
+	    eval_set("ct.suicide",V_BOOLEAN,SY_RO,1);
 	}else if(!strcmp(token,"atom")){
-	    value_init(value,V_STRING,"atomic");
-	    eval_set("ct.atomic",value1,SY_RO);
+	    eval_set("ct.variant",V_STRING,SY_RO,"atomic");
+	    eval_set("ct.atomic",V_BOOLEAN,SY_RO,1);
 	}else if(!strcmp(token,"zh")){
-	    value_init(value,V_STRING,"crazyhouse");
-	    eval_set("ct.crazyhouse",value1,SY_RO);
+	    eval_set("ct.variant",V_STRING,SY_RO,"crazyhouse");
+	    eval_set("ct.crazyhouse",V_BOOLEAN,SY_RO,1);
 	}else if(!strcmp(token,"wild")){
 	    char buffer[256];
 	    int i;
@@ -1621,52 +1614,47 @@ Bool ProcessTourneyNotifications(char *line){
 		    buffer[i]=tolower(buffer[i]);
 		}
 	    }
-	    value_init(value,V_STRING,buffer);
-	    eval_set("ct.wild",value1,SY_RO);
+	    eval_set("ct.variant",V_STRING,SY_RO,buffer);
+	    eval_set("ct.wild",V_BOOLEAN,SY_RO,1);
 	}
 	token=strtok(NULL," (\\)");
     }else{
-	eval_set("ct.chess",value1,SY_RO);
+	eval_set("ct.chess",V_BOOLEAN,SY_RO,1);
 	if(etime<180){
-	    value_init(value,V_STRING,"lightning");
-	    eval_set("ct.lightning",value1,SY_RO);
+	    eval_set("ct.variant",V_STRING,SY_RO,"lightning");
+	    eval_set("ct.lightning",V_BOOLEAN,SY_RO,1);
 	}else if(etime<900){
-	    eval_set("ct.blitz",value1,SY_RO);
-	    value_init(value,V_STRING,"blitz");
+	    eval_set("ct.variant",V_STRING,SY_RO,"blitz");
+	    eval_set("ct.blitz",V_BOOLEAN,SY_RO,1);
 	}else{
-	    eval_set("ct.standard",value1,SY_RO);
-	    value_init(value,V_STRING,"standard");
+	    eval_set("ct.variant",V_STRING,SY_RO,"standard");
+	    eval_set("ct.standard",V_BOOLEAN,SY_RO,1);
 	}
     }
-    eval_set("ct.variant",value,SY_RO);
-
-    value_init(value,V_STRING,token);
-    eval_set("ct.type",value,SY_RO);
+    eval_set("ct.type",V_STRING,SY_RO,token);
 
     if(!(!strcasecmp(token,"drr") || !strcasecmp(token,"rr"))){
 	// non RR or DDR have rounds
 	token=strtok(NULL," (\\)");
 	if(token){
-	    value_init(value,V_NUMERIC,atoi(token));    
+	    eval_set("ct.rounds",V_NUMERIC,SY_RO,atoi(token));
 	}else{
-	    value_init(value,V_NUMERIC,0);    
+	    eval_set("ct.rounds",V_NUMERIC,SY_RO,0);
 	}
     }else{
-	    value_init(value,V_NUMERIC,0);    
+	eval_set("ct.rounds",V_NUMERIC,SY_RO,0);
     }
-    eval_set("ct.rounds",value,SY_RO);
-    
 
     int ret;
     char *command="log(\"ct.tm=\"+str(ct.tm)+\" ct.time=\"+str(ct.time)+\" ct.inc=\"+str(ct.inc)+\" ct.etime=\"+str(ct.etime)+\" ct.rated=\"+str(ct.rated)+\" ct.variant=\"+str(ct.variant)+\" ct.type=\"+str(ct.type)+\" ct.rounds=\"+str(ct.rounds))";
     char *command1="log(\"ct.lightning=\"+str(ct.lightning)+\" ct.blitz=\"+str(ct.blitz)+\" ct.standard=\"+str(ct.standard)+\" ct.chess=\"+str(ct.chess)+\" ct.atomic=\"+str(ct.atomic)+\" ct.suicide=\"+str(ct.suicide)+\" ct.losers=\"+str(ct.losers)+\" ct.crazyhouse=\"+str(ct.crazyhouse)+\" ct.wild=\"+str(ct.wild))";
 
 
-    ret=eval(command,value);
-    ret=eval(command1,value);
+    ret=eval(value,"%s",command);
+    ret=eval(value,"%s",command1);
 
     logme(LOG_DEBUG,"Executing tourneyFilter command: \"%s\"",appData.tourneyFilter);
-    ret=eval(appData.tourneyFilter,value);
+    ret=eval(value,"%s",appData.tourneyFilter);
     logme(LOG_DEBUG,"Return code=%d\n",ret);
 
     if(!ret){
