@@ -1411,6 +1411,111 @@ Bool ProcessStandings(char *line){
     return FALSE;
  }
 
+void InjectCurrentTourney(char *TM, char* type){
+    value_t value[1];
+    char *token;
+    int inc;
+    int time_;
+    int etime;
+    /* inject things in interpreter */
+    //eval_debug=1;
+
+    token=strtok(TM," ");
+    eval_set("ct.tm",V_STRING,SY_RO,token);
+
+    token=strtok(type," (\\)");
+    eval_set("ct.time",V_NUMERIC,SY_RO,time_=atoi(token));
+
+    token=strtok(NULL," (\\)");
+    eval_set("ct.inc",V_NUMERIC,SY_RO,inc=atoi(token));
+
+    // compute a dependent variable
+    etime=60*time_+40*inc;
+    eval_set("ct.etime",V_NUMERIC,SY_RO,etime);
+
+    token=strtok(NULL," (\\)");
+    if(!strcmp(token,"r")){
+	eval_set("ct.rated",V_BOOLEAN,SY_RO,1);
+    }else{
+	eval_set("ct.rated",V_BOOLEAN,SY_RO,0);
+    }
+
+    eval_set("ct.lightning",V_BOOLEAN,SY_RO,0);
+    eval_set("ct.blitz",V_BOOLEAN,SY_RO,0);
+    eval_set("ct.standard",V_BOOLEAN,SY_RO,0);
+    eval_set("ct.chess",V_BOOLEAN,SY_RO,0);
+    eval_set("ct.atomic",V_BOOLEAN,SY_RO,0);
+    eval_set("ct.suicide",V_BOOLEAN,SY_RO,0);
+    eval_set("ct.losers",V_BOOLEAN,SY_RO,0);
+    eval_set("ct.crazyhouse",V_BOOLEAN,SY_RO,0);
+    eval_set("ct.wild",V_BOOLEAN,SY_RO,0);
+
+    token=strtok(NULL," (\\)");
+    if(!strcmp(token,"wild") || !strcmp(token,"los") || !strcmp(token,"sui") 
+       || !strcmp(token,"atom") || !strcmp(token,"zh")){
+	logme(LOG_DEBUG,"This is a variant tourney.");
+	if(!strcmp(token,"los")){
+	    eval_set("ct.variant",V_STRING,SY_RO,"losers");
+	    eval_set("ct.losers",V_BOOLEAN,SY_RO,1);
+	}else if(!strcmp(token,"sui")){
+	    eval_set("ct.variant",V_STRING,SY_RO,"suicide");
+	    eval_set("ct.suicide",V_BOOLEAN,SY_RO,1);
+	}else if(!strcmp(token,"atom")){
+	    eval_set("ct.variant",V_STRING,SY_RO,"atomic");
+	    eval_set("ct.atomic",V_BOOLEAN,SY_RO,1);
+	}else if(!strcmp(token,"zh")){
+	    eval_set("ct.variant",V_STRING,SY_RO,"crazyhouse");
+	    eval_set("ct.crazyhouse",V_BOOLEAN,SY_RO,1);
+	}else if(!strcmp(token,"wild")){
+	    char buffer[256];
+	    int i;
+	    // wild needs special treatment
+	    token=strtok(NULL," ");
+	    snprintf(buffer,255,"wild/%s",token);
+	    buffer[255]='\0';
+	    for(i=0;i<strlen(buffer);i++){
+		if(isupper(buffer[i])){
+		    buffer[i]=tolower(buffer[i]);
+		}
+	    }
+	    eval_set("ct.variant",V_STRING,SY_RO,buffer);
+	    eval_set("ct.wild",V_BOOLEAN,SY_RO,1);
+	}
+	token=strtok(NULL," (\\)");
+    }else{
+	eval_set("ct.chess",V_BOOLEAN,SY_RO,1);
+	if(etime<180){
+	    eval_set("ct.variant",V_STRING,SY_RO,"lightning");
+	    eval_set("ct.lightning",V_BOOLEAN,SY_RO,1);
+	}else if(etime<900){
+	    eval_set("ct.variant",V_STRING,SY_RO,"blitz");
+	    eval_set("ct.blitz",V_BOOLEAN,SY_RO,1);
+	}else{
+	    eval_set("ct.variant",V_STRING,SY_RO,"standard");
+	    eval_set("ct.standard",V_BOOLEAN,SY_RO,1);
+	}
+    }
+    eval_set("ct.type",V_STRING,SY_RO,token);
+
+    if(!(!strcasecmp(token,"drr") || !strcasecmp(token,"rr"))){
+	// non RR or DDR have rounds
+	token=strtok(NULL," (\\)");
+	if(token){
+	    eval_set("ct.rounds",V_NUMERIC,SY_RO,atoi(token));
+	}else{
+	    eval_set("ct.rounds",V_NUMERIC,SY_RO,0);
+	}
+    }else{
+	eval_set("ct.rounds",V_NUMERIC,SY_RO,0);
+    }
+
+    char *command="log(\"ct.tm=\"+str(ct.tm)+\" ct.time=\"+str(ct.time)+\" ct.inc=\"+str(ct.inc)+\" ct.etime=\"+str(ct.etime)+\" ct.rated=\"+str(ct.rated)+\" ct.variant=\"+str(ct.variant)+\" ct.type=\"+str(ct.type)+\" ct.rounds=\"+str(ct.rounds))";
+    char *command1="log(\"ct.lightning=\"+str(ct.lightning)+\" ct.blitz=\"+str(ct.blitz)+\" ct.standard=\"+str(ct.standard)+\" ct.chess=\"+str(ct.chess)+\" ct.atomic=\"+str(ct.atomic)+\" ct.suicide=\"+str(ct.suicide)+\" ct.losers=\"+str(ct.losers)+\" ct.crazyhouse=\"+str(ct.crazyhouse)+\" ct.wild=\"+str(ct.wild))";
+
+    eval(value,"%s",command);
+    eval(value,"%s",command1);
+}
+
 Bool ProcessTourneyNotifications(char *line){
   int tournamentId;
   Bool endOfTournament=FALSE;
@@ -1424,10 +1529,7 @@ Bool ProcessTourneyNotifications(char *line){
   char color[30+1];
   char name[30+1];
   value_t value[1];
-  char *token;
-  int inc;
-  int time_;
-  int etime;
+  int ret;
 
   if(hideFromProxy){
       runData.hideFromProxy=TRUE;
@@ -1554,105 +1656,8 @@ Bool ProcessTourneyNotifications(char *line){
       logme(LOG_DEBUG,"Not joining tourney since we are already in a tourney.");
       return TRUE;
     }
-    /* inject things in interpreter */
-    //eval_debug=1;
-
-    token=strtok(TM," ");
-    eval_set("ct.tm",V_STRING,SY_RO,token);
-
-    token=strtok(type," (\\)");
-    eval_set("ct.time",V_NUMERIC,SY_RO,time_=atoi(token));
-
-    token=strtok(NULL," (\\)");
-    eval_set("ct.inc",V_NUMERIC,SY_RO,inc=atoi(token));
-
-    // compute a dependent variable
-    etime=60*time_+40*inc;
-    eval_set("ct.etime",V_NUMERIC,SY_RO,etime);
-
-    token=strtok(NULL," (\\)");
-    if(!strcmp(token,"r")){
-	eval_set("ct.rated",V_BOOLEAN,SY_RO,1);
-    }else{
-	eval_set("ct.rated",V_BOOLEAN,SY_RO,0);
-    }
-
-    eval_set("ct.lightning",V_BOOLEAN,SY_RO,0);
-    eval_set("ct.blitz",V_BOOLEAN,SY_RO,0);
-    eval_set("ct.standard",V_BOOLEAN,SY_RO,0);
-    eval_set("ct.chess",V_BOOLEAN,SY_RO,0);
-    eval_set("ct.atomic",V_BOOLEAN,SY_RO,0);
-    eval_set("ct.suicide",V_BOOLEAN,SY_RO,0);
-    eval_set("ct.losers",V_BOOLEAN,SY_RO,0);
-    eval_set("ct.crazyhouse",V_BOOLEAN,SY_RO,0);
-    eval_set("ct.wild",V_BOOLEAN,SY_RO,0);
-
-    token=strtok(NULL," (\\)");
-    if(!strcmp(token,"wild") || !strcmp(token,"los") || !strcmp(token,"sui") 
-       || !strcmp(token,"atom") || !strcmp(token,"zh")){
-	logme(LOG_DEBUG,"This is a variant tourney.");
-	if(!strcmp(token,"los")){
-	    eval_set("ct.variant",V_STRING,SY_RO,"losers");
-	    eval_set("ct.losers",V_BOOLEAN,SY_RO,1);
-	}else if(!strcmp(token,"sui")){
-	    eval_set("ct.variant",V_STRING,SY_RO,"suicide");
-	    eval_set("ct.suicide",V_BOOLEAN,SY_RO,1);
-	}else if(!strcmp(token,"atom")){
-	    eval_set("ct.variant",V_STRING,SY_RO,"atomic");
-	    eval_set("ct.atomic",V_BOOLEAN,SY_RO,1);
-	}else if(!strcmp(token,"zh")){
-	    eval_set("ct.variant",V_STRING,SY_RO,"crazyhouse");
-	    eval_set("ct.crazyhouse",V_BOOLEAN,SY_RO,1);
-	}else if(!strcmp(token,"wild")){
-	    char buffer[256];
-	    int i;
-	    // wild needs special treatment
-	    token=strtok(NULL," ");
-	    snprintf(buffer,255,"wild/%s",token);
-	    buffer[255]='\0';
-	    for(i=0;i<strlen(buffer);i++){
-		if(isupper(buffer[i])){
-		    buffer[i]=tolower(buffer[i]);
-		}
-	    }
-	    eval_set("ct.variant",V_STRING,SY_RO,buffer);
-	    eval_set("ct.wild",V_BOOLEAN,SY_RO,1);
-	}
-	token=strtok(NULL," (\\)");
-    }else{
-	eval_set("ct.chess",V_BOOLEAN,SY_RO,1);
-	if(etime<180){
-	    eval_set("ct.variant",V_STRING,SY_RO,"lightning");
-	    eval_set("ct.lightning",V_BOOLEAN,SY_RO,1);
-	}else if(etime<900){
-	    eval_set("ct.variant",V_STRING,SY_RO,"blitz");
-	    eval_set("ct.blitz",V_BOOLEAN,SY_RO,1);
-	}else{
-	    eval_set("ct.variant",V_STRING,SY_RO,"standard");
-	    eval_set("ct.standard",V_BOOLEAN,SY_RO,1);
-	}
-    }
-    eval_set("ct.type",V_STRING,SY_RO,token);
-
-    if(!(!strcasecmp(token,"drr") || !strcasecmp(token,"rr"))){
-	// non RR or DDR have rounds
-	token=strtok(NULL," (\\)");
-	if(token){
-	    eval_set("ct.rounds",V_NUMERIC,SY_RO,atoi(token));
-	}else{
-	    eval_set("ct.rounds",V_NUMERIC,SY_RO,0);
-	}
-    }else{
-	eval_set("ct.rounds",V_NUMERIC,SY_RO,0);
-    }
-
-    int ret;
-    char *command="log(\"ct.tm=\"+str(ct.tm)+\" ct.time=\"+str(ct.time)+\" ct.inc=\"+str(ct.inc)+\" ct.etime=\"+str(ct.etime)+\" ct.rated=\"+str(ct.rated)+\" ct.variant=\"+str(ct.variant)+\" ct.type=\"+str(ct.type)+\" ct.rounds=\"+str(ct.rounds))";
-    char *command1="log(\"ct.lightning=\"+str(ct.lightning)+\" ct.blitz=\"+str(ct.blitz)+\" ct.standard=\"+str(ct.standard)+\" ct.chess=\"+str(ct.chess)+\" ct.atomic=\"+str(ct.atomic)+\" ct.suicide=\"+str(ct.suicide)+\" ct.losers=\"+str(ct.losers)+\" ct.crazyhouse=\"+str(ct.crazyhouse)+\" ct.wild=\"+str(ct.wild))";
-
-
-    ret=eval(value,"%s",command);
-    ret=eval(value,"%s",command1);
+    
+    InjectCurrentTourney(TM,type);
 
     logme(LOG_DEBUG,"Executing tourneyFilter command: \"%s\"",appData.tourneyFilter);
     ret=eval(value,"%s",appData.tourneyFilter);
