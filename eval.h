@@ -63,28 +63,20 @@ typedef struct value_ {
 extern const char *eval_errmsg[];
 extern int eval_debug;
 
-
 /*
  * api
  */ 
-
 
 int value_init(value_t * value, int type, ... );
 int (*value_clear)(value_t * value);
 
 void eval_init();
+void (*eval_clear)();
 
-/*
- * This call transfers the ownership of the contents of value to
- * the interpreter. Do not use value_clear on it afterwards!
- */
 int eval_set(char *name, int type, char flags,...);
-
 /*
  * The contents of value remains owned by the interpreter.
  */
 int eval(value_t *value, char *line, ...);
-
-void (*eval_clear)();
 
 #endif
