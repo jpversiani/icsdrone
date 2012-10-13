@@ -82,7 +82,6 @@ int get_option_wrap(value_t *result,value_t **value){
 }
 
 void ics_wrap_init(){
-    value_t value[1];
     eval_init();
     eval_set("log",V_CFUNC,SY_RO,log_wrap);
     eval_set("send_to_ics",V_CFUNC,SY_RO,send_to_ics_wrap);
