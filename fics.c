@@ -1555,6 +1555,7 @@ Bool ProcessTourneyNotifications(char *line){
       return TRUE;
     }
     /* inject things in interpreter */
+    //eval_debug=1;
 
     token=strtok(TM," ");
     eval_set("ct.tm",V_STRING,SY_RO,token);
@@ -1655,13 +1656,12 @@ Bool ProcessTourneyNotifications(char *line){
 
     logme(LOG_DEBUG,"Executing tourneyFilter command: \"%s\"",appData.tourneyFilter);
     ret=eval(value,"%s",appData.tourneyFilter);
-    logme(LOG_DEBUG,"Return code=%d\n",ret);
-
+    logme(LOG_DEBUG,"Error code=%d\n",ret);
     if(!ret){
 	if(value->type!=V_BOOLEAN){
 	    logme(LOG_ERROR,"tourneyFilter does not return a boolean value...");
 	}else{
-	    logme(LOG_DEBUG,"Return value=%d\n",value->value);
+	    logme(LOG_DEBUG,"Return value=%s\n",value->value?"true":"false");
 	    if(value->value){
 		logme(LOG_DEBUG,"Trying to join tourney %d\n",tournamentId);
 		SendToIcs("td join %d\n",tournamentId);
@@ -1670,15 +1670,6 @@ Bool ProcessTourneyNotifications(char *line){
 	    }
 	}
     }
- #if 0
-    if(strstr(type,"wild") || strstr(type,"los") || strstr(type,"sui") 
-       || strstr(type,"atom") || strstr(type,"zh") || strstr(type,"cra")){
-      logme(LOG_DEBUG,"Not joining tourney since it is a nonstandard variant.");
-      return TRUE;
-    }
-    logme(LOG_DEBUG,"Trying to join tourney %d\n",tournamentId);
-    SendToIcs("td join %d\n",tournamentId);
-#endif
     return TRUE;
   }
   

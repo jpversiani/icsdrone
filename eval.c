@@ -1,6 +1,5 @@
 // TODO: 
 // Exponentiation.
-// quoting in strings
 // % operator
 
 #include <ctype.h>
@@ -427,38 +426,47 @@ static int symbol_table_set(char *name, value_t *value, char flags){
 
 int eval_set(char *name, int type, char flags, ...){
     value_t value[1];
+    int num;
+    char *str;
+    cfunc cf;
     va_list a_list;
     int ret;
     va_start(a_list,flags);
     switch(type){
     case V_NUMERIC:
-	value->value=va_arg(a_list,int);
-	ret=value_init(value,type,value->value);
+	num=va_arg(a_list,int);
+	ret=value_init(value,type,num);
 	break;
     case V_BOOLEAN:
-	value->value=va_arg(a_list,int);
-	ret=value_init(value,type,value->value);
+	num=(va_arg(a_list,int)!=0);
+	ret=value_init(value,type,num);
 	break;
     case V_NONE:
-	value->value=0;
-	ret=value_init(value,type,value->value);
+	ret=value_init(value,type);
 	break;
     case V_ERROR:
-	value->value=va_arg(a_list,int);
-	ret=value_init(value,type,value->value);
+	num=va_arg(a_list,int);
+	ret=value_init(value,type,num);
 	break;
     case V_STRING:
-	value->string_value=string_create(va_arg(a_list,char *),-1);
-	ret=value_init(value,type,value->string_value);
+	str=va_arg(a_list,char *);
+	ret=value_init(value,type,str);
 	break;
     case V_CFUNC:
-	value->cfunc_value=va_arg(a_list,cfunc);
-	ret=value_init(value,type,value->cfunc_value);
+	cf=va_arg(a_list,cfunc);
+	ret=value_init(value,type,cf);
 	break;
     default:
 	ret=E_UNKNOWN_TYPE;
     }
     va_end(a_list);
+    if(ret){
+	return ret;
+    }
+    ret=symbol_table_set(name, value, flags);
+    if(ret){
+	decref(value);
+    }
     return ret;
 
 }
@@ -1897,14 +1905,14 @@ int eval(value_t *value, char *format, ... ){
     va_list alist;
     char *line;
     char buf[8192]; // make this dynamic
-    if(eval_debug){
-	printf("eval(): line=[%s]\n",line);
-    }
     va_start(alist,format);
     ret=vsnprintf(buf,sizeof(buf)-1,format,alist);
     va_end(alist);
     buf[sizeof(buf)-1]='\0';
     line=buf;
+    if(eval_debug){
+	printf("eval(): line=[%s]\n",line);
+    }
 
     if((ret=eval_commaexp(&line,value))){
 	value->type=V_ERROR;
