@@ -1904,11 +1904,15 @@ int eval(value_t *value, char *format, ... ){
     int ret;
     va_list alist;
     char *line;
-    char buf[8192]; // make this dynamic
+    char *buf;
     va_start(alist,format);
-    ret=vsnprintf(buf,sizeof(buf)-1,format,alist);
+    ret=vsnprintf(NULL,0,format,alist);
     va_end(alist);
-    buf[sizeof(buf)-1]='\0';
+    buf=malloc(ret+1);
+    va_start(alist,format);
+    vsnprintf(buf,ret+1,format,alist);
+    va_end(alist);
+
     line=buf;
     if(eval_debug){
 	printf("eval(): line=[%s]\n",line);
@@ -1918,6 +1922,7 @@ int eval(value_t *value, char *format, ... ){
 	value->type=V_ERROR;
 	value->value=ret;
 	symbol_table_set("_",value,0);
+	free(buf);
 	return ret;
     }
     if((ret=peektoken(&line,token))){
@@ -1925,8 +1930,10 @@ int eval(value_t *value, char *format, ... ){
 	value->type=V_ERROR;
 	value->value=ret;
 	symbol_table_set("_",value,0);
+	free(buf);
 	return ret;
     }
+    free(buf);
     if(token->type!=T_NONE){
 	decref(value);
 	value->type=V_ERROR;
