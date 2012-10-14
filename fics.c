@@ -1412,8 +1412,6 @@ Bool ProcessIncomingMatches(char *line){
   /*
    *  Accept incoming matches
    */
-  // a preliminary initialization
-  eval_set("co.color",V_NONE,SY_RO);
   if ((sscanf(line, "Challenge: %30s (%30[^)])%30s (%30[^)])%30s %30s %30s %30s", 
 	      name,rating,name2,rating2,rated,variant,time_,inc) == 8)
       ||
