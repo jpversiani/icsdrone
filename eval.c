@@ -1645,7 +1645,7 @@ static int parse_orexp(char ** line){
     if(eval_debug){
 	printf("parse_orexp(): line=[%s]\n",*line);
     }
-    if((ret=parse_boolterm(line))){
+    if((ret=parse_andexp(line))){
 	return ret;
     }
 
