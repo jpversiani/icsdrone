@@ -1471,25 +1471,6 @@ Bool ProcessIncomingMatches(char *line){
 	  return TRUE;
       }
 
-      if(!runData.inTourney){
-	  logme(LOG_DEBUG,"Executing matchFilter command: \"%s\"",appData.matchFilter);
-	  ret=eval(value,"%s",appData.matchFilter);
-	  logme(LOG_DEBUG,"Error code=%d\n",ret);
-	  if(!ret){
-	      if(value->type!=V_BOOLEAN){
-		  logme(LOG_ERROR,"matchFilter does not return a boolean value...");
-	      }else{
-		  logme(LOG_DEBUG,"Return value=%s\n",value->value?"true":"false");
-		  if(!value->value){
-		      logme(LOG_DEBUG,"Rejecting match as matchFilter=false\n");
-		      SendToIcs("decline %s",name);
-		      parsingIncoming=FALSE;
-		      return TRUE;
-		  }
-	      }
-	  }
-      }
-
     if(!runData.inTourney && IsNoPlay(name)){
         logme(LOG_DEBUG,"Ignoring %s as he is on our noplay list.",name);
         SendToIcs("decline %s\n",name);
