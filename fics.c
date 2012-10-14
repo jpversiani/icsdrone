@@ -1314,23 +1314,69 @@ void InjectChallenge(char *name,
     char *command;
     value_t value[1];
     // Inject in interpreter
-    eval_set("co.oppname",V_STRING,SY_RO,name);
-    eval_set("co.opprating",V_NUMERIC,SY_RO,atoi(rating));
-    eval_set("co.rating",V_NUMERIC,SY_RO,atoi(rating2));
+    eval_set("co.name",V_STRING,SY_RO,name);
+    eval_set("co.rating",V_NUMERIC,SY_RO,atoi(rating));
+    eval_set("co.myrating",V_NUMERIC,SY_RO,atoi(rating2));
+    eval_set("co.ratingdiff",V_NUMERIC,SY_RO,atoi(rating)-atoi(rating2));
     if(!strcmp(rated,"rated")){
 	eval_set("co.rated",V_BOOLEAN,SY_RO,1);
+	eval_set("co.unrated",V_BOOLEAN,SY_RO,0);
     }else{
 	eval_set("co.rated",V_BOOLEAN,SY_RO,0);
+	eval_set("co.unrated",V_BOOLEAN,SY_RO,1);
     }
     eval_set("co.variant",V_STRING,SY_RO,variant);
+    
+    eval_set("co.white",V_BOOLEAN,SY_RO,0);
+    eval_set("co.black",V_BOOLEAN,SY_RO,0);
     if(has_color){
 	eval_set("co.color",V_STRING,SY_RO,color);
+	if(!strcasecmp(color,"white")){
+	    eval_set("co.white",V_BOOLEAN,SY_RO,1);
+	}else{
+	    eval_set("co.black",V_BOOLEAN,SY_RO,1);
+	}
     }else{
 	eval_set("co.color",V_NONE,SY_RO);
+	eval_set("co.nocolor",V_BOOLEAN,SY_RO,1);
     }
     eval_set("co.time",V_NUMERIC,SY_RO,atoi(time_));
     eval_set("co.inc",V_NUMERIC,SY_RO,atoi(inc));
-    command="log(\"co.oppname=\"+str(co.oppname)+\" co.opprating=\"+str(co.opprating)+\" co.rating=\"+str(co.rating)+\" co.rated=\"+str(co.rated)+\" co.variant=\"+str(co.variant)+\" co.color=\"+str(co.color)+\" co.time=\"+str(co.time)+\" co.inc=\"+str(co.inc))";
+    eval_set("co.etime",V_NUMERIC,SY_RO,atoi(time_)+40*atoi(inc));
+    
+
+    eval_set("co.lightning",V_BOOLEAN,SY_RO,0);
+    eval_set("co.blitz",V_BOOLEAN,SY_RO,0);
+    eval_set("co.standard",V_BOOLEAN,SY_RO,0);
+    eval_set("co.chess",V_BOOLEAN,SY_RO,0);
+    eval_set("co.atomic",V_BOOLEAN,SY_RO,0);
+    eval_set("co.suicide",V_BOOLEAN,SY_RO,0);
+    eval_set("co.losers",V_BOOLEAN,SY_RO,0);
+    eval_set("co.crazyhouse",V_BOOLEAN,SY_RO,0);
+    eval_set("co.wild",V_BOOLEAN,SY_RO,0);
+
+    if(FALSE){
+    }else if(!strcasecmp(variant,"losers")){
+	eval_set("co.losers",V_BOOLEAN,SY_RO,1);
+    }else if(!strcasecmp(variant,"suicide")){
+	eval_set("co.suicide",V_BOOLEAN,SY_RO,1);
+    }else if(!strcasecmp(variant,"atom")){
+	eval_set("co.atomic",V_BOOLEAN,SY_RO,1);
+    }else if(!strcasecmp(variant,"crazyhouse")){
+	eval_set("co.crazyhouse",V_BOOLEAN,SY_RO,1);
+    }else if(!strncmp(variant,"wild",4)){
+	eval_set("co.wild",V_BOOLEAN,SY_RO,1);
+    }else if(!strcasecmp(variant,"lightning")){
+	eval_set("co.lightning",V_BOOLEAN,SY_RO,1);
+    }else if(!strcasecmp(variant,"blitz")){
+	eval_set("co.blitz",V_BOOLEAN,SY_RO,1);
+    }else if(!strcasecmp(variant,"standard")){
+	eval_set("co.standard",V_BOOLEAN,SY_RO,1);
+    }
+
+    command="log(\"co.name=\"+str(co.name)+\" co.rating=\"+str(co.rating)+\" co.myrating=\"+str(co.myrating)+\" co.rated=\"+str(co.rated)+\" co.variant=\"+str(co.variant)+\" co.color=\"+str(co.color)+\" co.time=\"+str(co.time)+\" co.inc=\"+str(co.inc))";
+    eval(value,command);
+   command="log(\"co.lightning=\"+str(co.lightning)+\" co.blitz=\"+str(co.blitz)+\" co.standard=\"+str(co.standard)+\" co.chess=\"+str(co.chess)+\" co.atomic=\"+str(co.atomic)+\" co.suicide=\"+str(co.suicide)+\" co.losers=\"+str(co.losers)+\" co.crazyhouse=\"+str(co.crazyhouse)+\" co.wild=\"+str(co.wild))";
     eval(value,command);
 }
 
