@@ -1519,9 +1519,19 @@ Bool ProcessIncomingMatches(char *line){
     return TRUE;
   }
   if(parsingIncoming){
-      line1=strstr(line,"Win");
-      if(line1 && sscanf(line,"Win: %d,  Draw: %d,  Loss: %d",&win,&draw,&loss)==3){
-	  return TRUE;
+      switch(runData.icsType){
+      case ICS_ICC:
+	  line1=strstr(line,"Loss");
+	  if(line1 && sscanf(line1,"Loss: %d%*[, ]Draw: %d%*[, ]Win: %d",
+			     &loss,&draw,&win)==3){
+	      return TRUE;
+	  }
+      default:
+	  line1=strstr(line,"Win");
+	  if(line1 && sscanf(line1,"Win: %d%*[, ]Draw: %d%*[, ]Loss: %d",
+			     &win,&draw,&loss)==3){
+	      return TRUE;
+	  }
       }
       if(strstr(line,"computer")){
 	  computer=TRUE;
@@ -1529,21 +1539,22 @@ Bool ProcessIncomingMatches(char *line){
       }
       if(strstr(line,"accept") && strstr(line,"decline")){
 	  parsingIncoming=FALSE;
-	  InjectChallenge(name, 
-			  rating, 
-			  has_color, 
-			  color, 
-			  name2, 
-			  rating2, 
-			  rated,
-			  variant,
-			  time_, 
-			  inc,
-			  win,
-			  draw,
-			  loss,
-			  computer);
+
 	  if(!runData.inTourney && appData.matchFilter){
+	      InjectChallenge(name, 
+			      rating, 
+			      has_color, 
+			      color, 
+			      name2, 
+			      rating2, 
+			      rated,
+			      variant,
+			      time_, 
+			      inc,
+			      win,
+			      draw,
+			      loss,
+			      computer);
 	      logme(LOG_DEBUG,"Executing matchFilter command: \"%s\"",appData.matchFilter);
 	      ret=eval(value,"%s",appData.matchFilter);
 	      logme(LOG_DEBUG,"Error code=%d\n",ret);
