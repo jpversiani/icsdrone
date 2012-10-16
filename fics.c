@@ -1356,7 +1356,7 @@ void InjectChallenge(char *name,
     }
     eval_set("co.time",V_NUMERIC,SY_RO,atoi(time_));
     eval_set("co.inc",V_NUMERIC,SY_RO,atoi(inc));
-    eval_set("co.etime",V_NUMERIC,SY_RO,atoi(time_)+40*atoi(inc));
+    eval_set("co.etime",V_NUMERIC,SY_RO,60*atoi(time_)+40*atoi(inc));
 
     eval_set("co.assesswin",V_NUMERIC,SY_RO,win);
     eval_set("co.assessdraw",V_NUMERIC,SY_RO,draw);
