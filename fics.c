@@ -1543,7 +1543,7 @@ Bool ProcessIncomingMatches(char *line){
 			  draw,
 			  loss,
 			  computer);
-	  if(!runData.inTourney){
+	  if(!runData.inTourney && appData.matchFilter){
 	      logme(LOG_DEBUG,"Executing matchFilter command: \"%s\"",appData.matchFilter);
 	      ret=eval(value,"%s",appData.matchFilter);
 	      logme(LOG_DEBUG,"Error code=%d\n",ret);
