@@ -1857,24 +1857,26 @@ Bool ProcessTourneyNotifications(char *line){
       logme(LOG_DEBUG,"Not joining tourney since we are already in a tourney.");
       return TRUE;
     }
-    
-    InjectCurrentTourney(TM,type);
-
-    logme(LOG_DEBUG,"Executing tourneyFilter command: \"%s\"",appData.tourneyFilter);
-    ret=eval(value,"%s",appData.tourneyFilter);
-    logme(LOG_DEBUG,"Error code=%d\n",ret);
-    if(!ret){
-	if(value->type!=V_BOOLEAN){
-	    logme(LOG_ERROR,"tourneyFilter does not return a boolean value...");
-	}else{
-	    logme(LOG_DEBUG,"Return value=%s\n",value->value?"true":"false");
-	    if(value->value){
-		logme(LOG_DEBUG,"Trying to join tourney %d\n",tournamentId);
-		SendToIcs("td join %d\n",tournamentId);
+    if(appData.tourneyFilter){
+	InjectCurrentTourney(TM,type);
+	logme(LOG_DEBUG,"Executing tourneyFilter command: \"%s\"",appData.tourneyFilter);
+	ret=eval(value,"%s",appData.tourneyFilter);
+	logme(LOG_DEBUG,"Error code=%d\n",ret);
+	if(!ret){
+	    if(value->type!=V_BOOLEAN){
+		logme(LOG_ERROR,"tourneyFilter does not return a boolean value...");
 	    }else{
-		logme(LOG_DEBUG,"Not joining tourney as tourneyFilter=false\n");
+		logme(LOG_DEBUG,"Return value=%s\n",value->value?"true":"false");
+		if(value->value){
+		    logme(LOG_DEBUG,"Trying to join tourney %d\n",tournamentId);
+		    SendToIcs("td join %d\n",tournamentId);
+		}else{
+		    logme(LOG_DEBUG,"Not joining tourney as tourneyFilter=false\n");
+		}
 	    }
 	}
+    }else{
+	logme(LOG_DEBUG,"No tourneyFilter command.");	
     }
     return TRUE;
   }
