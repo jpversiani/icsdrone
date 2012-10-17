@@ -1,7 +1,3 @@
-// TODO: 
-// Exponentiation.
-// % operator
-
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
@@ -10,6 +6,7 @@
 #include <sys/time.h>
 #include <stdarg.h>
 #include "eval.h"
+#include "math.h"
 
 
 typedef struct {
@@ -25,10 +22,8 @@ typedef struct {
 } symbol_t;
 
 #define MAXSYMBOLS 1024
-symbol_t * symbol_table[MAXSYMBOLS+1];
-
-
-#define WHITE_SPACE(c) ((c)==' ' || (c)=='\n' || (c)=='\r' || (c)=='\t')
+static symbol_t ** symbol_table;
+static int eval_memory_=0;
 
 // hidden symbol table flag
 
@@ -78,6 +73,8 @@ const char * eval_errmsg[]={
 #define S_QUOTE_         10
 #define S_NEG_           11
 #define S_QUOTE_QUOTE_   12
+#define S_PARSINGINT     13
+#define S_MULT_          14
 
 // exit states (token types)
 
@@ -112,7 +109,8 @@ const char * eval_errmsg[]={
 #define T_QUEST       128
 #define T_NEQ         129
 #define T_ASSIGN      130
-#define T_NONE        131
+#define T_POWER       131
+#define T_NONE        132
 
 #define MAXSTATES 20
 #define MAXINPUTS 128
@@ -137,8 +135,10 @@ static int decref(value_t *value);
 static int string_len_wrap(value_t *result,value_t **value);
 static int str_wrap(value_t *result,value_t **value);
 static int int_wrap(value_t *result,value_t **value);
+static int float_wrap(value_t *result,value_t **value);
 static int bool_wrap(value_t *result,value_t **value);
 static int eval_wrap(value_t *result,value_t **value);
+static int memory_wrap(value_t *result,value_t **value);
 static int abs_wrap(value_t *result,value_t **value);
 static int ord_wrap(value_t *result,value_t **value);
 static int chr_wrap(value_t *result,value_t **value);
@@ -151,9 +151,32 @@ static string_t * string_create(char *data, int size);
 
 static void fatal_error(char *s){
     fprintf(stderr,"%s\n",s);
-    exit(1);
+    abort();
 }
 
+static void * eval_malloc(int size){
+    void * p;
+    p=malloc(size+8);
+    *((int *)p)=size;
+    eval_memory_+=(size+8);
+    return p+8;
+}
+
+static char * eval_strdup(char *s){
+    int l;
+    char *ret;
+    l=strlen(s);
+    ret=eval_malloc(l+1);
+    strcpy(ret,s);
+    return ret;
+}
+
+static void eval_free(void *p){
+    int size;
+    size=*((int *)(p-8));
+    eval_memory_-=(size+8);
+    free(p-8);
+}
 
 static void init_tokenizer(){
     int state;
@@ -175,11 +198,11 @@ static void init_tokenizer(){
     // if we encounter the end of the string then there is no more token
 
     tok[S_START]['\0']=T_NONE;
+    pushback[S_START]['\0']=1;
 
     // 1 char tokens
     tok[S_START]['(']=T_LP;
     tok[S_START][')']=T_RP;
-    tok[S_START]['*']=T_TIMES;
     tok[S_START]['/']=T_DIV;
     tok[S_START]['-']=T_MINUS;
     tok[S_START]['{']=T_LB;
@@ -215,11 +238,16 @@ static void init_tokenizer(){
 
     for(input=0;input<MAXINPUTS;input++){
 	if(isdigit(input)){
-	    tok[S_START][input]=S_PARSINGNUMERIC;
+	    tok[S_START][input]=S_PARSINGINT;
+	    tok[S_PARSINGINT][input]=S_PARSINGINT;
 	    tok[S_PARSINGNUMERIC][input]=S_PARSINGNUMERIC;
+	}else if(input=='.'){
+	    tok[S_PARSINGINT][input]=S_PARSINGNUMERIC;
 	}else{
+	    tok[S_PARSINGINT][input]=T_NUM;
 	    tok[S_PARSINGNUMERIC][input]=T_NUM;
 	    pushback[S_PARSINGNUMERIC][input]=1;
+	    pushback[S_PARSINGINT][input]=1;
 	}
     }
 
@@ -310,6 +338,22 @@ static void init_tokenizer(){
 	}
     }
 
+    tok[S_START]['*']=T_TIMES;
+
+    // * vs **
+
+    tok[S_START]['*']=S_MULT_;
+    for(input=0;input<MAXINPUTS;input++){
+	if(input=='*'){
+	    tok[S_MULT_][input]=T_POWER;
+	}else{
+	    tok[S_MULT_][input]=T_TIMES;
+	    pushback[S_MULT_][input]=1;
+	}
+    }
+
+
+
     // ||
 
     tok[S_START]['|']=S_VERT_;
@@ -326,15 +370,17 @@ static void string_decref(string_t *string);
 
 static symbol_t * symbol_create(char *name){
     symbol_t *ret;
-    ret=malloc(sizeof(symbol_t));
-    ret->name=strdup(name);
+    ret=eval_malloc(sizeof(symbol_t));
+    ret->name=eval_strdup(name);
     ret->flags=0;
-    ret->value=malloc(sizeof(value_t));
+    ret->value=eval_malloc(sizeof(value_t));
     return ret;
 }
 
 static void symbol_table_init(){
     value_t value[1];
+    symbol_table=eval_malloc((MAXSYMBOLS+1)*sizeof(symbol_t *));
+    symbol_table[0]=NULL;
     value->type=V_BOOLEAN;
     value->value=1;
     symbol_table_set("true",value,SY_RO);
@@ -342,6 +388,8 @@ static void symbol_table_init(){
     symbol_table_set("false",value,SY_RO);
     value->type=V_NONE;
     symbol_table_set("none",value,SY_RO);
+    value->type=V_UNDEFINED;
+    symbol_table_set("undefined",value,SY_RO);
     value->type=V_CFUNC;
     value->cfunc_value=string_len_wrap;
     symbol_table_set("len",value,SY_RO);
@@ -349,10 +397,14 @@ static void symbol_table_init(){
     symbol_table_set("str",value,SY_RO);
     value->cfunc_value=int_wrap;
     symbol_table_set("int",value,SY_RO);
+    value->cfunc_value=float_wrap;
+    symbol_table_set("float",value,SY_RO);
     value->cfunc_value=bool_wrap;
     symbol_table_set("bool",value,SY_RO);
     value->cfunc_value=eval_wrap;
     symbol_table_set("eval",value,SY_RO);
+    value->cfunc_value=memory_wrap;
+    symbol_table_set("memory",value,SY_RO);
     value->cfunc_value=abs_wrap;
     symbol_table_set("abs",value,SY_RO);
     value->cfunc_value=ord_wrap;
@@ -378,10 +430,11 @@ static void symbol_table_clear(){
 	    break;
 	}
 	decref(entry->value);
-	free(entry->name);
-	free(entry->value);
-	free(entry);
+	eval_free(entry->name);
+	eval_free(entry->value);
+	eval_free(entry);
     }
+    eval_free(symbol_table);
 }
 
 // external interface
@@ -395,7 +448,7 @@ static int symbol_table_set(char *name, value_t *value, char flags){
 	if(value->type==V_STRING){
 	    printf("symbol_table_set(): name=%s value=[%s]\n",name,value->string_value->data);
 	}else{
-	    printf("symbol_table_set(): name=%s value=%d\n",name,value->value);
+	    printf("symbol_table_set(): name=%s value=%f\n",name,value->value);
 	}
     }
     for(i=0;i<MAXSYMBOLS;i++){
@@ -422,6 +475,10 @@ static int symbol_table_set(char *name, value_t *value, char flags){
     return 0;
 }
 
+int eval_memory(){
+    return eval_memory_;
+}
+
 // external interface
 
 int eval_set(char *name, int type, char flags, ...){
@@ -442,6 +499,9 @@ int eval_set(char *name, int type, char flags, ...){
 	ret=value_init(value,type,num);
 	break;
     case V_NONE:
+	ret=value_init(value,type);
+	break;
+    case V_UNDEFINED:
 	ret=value_init(value,type);
 	break;
     case V_ERROR:
@@ -480,7 +540,7 @@ int symbol_table_get(char *name, value_t *value){
     for(i=0;i<MAXSYMBOLS;i++){
 	entry=symbol_table[i];
 	if(entry==NULL){
-	    value->type=V_NONE;
+	    value->type=V_UNDEFINED;
 	    value->value=0;
 	    return 0;
 	}
@@ -499,9 +559,9 @@ static string_t * string_create(char *data, int size){
     if(size<0){
 	size=strlen(data);
     }
-    ret=malloc(sizeof(string_t));
+    ret=eval_malloc(sizeof(string_t));
     ret->refcount=1;
-    ret->data=malloc(size+1);
+    ret->data=eval_malloc(size+1);
     for(i=0;i<size;i++){
 	ret->data[i]=data[i];
 	if(data[i]==0){
@@ -575,8 +635,8 @@ static void string_decref(string_t *string){
     }
     string->refcount--;
     if(string->refcount==0){
-	free(string->data);
-	free(string);
+	eval_free(string->data);
+	eval_free(string);
     }
 }
 
@@ -607,9 +667,9 @@ static string_t * string_slice(string_t *string, int first, int second){
     if(second<first){
 	second=first;
     }
-    ret=malloc(sizeof(string_t));
+    ret=eval_malloc(sizeof(string_t));
     ret->refcount=1;
-    ret->data=malloc(second-first+1);
+    ret->data=eval_malloc(second-first+1);
     for(i=0;i<second-first;i++){
 	ret->data[i]=string->data[i+first];
 	if(ret->data[i]==0){
@@ -674,14 +734,20 @@ static int unop(value_t *value, value_t *value1, int op){
 	value->value=!value1->value;
 	break;
     default:
-	fatal_error("Internal error.");
+	fatal_error("Non existant unary operation.");
 	break;
     }
     return 0;
 }
 
 static int binop(value_t *value, value_t *value1, value_t *value2, int op){
+    // note: value may be equal to value1 or value2;
     // first deal with errors and set result type
+    int c;
+    int i;
+    char *m;
+    int result_type=V_NUMERIC; // make old version of gcc happy
+    string_t *ret;
     switch(op){
     case T_LT:
     case T_GT:
@@ -693,21 +759,31 @@ static int binop(value_t *value, value_t *value1, value_t *value2, int op){
 	// fall through
     case T_EQ:
     case T_NEQ:
-	value->type=V_BOOLEAN;
+	result_type=V_BOOLEAN;
 	break;
     case T_PLUS:
 	if((value1->type==V_STRING) && (value2->type==V_STRING)){
-	    value->type=V_STRING;
+	    result_type=V_STRING;
 	    break;
 	}
 	// fall through
     case T_TIMES:
+	if((value1->type==V_NUMERIC) && (value2->type==V_STRING)){
+	    result_type=V_STRING;
+	    break;
+	}
+	if((value1->type==V_STRING) && (value2->type==V_NUMERIC)){
+	    result_type=V_STRING;
+	    break;
+	}
+	// fall through
     case T_DIV:
     case T_MINUS:
+    case T_POWER:
 	if((value1->type!=V_NUMERIC) ||(value2->type!=V_NUMERIC)){
 	    return E_BINARY_OPERATOR_IS_INCOMPATIBLE_WITH_OPERANDS;
 	}
-	value->type=V_NUMERIC;
+	result_type=V_NUMERIC;
 	break;
 	
     case T_OR:
@@ -715,10 +791,10 @@ static int binop(value_t *value, value_t *value1, value_t *value2, int op){
 	if((value1->type!=V_BOOLEAN) ||(value2->type!=V_BOOLEAN)){
 	    return E_BINARY_OPERATOR_IS_INCOMPATIBLE_WITH_OPERANDS;
 	}
-	value->type=V_BOOLEAN;
+	result_type=V_BOOLEAN;
 	break;	
     default:
-	fatal_error("Internal error");
+	fatal_error("Non existant binary operation");
 	break;
     }
 
@@ -730,12 +806,15 @@ static int binop(value_t *value, value_t *value1, value_t *value2, int op){
 	case V_NUMERIC:
 	case V_BOOLEAN:
 	case V_NONE:
+	case V_UNDEFINED:
 	    value->value=(value1->value<value2->value);
+	    value->type=result_type;
 	    break;
 	case V_STRING:
 	    value->value=(strcmp(value1->string_value->data,value2->string_value->data)<0);
 	    decref(value1);
 	    decref(value2);
+	    value->type=result_type;
 	    break;
 	default:
 	    return E_BINARY_OPERATION_NOT_IMPLEMENTED;
@@ -746,12 +825,15 @@ static int binop(value_t *value, value_t *value1, value_t *value2, int op){
 	case V_NUMERIC:
 	case V_BOOLEAN:
 	case V_NONE:
+	case V_UNDEFINED:
 	    value->value=(value1->value>value2->value);
+	    value->type=result_type;
 	    break;
 	case V_STRING:
 	    value->value=(strcmp(value1->string_value->data,value2->string_value->data)>0);
 	    decref(value1);
 	    decref(value2);
+	    value->type=result_type;
 	    break;
 	default:
 	    return E_BINARY_OPERATION_NOT_IMPLEMENTED;
@@ -762,12 +844,15 @@ static int binop(value_t *value, value_t *value1, value_t *value2, int op){
 	case V_NUMERIC:
 	case V_BOOLEAN:
 	case V_NONE:
+	case V_UNDEFINED:
 	    value->value=(value1->value<=value2->value);
+	    value->type=result_type;
 	    break;
 	case V_STRING:
 	    value->value=(strcmp(value1->string_value->data,value2->string_value->data)<=0);
 	    decref(value1);
 	    decref(value2);
+	    value->type=result_type;
 	    break;
 	default:
 	    return E_BINARY_OPERATION_NOT_IMPLEMENTED;
@@ -778,12 +863,15 @@ static int binop(value_t *value, value_t *value1, value_t *value2, int op){
 	case V_NUMERIC:
 	case V_BOOLEAN:
 	case V_NONE:
+	case V_UNDEFINED:
 	    value->value=(value1->value>=value2->value);
+	    value->type=result_type;
 	    break;
 	case V_STRING:
 	    value->value=(strcmp(value1->string_value->data,value2->string_value->data)>=0);
 	    decref(value1);
 	    decref(value2);
+	    value->type=result_type;
 	    break;
 	default:
 	    return E_BINARY_OPERATION_NOT_IMPLEMENTED;
@@ -794,14 +882,17 @@ static int binop(value_t *value, value_t *value1, value_t *value2, int op){
 	case V_NUMERIC:
 	case V_BOOLEAN:
 	case V_NONE:
+	case V_UNDEFINED:
 	case V_ERROR:
 	    value->value=(value1->type==value2->type) &&
 		(value1->value==value2->value);
+	    value->type=result_type;
 	    break;
 	case V_STRING:
 	    value->value=(strcmp(value1->string_value->data,value2->string_value->data)==0) && 	(value1->type==value2->type);
 	    decref(value1);
 	    decref(value2);
+	    value->type=result_type;
 	    break;
 	default:
 	    return E_BINARY_OPERATION_NOT_IMPLEMENTED;
@@ -812,27 +903,52 @@ static int binop(value_t *value, value_t *value1, value_t *value2, int op){
 	case V_NUMERIC:
 	case V_BOOLEAN:
 	case V_NONE:
+	case V_UNDEFINED:
 	case V_ERROR:
 	    value->value=(value1->type!=value2->type) ||
 		(value1->value!=value2->value);
+	    value->type=result_type;
 	    break;
 	case V_STRING:
 	    value->value=(strcmp(value1->string_value->data,value2->string_value->data)!=0) || (value1->type!=value2->type);
 	    decref(value1);
 	    decref(value2);
+	    value->type=result_type;
 	    break;
 	default:
 	    return E_BINARY_OPERATION_NOT_IMPLEMENTED;
 	}
 	break;
     case T_TIMES:
-	value->value=value1->value*value2->value;
+	if(result_type==V_NUMERIC){
+	    value->value=value1->value*value2->value;
+	    value->type=result_type;
+	    break;
+	}
+	if(result_type==V_STRING){
+	    if(value1->type==V_NUMERIC){
+		c=(int)value1->value;
+		m=value2->string_value->data;
+	    }else{
+		c=(int)value2->value;
+		m=value1->string_value->data;
+	    }
+	    ret=string_create("",c*strlen(m));
+	    for(i=0;i<c;i++){
+		strcat(ret->data,m);
+	    }
+	    decref(value1);
+	    decref(value2);
+	    value->string_value=ret;
+	    value->type=result_type;
+	}
 	break;
     case T_DIV:
 	value->value=value1->value/value2->value;
+	value->type=result_type;
 	break;
     case T_PLUS:
-	if(value->type==V_STRING){
+	if(result_type==V_STRING){
 	    string_t *ret;
 	    ret=string_add(value1->string_value,value2->string_value);
 	    decref(value1);
@@ -841,18 +957,26 @@ static int binop(value_t *value, value_t *value1, value_t *value2, int op){
 	}else{
 	    value->value=value1->value+value2->value;
 	}
+	value->type=result_type;
 	break;
     case T_MINUS:
 	value->value=value1->value-value2->value;
+	value->type=result_type;
+	break;
+    case T_POWER:
+	value->value=pow(value1->value,value2->value);
+	value->type=result_type;
 	break;
     case T_AND:
 	value->value=value1->value&&value2->value;
+	value->type=result_type;
 	break;
     case T_OR:
 	value->value=value1->value||value2->value;
+	value->type=result_type;
 	break;
     default:
-	fatal_error("Internal error.");
+	fatal_error("Non existant binary operation.");
 	break;
     }
     return 0;
@@ -867,7 +991,7 @@ static int peektoken(char **line, token_t *token){
     }
     token->length=0;
     state=S_START;
-    while(WHITE_SPACE(**line)){
+    while(isspace(**line)){
     	(*line)++;
     }
     token->data=*line;
@@ -905,11 +1029,9 @@ static int gettoken(char **line, token_t *token){
     if(eval_debug){
 	printf("gettoken(): line=[%s]\n",*line);
     }
-    if((ret=peektoken(line,token))){
-	return ret;
-    }
+    ret=peektoken(line,token);
     skiptoken(line,token);
-    return 0;
+    return ret;
 }
 
 static int eval_function(char **line, value_t *value){
@@ -930,16 +1052,16 @@ static int eval_function(char **line, value_t *value){
     if(token->type!=T_VAR){
 	return E_BAD_FUNCTION_CALL_SYNTAX;
     }
-    name=malloc(token->length+1);
+    name=eval_malloc(token->length+1);
     for(i=0;i<token->length;i++){
 	name[i]=token->data[i];
     }
     name[i]='\0';
     if((ret=symbol_table_get(name,value1))){
-	free(name);
+	eval_free(name);
 	return ret;
     }
-    free(name);
+    eval_free(name);
     if(value1->type!=V_CFUNC){
 	return E_SYMBOL_NOT_CALLABLE;
     }
@@ -955,11 +1077,11 @@ static int eval_function(char **line, value_t *value){
 	}
 	peektoken(line,token);
 	if(token->type!=T_RP){
-	    values[args]=malloc(sizeof(value_t));
+	    values[args]=eval_malloc(sizeof(value_t));
 	    values[args+1]=NULL;
 	    ret=eval_assign(line,values[args]);
 	    if(ret){
-		free(values[args]);
+		eval_free(values[args]);
 		goto bailout;
 	    }
 	    args++;
@@ -986,7 +1108,7 @@ static int eval_function(char **line, value_t *value){
     decref(value1);
     for(i=0;i<args;i++){
 	decref(values[i]);
-	free(values[i]);
+	eval_free(values[i]);
     }
     return ret;
 
@@ -1036,20 +1158,21 @@ static int parse_function(char **line){
 
 }
 
-static int eval_factor(char **line, value_t *value){
+static int eval_primary(char **line, value_t *value){
     token_t token[1];
     token_t token1[1];
     value_t value1[1];
     value_t value2[1];
     value_t value3[1];
+    string_t *string;
+    char *line1;
     int ret;
-    int val, i;
+    int i;
     char *name;
     int nocolon=0;
     int l1;
-    char *line1;
     if(eval_debug){
-	printf("eval_factor(): line=[%s]\n",*line);
+	printf("eval_primary(): line=[%s]\n",*line);
     }
     line1=*line;
     if((ret=gettoken(line,token))){
@@ -1072,7 +1195,7 @@ static int eval_factor(char **line, value_t *value){
     case T_NEG:
     case T_PLUS:
     case T_MINUS:
-	if((ret=eval_factor(line,value1))){
+	if((ret=eval_primary(line,value1))){
 	    return ret;
 	}
 	if((ret=unop(value,value1,token->type))){
@@ -1081,12 +1204,10 @@ static int eval_factor(char **line, value_t *value){
 	}
 	return 0;
     case T_NUM:
-	val=0;
-	for(i=0;i<token->length;i++){
-	    val=10*val+(token->data[i]-'0');
-	}
+	string=string_create(token->data,token->length);
 	value->type=V_NUMERIC;
-	value->value=val;
+	value->value=atof(string->data);
+	string_decref(string);
 	return 0;
     case T_STRING:
 	value1->string_value=string_create(token->data+1,token->length-2);
@@ -1099,20 +1220,21 @@ static int eval_factor(char **line, value_t *value){
 	}
 	if(token1->type==T_LP){
 	    if((ret=eval_function(&line1,value1))){
+		*line=line1;
 		return ret;
 	    }
 	    *line=line1;
 	}else{
-	    name=malloc(token->length+1);
+	    name=eval_malloc(token->length+1);
 	    for(i=0;i<token->length;i++){
 		name[i]=token->data[i];
 	    }
 	    name[i]='\0';
 	    if((ret=symbol_table_get(name,value1))){
-		free(name);
+		eval_free(name);
 		return ret;
 	    }
-	    free(name);
+	    eval_free(name);
 	    incref(value1);
 	}
 	break;
@@ -1222,13 +1344,13 @@ static int eval_factor(char **line, value_t *value){
     return 0;
 }
 
-static int parse_factor(char **line){
+static int parse_primary(char **line){
     token_t token[1];
     token_t token1[1];
     int ret;
     char *line1;
     if(eval_debug){
-	printf("parse_factor(): line=[%s]\n",*line);
+	printf("parse_primary(): line=[%s]\n",*line);
     }
     line1=*line;
     if((ret=gettoken(line,token))){
@@ -1249,7 +1371,7 @@ static int parse_factor(char **line){
     case T_NEG:
     case T_PLUS:
     case T_MINUS:
-	if((ret=parse_factor(line))){
+	if((ret=parse_primary(line))){
 	    return ret;
 	}
 	return 0;
@@ -1263,6 +1385,7 @@ static int parse_factor(char **line){
 	}
 	if(token1->type==T_LP){
 	    if((ret=parse_function(&line1))){
+		*line=line1;
 		return ret;
 	    }
 	    *line=line1;
@@ -1321,6 +1444,70 @@ static int parse_factor(char **line){
 }
 
 
+static int eval_factor(char **line, value_t *value){
+    token_t token[1];
+    value_t value1[1], value2[1];
+    int ret;
+    if(eval_debug){
+	printf("eval_factor(): line=[%s]\n",*line);
+    }
+    if((ret=eval_primary(line,value1))){
+	return ret;
+    }
+    if((ret=peektoken(line,token))){
+	decref(value1);
+	return ret;
+    }
+    switch(token->type){
+    case T_POWER:
+	skiptoken(line,token);
+	break;
+    default:
+	transfer(value,value1);
+	return 0;
+    }
+    if((ret=eval_factor(line,value2))){
+	decref(value1);
+	return ret;
+    }
+    if((ret=binop(value,value1,value2,token->type))){
+	decref(value1);
+	decref(value2);
+	return ret;
+    }
+    return 0;
+}
+
+
+static int parse_factor(char **line){
+    token_t token[1];
+    int ret;
+    if(eval_debug){
+	printf("parse_factor(): line=[%s]\n",*line);
+    }
+    if((ret=parse_primary(line))){
+	return ret;
+    }
+    if((ret=peektoken(line,token))){
+	return ret;
+    }
+    switch(token->type){
+    case T_POWER:
+	skiptoken(line,token);
+	break;
+    default:
+	return 0;
+    }
+    if((ret=parse_factor(line))){
+	return ret;
+    }
+    return 0;
+}
+
+
+
+
+
 
 static int eval_term(char **line, value_t *value){
     token_t token[1];
@@ -1343,7 +1530,7 @@ static int eval_term(char **line, value_t *value){
 		decref(value1);
 		return ret;
 	    }
-	    if((ret=eval_term(line,value2))){
+	    if((ret=eval_factor(line,value2))){
 		decref(value1);
 		return ret;
 	    }
@@ -1380,7 +1567,7 @@ static int parse_term(char **line){
 	    if((ret=skiptoken(line,token))){
 		return ret;
 	    }
-	    if((ret=parse_term(line))){
+	    if((ret=parse_factor(line))){
 		return ret;
 	    }
 	    break;
@@ -1770,6 +1957,7 @@ static int eval_assign(char **line, value_t *value){
     }
     if(var->type!=T_VAR){
 	if((ret=eval_ternary(&line1,value))){
+	    *line=line1;
 	    return ret;
 	}
 	*line=line1;
@@ -1780,6 +1968,7 @@ static int eval_assign(char **line, value_t *value){
     }
     if(token->type!=T_ASSIGN){
 	if((ret=eval_ternary(&line1,value))){
+	    *line=line1;
 	    return ret;
 	}
 	*line=line1;
@@ -1788,18 +1977,18 @@ static int eval_assign(char **line, value_t *value){
     if((ret=eval_assign(line,value))){
 	return ret;
     }
-    name=malloc(var->length+1);
+    name=eval_malloc(var->length+1);
     for(i=0;i<var->length;i++){
 	name[i]=var->data[i];
     }
     name[i]='\0';
     if((ret=symbol_table_set(name,value,SY_HONOR_RO))){
-	free(name);
+	eval_free(name);
 	decref(value);
 	return ret;
     }
 
-    free(name);
+    eval_free(name);
     incref(value);
     return 0;
 }
@@ -1818,6 +2007,7 @@ static int parse_assign(char **line){
     }
     if(var->type!=T_VAR){
 	if((ret=parse_ternary(&line1))){
+	    *line=line1;
 	    return ret;
 	}
 	*line=line1;
@@ -1828,6 +2018,7 @@ static int parse_assign(char **line){
     }
     if(token->type!=T_ASSIGN){
 	if((ret=parse_ternary(&line1))){
+	    *line=line1;
 	    return ret;
 	}
 	*line=line1;
@@ -1904,13 +2095,14 @@ int eval(value_t *value, char *format, ... ){
     int ret;
     va_list alist;
     char *line;
+    //    char *line1;
     char *buf;
     va_start(alist,format);
     ret=vsnprintf(NULL,0,format,alist);
     va_end(alist);
-    buf=malloc(ret+1);
+    buf=eval_malloc(ret+1);
     va_start(alist,format);
-    vsnprintf(buf,ret+1,format,alist);
+    vsprintf(buf,format,alist);
     va_end(alist);
 
     line=buf;
@@ -1921,33 +2113,40 @@ int eval(value_t *value, char *format, ... ){
     if((ret=eval_commaexp(&line,value))){
 	value->type=V_ERROR;
 	value->value=ret;
+	//	printf("rest=[%s]\n",line);
 	symbol_table_set("_",value,0);
-	free(buf);
+	eval_free(buf);
 	return ret;
     }
+    //    line1=line;
     if((ret=peektoken(&line,token))){
 	decref(value);
 	value->type=V_ERROR;
 	value->value=ret;
+	//	printf("rest=[%s]\n",line1);
 	symbol_table_set("_",value,0);
-	free(buf);
+	eval_free(buf);
 	return ret;
     }
-    free(buf);
     if(token->type!=T_NONE){
 	decref(value);
 	value->type=V_ERROR;
 	value->value=E_TOKENS_AFTER_EXPRESSION;
 	symbol_table_set("_",value,0);
+	//	printf("rest=[%s]\n",line1);
+	eval_free(buf);
 	return E_TOKENS_AFTER_EXPRESSION;
     }
     if((ret=symbol_table_set("_",value,0))){
 	decref(value);
 	value->type=V_ERROR;
 	value->value=ret;
+	//	printf("rest=[%s]\n",line1);
+	eval_free(buf);
 	symbol_table_set("_",value,0);
 	return ret;
     }
+    eval_free(buf);
     return 0;
 }
 
@@ -2005,7 +2204,7 @@ static int str_wrap(value_t *result,value_t **value){
 					     break;
     case V_NUMERIC:
 	result->string_value=string_create("",100);
-	snprintf(result->string_value->data,99,"%d",value[0]->value);
+	snprintf(result->string_value->data,99,"%.16g",value[0]->value);
 	break;
     case V_CFUNC:
 	result->string_value=string_create("",100);
@@ -2014,12 +2213,15 @@ static int str_wrap(value_t *result,value_t **value){
     case V_NONE:
 	result->string_value=string_create("none",-1);
 	break;
+    case V_UNDEFINED:
+	result->string_value=string_create("undefined",-1);
+	break;
     case V_ERROR:
 	if(value[0]->value<0 || value[0]->value>MAXERROR){
 	    result->string_value=string_create("",100);
-	    snprintf(result->string_value->data,99,"<Error: %d>",value[0]->value);
+	    snprintf(result->string_value->data,99,"<Error: %d>",(int)value[0]->value);
 	}else{
-	    result->string_value=string_create((char *)eval_errmsg[value[0]->value],-1);
+	    result->string_value=string_create((char *)eval_errmsg[(int) value[0]->value],-1);
 	}
 	break;
     default:
@@ -2028,7 +2230,7 @@ static int str_wrap(value_t *result,value_t **value){
     return 0;
 }
 
-static int int_wrap(value_t *result,value_t **value){
+static int float_wrap(value_t *result,value_t **value){
     token_t token[1];
     token_t token1[1];
     char * input;
@@ -2065,6 +2267,7 @@ static int int_wrap(value_t *result,value_t **value){
     case V_BOOLEAN:
     case V_NUMERIC:
     case V_NONE:
+    case V_UNDEFINED:
     case V_ERROR:
 	result->value=value[0]->value;
 	break;
@@ -2074,6 +2277,30 @@ static int int_wrap(value_t *result,value_t **value){
     }
     return 0;
 }
+
+static int int_wrap(value_t *result,value_t **value){
+    value_t *tmp[2];
+    value_t tmp1;
+    int ret;
+    if(value[0]==NULL){
+	return E_INVALID_SIGNATURE;
+    }
+    if(value[1]!=NULL){
+	return E_INVALID_SIGNATURE;
+    }
+    tmp[0]=eval_malloc(sizeof(value_t));
+    transfer(tmp[0],value[0]);
+    tmp[1]=NULL;
+    if((ret=float_wrap(&tmp1,tmp))){
+	eval_free(tmp[0]);
+	return ret;
+    }
+    eval_free(tmp[0]);
+    result->type=V_NUMERIC;
+    result->value=(int) tmp1.value;
+    return 0;
+}
+
 
 static int bool_wrap(value_t *result,value_t **value){
     if(value[0]==NULL){
@@ -2094,6 +2321,7 @@ static int bool_wrap(value_t *result,value_t **value){
     case V_BOOLEAN:
     case V_NUMERIC:
     case V_NONE:
+    case V_UNDEFINED:
 	if(value[0]->value==0){
 	    result->value=0;
 	}else{
@@ -2107,8 +2335,6 @@ static int bool_wrap(value_t *result,value_t **value){
     }
     return 0;
 }
-
-// needs quoting regime
 
 static int eval_wrap(value_t *result,value_t **value){
     int ret;
@@ -2128,6 +2354,14 @@ static int eval_wrap(value_t *result,value_t **value){
     return 0;
 }
 
+int memory_wrap(value_t *result,value_t **value){
+    int ret;
+    if(value[0]!=NULL){
+	return E_INVALID_SIGNATURE;
+    }
+    ret=value_init(result,V_NUMERIC,eval_memory());
+    return ret;
+}
 
 static int abs_wrap(value_t *result,value_t **value){
     if(value[0]==NULL){
@@ -2255,7 +2489,8 @@ static int time_wrap(value_t *result, value_t **value){
     }
     gettimeofday(&tv,NULL);
     result->type=V_NUMERIC;
-    result->value=1000*tv.tv_sec+tv.tv_usec/1000;
+    result->value=tv.tv_sec+tv.tv_usec/1000000.0;
+    //    result->value=tv.tv_sec;
     return 0;
 }
 
@@ -2277,6 +2512,9 @@ int value_init( value_t * value, int type, ...){
 	value->value=va_arg(a_list,int);
 	break;
     case V_NONE:
+	value->value=0;
+	break;
+    case V_UNDEFINED:
 	value->value=0;
 	break;
     case V_ERROR:

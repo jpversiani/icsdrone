@@ -506,7 +506,7 @@ void ExecCommand(char * command, int mask, int inhibitSet){
       }else if(result->type==V_ERROR){
 	  Feedback(mask,"<error:%d>",result->value);
       }else{
-	  Feedback(mask,"%d",result->value);
+	  Feedback(mask,"%g",result->value);
       }
   }else if(((i=sscanf(command,"set %254[^=\n\r ] %8191[^\n\r]", key,value))==1)  || (i==2)){
       if(mask & (CONSOLE|PROXY)){

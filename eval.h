@@ -11,12 +11,13 @@
  * value types
  */
 
-#define V_BOOLEAN 0
-#define V_NUMERIC 1
-#define V_STRING  2
-#define V_CFUNC   3
-#define V_NONE    4
-#define V_ERROR   5
+#define V_BOOLEAN     0
+#define V_NUMERIC     1
+#define V_STRING      2
+#define V_CFUNC       3
+#define V_NONE        4
+#define V_ERROR       5
+#define V_UNDEFINED   6
 
 /*
  * errors
@@ -54,7 +55,7 @@ typedef int (*cfunc)(struct value_ * result, struct value_ ** value);
 typedef struct value_ {
     int type;
     union {
-	int  value;
+	double  value;
 	string_t* string_value;
 	cfunc  cfunc_value;
     };
@@ -74,6 +75,7 @@ void eval_init();
 void (*eval_clear)();
 
 int eval_set(char *name, int type, char flags,...);
+int eval_memory();
 /*
  * The contents of value remains owned by the interpreter.
  */
