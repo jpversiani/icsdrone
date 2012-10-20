@@ -716,7 +716,6 @@ void SetupEngineOptions(IcsBoard *icsBoard){
 char * KillPrompts(char *line){
   /*  Get rid of those damn prompts  -- might be more on the same line even */
   /*  Eat both "fics%" and "aics%". */
-  logcomm("ics","icsdrone",line);
   while (isalpha(line[0])&&!strncmp(line+1, "ics% ", 5)){
     if(runData.lastIcsPrompt[0]=='\0'){
 	  strncpy(runData.lastIcsPrompt,line,6);
@@ -2534,7 +2533,8 @@ Bool ProcessIllegalMove(char *line){
 
 void ProcessIcsLine(char *line, char *queue){
   char *old_line;
-  old_line=line;
+  logcomm("ics","icsdrone",line);
+  StripCR(line); // for cygwin
   line=KillPrompts(line);
   // Eol's are killed somewhere below. Debug!
   // For now we just keep a copy of line.

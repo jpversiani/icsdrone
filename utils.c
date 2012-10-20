@@ -203,6 +203,17 @@ char * ConvertNewlines(char *s){
 	return p;
 }
 
+void StripCR(char *buf){
+    char c;
+    /* strip out any '\r' */
+    char *source=buf, *dest=buf;
+    while ((c=(*dest++=*source++))!='\0'){
+	if (c == '\r'){
+	    dest--;
+	}
+    }
+}
+
 /*  Converts move from ICS LAN to COMPUTER LAN  */
 void ConvIcsLanToComp(char onMove, move_t move)
 {
