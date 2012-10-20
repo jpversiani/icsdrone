@@ -111,7 +111,7 @@ readline support is compiled in.
 
 Go into background. This implies console off.
 
-=item B<-feedback> (default: "off")
+=item B<-feedback> (default: "on")
 
 Send info about the eval and principal variation.
 
@@ -124,7 +124,7 @@ Give feedback info only before move.
 The command to use to send feedback to observers. Use "kibitz" if you want your
 opponent to also see the feedback.
 
-=item B<-proxyFeedback> (default: "off")
+=item B<-proxyFeedback> (default: "on")
 
 Make icsdroneng give PV feedback directly to the proxy
 (i.e. without relying on kibitz/whisper).
