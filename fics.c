@@ -512,7 +512,11 @@ void ExecCommand(char * command, int mask, int inhibitSet){
       if(mask & (CONSOLE|PROXY)){
       runData.inhibitPrompt=TRUE;
     }
-      if(!inhibitSet){
+      /*
+       * This is not quite right. I we are unregistered and we relogin we should only
+       * redo the FICS set commands....Unfortunately this seems logically too convoluted now.
+       */
+      if(!inhibitSet || !runData.registered){
 	  if(i==1){
 	      if(!SetOption(key,CLEAR,mask,"%s",value)){
 		  StartForwarding(mask);
