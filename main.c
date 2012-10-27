@@ -113,6 +113,7 @@ void InitRunData(){
   runData.flagTimer=NULL;
   runData.courtesyAdjournTimer=NULL;
   runData.pingTimer=NULL;
+  runData.clearStateTimer=NULL;
   runData.timestring=NULL;
   runData.inGame=FALSE;
   runData.inTourney=FALSE;
