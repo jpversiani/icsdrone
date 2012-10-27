@@ -1647,6 +1647,7 @@ Bool ProcessStartOfGame(char *line){
     }
     /* update our state */
     runData.waitingForFirstBoard = TRUE;
+    runData.engineMovesPlayed=0;
     return TRUE;
   }
   /*
@@ -2128,9 +2129,17 @@ Bool ProcessCleanUps(char *line){
 
 Bool ProcessIllegalMove(char *line){
     if(!runData.loggedIn) return FALSE;  
+
     if(!strncasecmp(line,"Illegal move",12)){
-	logme(LOG_DEBUG,"Something bad happened. Bailing out.");
-	SendToIcs("resign\n");
+      /* 
+       * We have the problem that the illegal move might be from a previous game.
+       */
+	if(runData.engineMovesPlayed>0){
+	    logme(LOG_DEBUG,"Something bad happened. Bailing out.");
+	    SendToIcs("resign\n");
+	}else{
+	    logme(LOG_DEBUG,"Not bailing out since we are at the start of the game.");
+	}
 	return TRUE;
     }
     return FALSE;

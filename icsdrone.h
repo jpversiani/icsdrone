@@ -260,6 +260,7 @@ typedef struct {
   char chessVariants[MAXVARIANTS][30+1];
   char chessVariant[30+1];
   Bool noCastle;
+  int engineMovesPlayed;
 } RunData;
 
 /* AppData */
