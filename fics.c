@@ -566,9 +566,14 @@ void GetTourney(){
   }
   if(runData.registered && appData.autoJoin &&
      (!appData.acceptOnly || appData.acceptOnly[0]=='\0')){
-    runData.parsingListTourneys=TRUE;
-    SendToIcs("td ListTourneys -j\n");
+      runData.parsingListTourneys=TRUE;
+      SendToIcs("td ListTourneys -j\n");
+      create_time(&(runData.clearState),
+		  10,
+		  ClearState,
+		  NULL);  
   }
+  
 }
 
 Bool EngineToMove(IcsBoard * icsBoard){
