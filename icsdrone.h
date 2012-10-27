@@ -480,7 +480,6 @@ extern void ConvCompToIcs P((char *));
 extern Bool ConvIcsCastlingToLan P((char ,char *));
 extern void ConvIcsTransferPromotionSuffix P((char *, char *));
 extern char* ConvertNewlines P((char *));
-extern void StripCR P((char *));
 extern char* PromptInput P((char * buf, int bufsize, char * prompt, int echo));
 extern void EchoOn P(());
 extern void EchoOff P(());
