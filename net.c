@@ -139,31 +139,27 @@ int ProcessRawInput(int fd, char *buf, int sizeofbuf, void (*LineFunc)(char *lin
 	return ERROR;          
     } else if (num > 0) {
 	buf[(pos += num)] = '\0';
+	
+	/* strip out any '\r' first */
+	char *source=buf, *dest=buf;
+	while ((c=(*dest++=*source++))!='\0')
+	  if (c == '\r')
+	  {
+	    dest--;
+	    pos--;
+	  }
+	
 	state = TS_NONE; i = 0;
 	while ((c = buf[i++])) {
 	    switch(state) {
 	    case TS_NONE:
 		if (c == IAC) {
 		    state = TS_IAC;
-		} else if ((c == '\n') || (c == '\r')) {
+		} else if (c == '\n') {
 		    /* scan the input */
-		    /*stringcopy(tmp, buf, i-1);*/
-		    int u;
 		    strncpy(tmp,buf,i);
 		    tmp[i]='\0';
-		    u=i; // strlen[tmp]
-		    /*stringcat(tmp, NEWLINE, strlen(NEWLINE));*/
-                    //strcat(tmp,NETNEWLINE);
-		    while ((buf[i] == '\n' || buf[i] == '\r') && buf[i]!=c) {
-			if(u<sizeof(tmp)){
-			    tmp[u]=buf[i];
-			    tmp[u+1]='\0';
-			    i++;
-			    u++;
-			}
-		    }
 		    LineFunc(tmp,buf+i);
-		    /*bytecopy(buf, buf + i, pos+1 - i);*/
 		    memmove(buf, buf + i, pos+1 - i);
 		    i = 0;
 		}
