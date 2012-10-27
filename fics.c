@@ -617,6 +617,11 @@ Bool IsNoPlay(char *s){
     }
 }
 
+void ClearState(void *data){
+    logme(LOG_DEBUG,"Clearing runData.parsingListTourneys since Mamer did not respond.");
+    runData.parsingListTourneys=FALSE;
+}
+
 void GetTourney(){
   if(runData.parsingListTourneys){
     logme(LOG_DEBUG,"We have already a ListTourneys command running.");
@@ -624,9 +629,14 @@ void GetTourney(){
   }
   if(runData.registered &&  appData.autoJoin &&
      (!appData.acceptOnly || appData.acceptOnly[0]=='\0')){
-    runData.parsingListTourneys=TRUE;
-    SendToIcs("td ListTourneys -j\n");
+      runData.parsingListTourneys=TRUE;
+      SendToIcs("td ListTourneys -j\n");
+      create_timer(&(runData.clearStateTimer),
+		  CLEARSTATETIMEOUT,
+		  ClearState,
+		  NULL);  
   }
+  
 }
 
 Bool EngineToMove(IcsBoard * icsBoard){
@@ -1848,6 +1858,8 @@ Bool ProcessTourneyNotifications(char *line){
   /* Last line of result of "td ListTourneys -j" */
   if(runData.parsingListTourneys && !strncmp(line,":Listed:",8)){
     runData.parsingListTourneys=FALSE;
+    logme(LOG_DEBUG,"Deleting clearStateTimer.");
+    delete_timer(&(runData.clearStateTimer));
     hideFromProxy=FALSE;
     runData.hideFromProxy=TRUE;
     return TRUE;
