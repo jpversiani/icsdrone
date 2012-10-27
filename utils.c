@@ -235,6 +235,12 @@ void ConvIcsTransferPromotionSuffix(char *sanMove,char *lanMove){
 	    *(ss++)=*(s++);
 	}
 	*ss='\0';
+	/* work around for HGM's ics */
+	/* P/fr-fr=  --> P/fr-fr=Q */
+	if(*(ss-1)=='='){
+	    *ss='Q';
+	    *(ss+1)='\0';
+	}
     }
 }
 
