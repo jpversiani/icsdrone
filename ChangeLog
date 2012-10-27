@@ -100,3 +100,7 @@ do not work but playing games seems to be ok!
 - Transfer to sourceforge.
 0.27
 - Wild support.
+0.28
+- More careful parsing of ICS promotion suffix.
+- Avoid getting stuck if mamer does not respond to the ListTourneys command.
+- Documentation fixes (Eric Mullins).
