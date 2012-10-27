@@ -1,3 +1,13 @@
+icsdroneng (0.28) unstable; urgency=low
+
+  * More careful parsing of ICS promotion suffix.
+	
+  * Avoid getting stuck if mamer does not respond to the ListTourneys command.
+	
+  * Documentation fixes (Eric Mullins).
+	
+ -- Michel Van den Bergh <michel.vandenbergh@uhasselt.be>  Sat, 2 Oct 2012 19:00:00 +0200
+
 icsdroneng (0.27) unstable; urgency=low
 
   * Wild support.
