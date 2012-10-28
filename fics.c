@@ -263,11 +263,13 @@ void Feedback(int mask,char *format,...){
     }
     va_start(ap,format); 
     if(runData.promptOnLine){
-      printf("\n");
+	//      printf("\n");
+	SendToConsole("\n");
     }
     runData.promptOnLine=0;
-    vprintf(format,ap);
-    printf("\n");
+    vsnprintf(buf,sizeof(buf),format,ap);
+    buf[sizeof(buf)-1]='\0';
+    SendToConsole("%s\n",buf);
     va_end(ap);
     ResetColor();
     if(runData.multiFeedbackDepth==0){
