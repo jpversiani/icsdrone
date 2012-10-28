@@ -115,6 +115,20 @@ void SendToComputer(char *format, ... )
     }
 }
 
+void SendToConsole(char *format, ... )
+{
+  char buf[16384] = "";
+  va_list ap;
+  
+  va_start(ap, format);
+  vsnprintf(buf, sizeof(buf), format, ap);
+  buf[sizeof(buf)-1]='\0';
+  logcomm("icsdrone","console", buf);
+  WRITE(STDOUT_FILENO, buf); 
+  va_end(ap);
+}
+
+
 #define TS_NONE 0
 #define TS_IAC 1
 #define TS_CMD 2
