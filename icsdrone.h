@@ -490,6 +490,7 @@ extern Bool time_gt P((struct timeval,struct timeval));
 extern struct timeval time_add P((struct timeval tv, int t));
 extern void my_sleep P((int msec));
 extern Bool IsWhiteSpace P((char *s));
+extern void SendToConsole(char *, ...);
 /*
  * Logging
  */
