@@ -162,13 +162,18 @@ int ProcessRawInput(int fd, char *buf, int sizeofbuf, void (*LineFunc)(char *lin
 		} else if ((c == '\n') || (c == '\r')) {
 		    /* scan the input */
 		    /*stringcopy(tmp, buf, i-1);*/
-		    int u;
+		    int u, nl_seen;
 		    strncpy(tmp,buf,i);
 		    tmp[i]='\0';
-		    u=i; // strlen[tmp]
-		    /*stringcat(tmp, NEWLINE, strlen(NEWLINE));*/
-                    //strcat(tmp,NETNEWLINE);
-		    while ((buf[i] == '\n' || buf[i] == '\r') && buf[i]!=c) {
+		    u=i; 
+		    /* timeseal on Windows generates \r\n\r as eol sequence!
+                       We consider any sequence of consecutive \n and \r's containing
+                       at most one \n to be an eol sequence. */
+		    nl_seen=(c=='\n');
+		    while ((!nl_seen && ( buf[i]=='\r' || buf[i]=='\n')) || (nl_seen && buf[i]=='\r')) {
+		        if(buf[i]=='\n'){
+			  nl_seen=TRUE;
+		        }
 			if(u<sizeof(tmp)){
 			    tmp[u]=buf[i];
 			    tmp[u+1]='\0';
