@@ -1744,6 +1744,34 @@ void InjectCurrentTourney(char *TM, char* type){
     eval(value,"%s",command1);
 }
 
+Bool ProcessICCTourneyGameStart(char *line){
+    /* 
+     * This based on a patch by Marcel van Kervinck. Its natural place
+     * would be at the end of ProcessTourneyNotifications() (which treats
+     * the matches).
+     * But it is not clear to me that any of FICS tourney logic works on ICC.
+     * In particular I think the runData.inTourney is not set on ICC.
+     * Therefore for safety we treat this separately until further notice.
+     */
+    char name[30+1];
+    if(!runData.loggedIn) return FALSE;
+    /*
+     *  On ICC the players must create the match themselves.
+     *  The Automato tournament software doesn't do that, unlike mamer on FICS.
+     *  A new round looks like:
+     *    tourney set to "Automato AWCRCC * Goldbar 25 4 25 4 u w0 black 6" by Automato.
+     *  And the needed response is then:
+     *    match Goldbar!
+     *  The server knows the parameters such as color and time control.
+     */
+    if (sscanf(line, "tourney set to %*[^*]* %30s", name) == 1) {
+	SendToIcs("match %s!\n", name);
+	runData.lastGameWasInTourney++; // mainly to avoid 'rematch'
+	return TRUE;
+    }
+    return FALSE;
+}
+
 Bool ProcessTourneyNotifications(char *line){
   int tournamentId;
   Bool endOfTournament=FALSE;
@@ -2570,6 +2598,7 @@ void ProcessIcsLine(char *line, char *queue){
   if(ProcessNotifications(line))goto finish;
   if(ProcessOwnerNotify(line))goto finish;
   if(ProcessIncomingMatches(line))goto finish;
+  if(ProcessICCTourneyGameStart(line))goto finish;
   if(ProcessTourneyNotifications(line)) goto finish;
   if(ProcessStandings(line)) goto finish;
   if(ProcessFlaggedOpponent(line))goto finish;
