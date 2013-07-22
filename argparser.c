@@ -95,7 +95,7 @@ ArgList argList = {
     {"-feedbackCommand",      ArgString, &appData.feedbackCommand   , 1 },
     {"-engineQuiet",          ArgBool,   &appData.engineQuiet       , 1 },
     {"-variants",             ArgString, &appData.variants          , 0 },
-    {"-engineKnowsSAN",       ArgBool,   &appData.engineKnowsSAN    , 1 },
+    {"-engineKnowsSAN",       ArgBool,   &appData.engineKnowsSAN    , 0 },
     {"-tourneyFilter",        ArgString, &appData.tourneyFilter     , 1 },
     {"-matchFilter",          ArgString, &appData.matchFilter       , 1 },
     {NULL,                    ArgNull,   NULL                       , 0 } 
