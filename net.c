@@ -128,7 +128,7 @@ void SendToConsole(char *format, ... )
   vsnprintf(buf, sizeof(buf), format, ap);
   buf[sizeof(buf)-1]='\0';
   logcomm("icsdrone","console", buf);
-  WRITE(STDOUT_FILENO, buf); 
+  printf("%s",buf);
   va_end(ap);
 }
 
