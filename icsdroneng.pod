@@ -47,7 +47,8 @@ The managing options for icsdroneng are schematically described in the
 following drawing
 
                                            
-                                                                                V
+
+
                            console        xboard
                               A             A
                               |             | 
@@ -258,6 +259,62 @@ sensitive). Note this is not the same as the ICS "noplay" list.
 
 Autojoin tourneys. Currently this does not work on ICC.
 
+=item B<-tourneyFilter> (default: "ct.chess")
+
+Boolean expression (using C syntax) which acts as a filter
+for joining tourneys (currently FICS specific). The following
+variables may be used (most have the same meaning as 
+in the FICS formula variable)
+
+    ct.tm          (string)
+    ct.time        (numeric)
+    ct.inc         (numeric)
+    ct.etime       (numeric)
+    ct.rounds      (numeric)
+    ct.lightning   (boolean)
+    ct.blitz       (boolean)
+    ct.standard    (boolean)
+    ct.chess       (boolean)
+    ct.atomic      (boolean)
+    ct.suicide     (boolean)
+    ct.losers      (boolean)
+    ct.crazyhouse  (boolean)
+    ct.wild        (boolean)
+    ct.variant     (string)
+    ct.rated       (boolean)
+    
+Symbols that are understood are 
+
+    =(assignment) == < > <= >= || && 
+    + - * / "" != **(exponentiation) "" ()
+
++ acts as concatenation on strings
+
+Predefined functions
+
+    len         (length of string)
+    str         (convert to string) 
+    int         (take integer part)
+    float       (convert to float)
+    bool        (convert to bool)
+    eval        (evaluate string expression)
+    memory      (gives amount of free memory in interpreter)
+    abs         (absolute value)
+    ord         (asci value of 1 char string)
+    chr         (convert asci to 1 char string)
+    lower       (convert string to lower case)
+    upper       (convert string to upper case)
+    find        (find location of substring)
+    time        (gives current time in seconds since the epoch)
+
+Arithmetic is using real numbers. Known types are float, bool and string.
+
+=item B<engineKnowsSAN> (default: "true")
+
+The engine understands GUI moves in SAN format. This is less
+drastic than sending "feature san=1" which actually forces the GUI
+to send moves in SAN format.
+    
 =item B<-proxy> (default: "off")
 
 Proxy the ICS.

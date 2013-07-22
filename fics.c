@@ -832,9 +832,11 @@ Bool IsFicsShuffle(char *icsvariant){
 Bool UseMoveList(){
     int ret;
     ret=TRUE;
-    if (runData.longAlgMoves && runData.icsType!=ICS_FICS) {
+    if (!appData.engineKnowsSAN && runData.longAlgMoves && runData.icsType!=ICS_FICS) {
 	/* only FICS has the (undocumented) command "moves l" */
-	logme(LOG_WARNING,"Server doesn't support long algebraic move lists.\n\
+	logme(LOG_WARNING,"The engine did not specify san=1.\n\
+The server does not support long algebraic move lists\n\
+and the option engineKnowsSAN is false.\n\
 Do not ask for movelist.\n");
 	ret=FALSE;
     }else if(IsFicsShuffle(runData.icsVariant)){
@@ -1750,7 +1752,7 @@ Bool ProcessICCTourneyGameStart(char *line){
      * would be at the end of ProcessTourneyNotifications() (which treats
      * the matches).
      * But it is not clear to me that any of FICS tourney logic works on ICC.
-     * In particular I think the runData.inTourney is not set on ICC.
+     * In particular I think the runData.inTourney flag is not set on ICC.
      * Therefore for safety we treat this separately until further notice.
      */
     char name[30+1];
@@ -2072,10 +2074,11 @@ Bool ProcessStartOfGame(char *line){
 	/* reset movelist and ask for the moves */
 	runData.moveList[0] = '\0';
 	SendMarker(ASKSTARTMOVES);
-	if (runData.longAlgMoves)
+	if (runData.longAlgMoves && runData.icsType==ICS_FICS){
 	    InternalIcsCommand("moves l\n");
-	else
+	}else{
 	    InternalIcsCommand("moves\n");
+	}
 	runData.waitingForMoveList =TRUE;
     }
     /* update our state */

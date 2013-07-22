@@ -217,6 +217,7 @@ AppData appData = {
     NULL,            /* feedbackCommand */
     FALSE,           /* engineQuiet */
     NULL,            /* variants */
+    TRUE,            /* engineKnowsSAN */
     NULL,            /* tourneyFilter */
     NULL             /* matchFilter */
 };

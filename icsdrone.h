@@ -324,6 +324,7 @@ typedef struct {
     char * feedbackCommand;
     Bool engineQuiet;
     char * variants;
+    Bool engineKnowsSAN;
     char *tourneyFilter;
     char *matchFilter;
 } AppData;
