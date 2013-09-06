@@ -265,7 +265,7 @@ void ResetComputer(){
     SendToComputer("\nforce\nnew\neasy\n");
   }
   validKibitzSeen=0;
-  runData.computerIsThinking=TRUE;
+  runData.computerIsThinking=FALSE;
 }
 
 void RawKillComputer(){
