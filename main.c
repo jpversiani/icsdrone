@@ -147,6 +147,7 @@ void InitRunData(){
   strcpy(runData.chessVariant,"normal");
   runData.noCastle=FALSE;
   runData.engineMovesPlayed=0;
+  runData.computerIsThinking=FALSE;
 }
 
 PersistentData persistentData;

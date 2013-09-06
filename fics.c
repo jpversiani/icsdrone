@@ -678,39 +678,43 @@ void HandleBoard(IcsBoard * icsBoard, char *moveList, Bool ignoreMove){
     SendMovesToComputer(moveList);
   }
   if(EngineToMove(icsBoard)){
-    /* clear outstanding flag and abort alarms */
-    CancelTimers();
-    whitetime=100*icsBoard->whitetime;
-    blacktime=100*icsBoard->blacktime;
-    SendTimeToComputer(whitetime, blacktime);
-    book_move(icsBoard,&bmove,TRUE);
-    if(strcmp(bmove.move,"none")){
-      Force();
-    }
-    if (runData.longAlgMoves) {
-      strcpy(move, icsBoard->lanMove);
-    } else {
-      strcpy(move, icsBoard->sanMove);
-    }
-    if(strcmp(move,"none") && !moveList && !ignoreMove){
-      logme(LOG_INFO, "Move from ICS: %s %s", 
-                     icsBoard->lanMove,icsBoard->sanMove);
-      SendMoveToComputer(move);
-    }
-    runData.waitingForFirstBoard=FALSE;
-    if(strcmp(bmove.move,"none")){
-      logme(LOG_INFO,"Bookmove: %s score=%d\n",bmove.move,bmove.score);
-      if(appData.feedback && appData.feedbackCommand){
-	  SendToIcs("%s Bookmove: %s score=%d\n",appData.feedbackCommand,bmove.move,bmove.score); 
+      if(runData.computerIsThinking){
+	  logme(LOG_DEBUG,"Ignoring board since the computer is thinking.");
+      }else{
+		    /* clear outstanding flag and abort alarms */
+	  CancelTimers();
+	  whitetime=100*icsBoard->whitetime;
+	  blacktime=100*icsBoard->blacktime;
+	  SendTimeToComputer(whitetime, blacktime);
+	  book_move(icsBoard,&bmove,TRUE);
+	  if(strcmp(bmove.move,"none")){
+	      Force();
+	  }
+	  if (runData.longAlgMoves) {
+	      strcpy(move, icsBoard->lanMove);
+	  } else {
+	      strcpy(move, icsBoard->sanMove);
+	  }
+	  if(strcmp(move,"none") && !moveList && !ignoreMove){
+	      logme(LOG_INFO, "Move from ICS: %s %s", 
+		    icsBoard->lanMove,icsBoard->sanMove);
+	      SendMoveToComputer(move);
+	  }
+	  runData.waitingForFirstBoard=FALSE;
+	  if(strcmp(bmove.move,"none")){
+	      logme(LOG_INFO,"Bookmove: %s score=%d\n",bmove.move,bmove.score);
+	      if(appData.feedback && appData.feedbackCommand){
+		  SendToIcs("%s Bookmove: %s score=%d\n",appData.feedbackCommand,bmove.move,bmove.score); 
+	      }
+	      if(appData.proxyFeedback){
+		  Feedback(PROXY,"--> icsdrone: Bookmove: %s score=%d",bmove.move,bmove.score); 
+	      }
+	      SendToIcs("%s\n",bmove.move);
+	      SendMoveToComputer(bmove.move);
+	  }else{
+	      Go();
+	  }
       }
-      if(appData.proxyFeedback){
-	  Feedback(PROXY,"--> icsdrone: Bookmove: %s score=%d",bmove.move,bmove.score); 
-      }
-      SendToIcs("%s\n",bmove.move);
-      SendMoveToComputer(bmove.move);
-    }else{
-      Go();
-    }
   }
 }
 

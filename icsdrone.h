@@ -266,6 +266,7 @@ typedef struct {
   char chessVariant[30+1];
   Bool noCastle;
   int engineMovesPlayed;
+  int computerIsThinking;
 } RunData;
 
 /* AppData */

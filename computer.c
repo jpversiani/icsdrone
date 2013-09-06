@@ -53,6 +53,7 @@ static Bool forceMode=FALSE;
 void Force(){
   SendToComputer("force\n");
   forceMode=TRUE;
+  /* What happens if this happens while the computer is thinking? */
 }
 
 void Go(){
@@ -66,6 +67,7 @@ void Go(){
 	  SendToComputer("go\n");
     }
   forceMode=FALSE;
+  runData.computerIsThinking=TRUE;
 }
 
 void Depth(int depth){
@@ -101,6 +103,7 @@ void SecondsPerMove(int seconds){
 
 void Result(char * result){
   SendToComputer("result %s\n", result);
+  runData.computerIsThinking=FALSE;
 }
 
 void EnsureComputerReady(){
@@ -160,6 +163,9 @@ void SendMoveToComputer(move_t move){
     SendToComputer("%s\n",move);
   }else{
     SendToComputer("usermove %s\n", move);
+  }
+  if(!forceMode){
+      runData.computerIsThinking=TRUE;
   }
 }
 				   
@@ -259,6 +265,7 @@ void ResetComputer(){
     SendToComputer("\nforce\nnew\neasy\n");
   }
   validKibitzSeen=0;
+  runData.computerIsThinking=TRUE;
 }
 
 void RawKillComputer(){
@@ -408,6 +415,7 @@ void ProcessComputerLine(char *line, char *queue)
       sscanf(line, "move %15s", move) == 1) {
     if (runData.gameID != -1) {
       runData.engineMovesPlayed++;
+      runData.computerIsThinking=FALSE;
       if((appData.feedback || appData.proxyFeedback) && validKibitzSeen){
 	PVFeedback();
       }
@@ -538,10 +546,13 @@ void ProcessComputerLine(char *line, char *queue)
           // probably we should send "draw <move>" but this requires cooperation
           // from the engine...
       SendToIcs("draw\n");
+      runData.computerIsThinking=FALSE;
   } else if (!strncmp(line,"offer draw",10)) {
       SendToIcs("draw\n");
+      runData.computerIsThinking=FALSE;
   } else if (!strncmp(line, "resign",6)) {
     SendToIcs("resign\n");
+      runData.computerIsThinking=FALSE;
   } else if (!appData.engineQuiet && !strncmp(line, "tellics ", 8)) {
       SendToIcs("%s\n", line + 8);
   } else if(!appData.engineQuiet && !strncmp(line,"tellothers ",11)) {
