@@ -1001,7 +1001,7 @@ Bool ProcessLogin(char *line){
 	char *variants;
 	switch(runData.icsType){
 	case ICS_FICS:
-	    variants="lightning,blitz,standard,wild/0=wildcastle,wild/1=wildcastle,wild/fr=fischerandom,wild=nocastle,suicide=suicide,losers=losers,atomic=atomic,crazyhouse=crazyhouse,odds,eco,nic,uwild=nocastle,pawns,misc";
+	    variants="lightning,blitz,standard,wild/0=wildcastle,wild/1=wildcastle,wild/8,wild/8a,wild/fr=fischerandom,wild=nocastle,suicide=suicide,losers=losers,atomic=atomic,crazyhouse=crazyhouse,odds,eco,nic,uwild=nocastle,pawns,misc";
 	    break;
 	case ICS_ICC:
 	    /* This is currently not tested! */
