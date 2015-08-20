@@ -2576,6 +2576,8 @@ Bool ProcessIllegalMove(char *line){
        */
 	if(runData.engineMovesPlayed>0){
 	    logme(LOG_DEBUG,"Something bad happened. Bailing out.");
+	    Feedback(CONSOLE|OWNER|PROXY|SHORTLOG,"Something bad happened. Bailing out.");
+	    SendToIcs("Something bad happened. Bailing out.");
 	    SendToIcs("resign\n");
 	}else{
 	    logme(LOG_DEBUG,"Not bailing out since we are at the start of the game.");

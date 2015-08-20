@@ -449,8 +449,9 @@ void MainLoop()
       if (ProcessRawInput(runData.computerReadFd, cBuf, sizeof(cBuf), 
 			  ProcessComputerLine) == ERROR){
 	  //	ExitOn(EXIT_HARDQUIT,"Lost contact with computer.");
-	  logme(LOG_DEBUG,"Lost contact with computer.");
-	  logme(LOG_DEBUG,"Bailing out.");
+	  logme(LOG_DEBUG,"Lost contact with computer. Bailing out.");
+	  Feedback(CONSOLE|OWNER|PROXY|SHORTLOG,"Lost contact with computer. Bailing out.");
+	  SendToIcs("say Lost contact with computer. Bailing out.");
 	  SendToIcs("resign\n");
 	  RawKillComputer();
 	  StartComputer();
