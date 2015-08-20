@@ -259,19 +259,27 @@ void ProcessConsoleLine(char *line, char *queue)
 
 void SetInterface(){
   char *uptime=strdup(asctime(gmtime(&persistentData.startTime)));
+#ifdef GIT
+  char gitversion1[128];
+  strcpy(gitversion1,gitversion);
+  gitversion1[0]='-';
+  gitversion1[17]='\0';
+#else
+  gitversion1[0]='\0';
+#endif
   uptime=strtok(uptime,"\r\n");
   logme(LOG_DEBUG,"Setting interface. runData.icsType=%d\n",runData.icsType);
   if(runData.icsType==ICS_FICS){
       if(runData.myname[0]){
-	  SendToIcs("set interface %s-%s + %s. Online since %s GMT (%d games played).\n",PACKAGE_NAME,VERSION,runData.myname,uptime,persistentData.games);
+	  SendToIcs("set interface %s-%s%s + %s. Online since %s GMT (%d games played).\n",PACKAGE_NAME,VERSION,gitversion1,runData.myname,uptime,persistentData.games);
       }else{
-	  SendToIcs("set interface %s-%s. Online since: %s GMT (%d games played).\n",PACKAGE_NAME,VERSION,uptime,persistentData.games);
+	  SendToIcs("set interface %s-%s%s. Online since: %s GMT (%d games played).\n",PACKAGE_NAME,VERSION,gitversion1,uptime,persistentData.games);
       }
   }else{
       if(runData.myname[0]){
-	  SendToIcs("set interface %s-%s + %s. Online since %s GMT.\n",PACKAGE_NAME,VERSION,runData.myname,uptime);
+	  SendToIcs("set interface %s-%s%s + %s. Online since %s GMT.\n",PACKAGE_NAME,VERSION,gitversion1,runData.myname,uptime);
       }else{
-	  SendToIcs("set interface %s-%s. Online since: %s GMT.\n",PACKAGE_NAME,VERSION,uptime);
+	  SendToIcs("set interface %s-%s%s. Online since: %s GMT.\n",PACKAGE_NAME,VERSION,gitversion1,uptime);
       }
   }
   free(uptime);

@@ -95,6 +95,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "eval.h"
 
+#ifdef GIT
+extern const char *gitversion;
+#endif 
+
 /*
  * Main data structures
  */
