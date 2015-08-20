@@ -49,6 +49,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MAX_PGN_FILE_LINE	80
 
 
+void BailOut(char *msg){
+    logme(LOG_DEBUG,"%s",msg);
+    Feedback(CONSOLE|OWNER|PROXY|SHORTLOG,"%s");
+    SendToIcs("say %s",msg);
+    SendToIcs("resign\n");
+}
 
 void InternalIcsCommand(char *command){
     SendMarker(STARTINTERNAL);
@@ -2575,10 +2581,7 @@ Bool ProcessIllegalMove(char *line){
        * We have the problem that the illegal move might be from a previous game.
        */
 	if(runData.engineMovesPlayed>0){
-	    logme(LOG_DEBUG,"Something bad happened. Bailing out.");
-	    Feedback(CONSOLE|OWNER|PROXY|SHORTLOG,"Something bad happened. Bailing out.");
-	    SendToIcs("Something bad happened. Bailing out.");
-	    SendToIcs("resign\n");
+	    BailOut("Something bad happened. Bailing out.");
 	}else{
 	    logme(LOG_DEBUG,"Not bailing out since we are at the start of the game.");
 	}

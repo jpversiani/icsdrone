@@ -431,6 +431,7 @@ extern void Feedback P((int mask, char *format, ... ));
 extern char *myfgets P((char *s, int size, FILE *stream));
 extern void strip_nts P((char *s, char *strip));
 void CancelTimers P(());
+extern void BailOut P((char *s));
 #define PINGINTERVAL 60*1000
 #define PINGWINDOW 2
 #define RECONNECTINTERVAL 30

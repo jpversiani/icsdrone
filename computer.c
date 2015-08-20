@@ -460,8 +460,7 @@ void ProcessComputerLine(char *line, char *queue)
        * It is not completely clear that this is the right test though.
        */
       if(runData.engineMovesPlayed>0){
-      	logme(LOG_DEBUG,"Something bad happened. Bailing out.");
-	SendToIcs("resign\n");
+	BailOut("Something bad happened. Bailing out.");
       }else{
 	logme(LOG_DEBUG,"Not bailing out since we are at the start of the game.");
       }
