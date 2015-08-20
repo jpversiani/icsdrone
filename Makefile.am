@@ -18,4 +18,10 @@ rpm:
 	make dist
 	rpmbuild -ta @PACKAGE@-@VERSION@.tar.gz
 
+if GIT
+icsdrone_SOURCES += gitversion.c
+gitversion.c: .git/HEAD .git/index
+	echo "const char *gitversion = \"`git rev-parse HEAD`\";" > $@
+endif
+
 EXTRA_DIST=icsdrone.man icsdroneng.pod icsdroneng.spec.in icsdroneng.spec debian/changelog debian/control debian/docs debian/README debian/compat debian/copyright debian/files debian/icsdroneng.substvars debian/rules

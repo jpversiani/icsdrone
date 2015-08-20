@@ -13,8 +13,15 @@ AC_PROG_CC
 # Checks for libraries.
 AC_CHECK_LIB([m],[main])
 
-# Checks for readline
+# Check if we have a git repository
+if [test -e .git] 
+then
+	AC_DEFINE([GIT], [], [We have a git repository])
+fi
 
+AM_CONDITIONAL([GIT], [test -e .git])
+
+# Checks for readline
 AC_ARG_WITH([readline],
 	[AS_HELP_STRING([--with-readline],
 		[console with readline support @<:@default=check@:>@])],
@@ -36,7 +43,6 @@ AS_IF([test "x$with_readline" != xno],
             ])
 
 # Checks for libz
-
 AC_ARG_WITH([zlib],
 	[AS_HELP_STRING([--with-zlib],
 		[compressed logfile support @<:@default=check@:>@])],
