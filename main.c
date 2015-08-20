@@ -808,6 +808,7 @@ int main(int argc, char *argv[])
 			  "iset fr 1\n"
 			  "iset losers 1\n"
 			  "iset suicide 1\n"
+			  "iset wildcastle 1\n"
                           "iset lock 1\n"
                           "td set tourneyinfo on\n"
                           "td set autostart yes\n"
