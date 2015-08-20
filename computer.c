@@ -460,7 +460,7 @@ void ProcessComputerLine(char *line, char *queue)
        * It is not completely clear that this is the right test though.
        */
       if(runData.engineMovesPlayed>0){
-	BailOut("Something bad happened. Bailing out.");
+	BailOut("The engine claims the ICS move is illegal... Bailing out.");
       }else{
 	logme(LOG_DEBUG,"Not bailing out since we are at the start of the game.");
       }

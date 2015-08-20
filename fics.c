@@ -2581,7 +2581,7 @@ Bool ProcessIllegalMove(char *line){
        * We have the problem that the illegal move might be from a previous game.
        */
 	if(runData.engineMovesPlayed>0){
-	    BailOut("Something bad happened. Bailing out.");
+	    BailOut("ICS claims engine move is illegal... Bailing out.");
 	}else{
 	    logme(LOG_DEBUG,"Not bailing out since we are at the start of the game.");
 	}
