@@ -51,7 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void BailOut(char *msg){
     logme(LOG_DEBUG,"%s",msg);
-    Feedback(CONSOLE|OWNER|PROXY|SHORTLOG,"%s");
+    Feedback(CONSOLE|OWNER|PROXY|SHORTLOG,"%s",msg);
     SendToIcs("say %s",msg);
     SendToIcs("resign\n");
 }
