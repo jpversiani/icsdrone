@@ -51,9 +51,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void BailOut(char *msg){
     logme(LOG_DEBUG,"%s",msg);
+    if(appData.bailoutStrategy==0){
+	logme(LOG_DEBUG,"Ignoring bailout command as appData.bailoutStrategy is set to 0.");
+	logme(LOG_DEBUG,"It is possible that icsdrone behaves incorrectly now.");
+	return;
+    }
     Feedback(CONSOLE|OWNER|PROXY|SHORTLOG,"%s",msg);
     SendToIcs("say %s",msg);
-    SendToIcs("resign\n");
+    if(appData.bailoutStrategy>=2){
+	ExitOn(EXIT_HARDQUIT,msg);
+    }else{
+	SendToIcs("resign\n");
+    }
 }
 
 void InternalIcsCommand(char *command){

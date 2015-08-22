@@ -220,7 +220,8 @@ AppData appData = {
     NULL,            /* variants */
     TRUE,            /* engineKnowsSAN */
     NULL,            /* tourneyFilter */
-    NULL             /* matchFilter */
+    NULL,            /* matchFilter */
+    1,               /* bailoutStrategy */
 };
 
 int  ProcessRawInput P((int, char *, int, void (*)(char *, char*)));
