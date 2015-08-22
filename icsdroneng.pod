@@ -342,6 +342,21 @@ on the proxy. User/password are derived from
 the -handle and -password arguments and from the
 strings entered at the icsdrone login prompt.
 
+=item B<-bailoutStrategy> (default: 1)
+
+This options tells icsdrone what to do in case something that should
+not happen does happen. Cases that are currently recognized are
+
+    The ICS sends a move that is illegal according to the engine.
+    The engine sends a move that is illegal according to the ICS.
+    The engine crashes.
+
+If the -bailoutStrategy variable is set to 1 then icsdrone
+will resign on behalf of the engine. If it is set to 2
+(or more) then icsdrone will quit. If it is set to 0 then
+icsdrone will do... nothing. Use this at your own risk as icsdrone
+will now likely hang or behave strangely.
+
 =item B<-variants> (default is server specific)
 
 This is a string of comma separated variant specifiers.
