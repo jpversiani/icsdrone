@@ -332,6 +332,7 @@ typedef struct {
     Bool engineKnowsSAN;
     char *tourneyFilter;
     char *matchFilter;
+    int bailoutStrategy;
 } AppData;
 
 extern PersistentData  persistentData;

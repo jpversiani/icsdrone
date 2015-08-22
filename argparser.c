@@ -98,6 +98,7 @@ ArgList argList = {
     {"-engineKnowsSAN",       ArgBool,   &appData.engineKnowsSAN    , 0 },
     {"-tourneyFilter",        ArgString, &appData.tourneyFilter     , 1 },
     {"-matchFilter",          ArgString, &appData.matchFilter       , 1 },
+    {"-bailoutStrategy",      ArgInt,    &appData.bailoutStrategy   , 1 },
     {NULL,                    ArgNull,   NULL                       , 0 } 
 };
 
