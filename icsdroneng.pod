@@ -120,7 +120,7 @@ Send info about the eval and principal variation.
 
 Give feedback info only before move.
 
-=item B<-feedbackCommand> (default "whisper")
+=item B<-feedbackCommand> (default: "whisper")
 
 The command to use to send feedback to observers. Use "kibitz" if you want your
 opponent to also see the feedback.
@@ -309,7 +309,7 @@ Predefined functions
 
 Arithmetic is using real numbers. Known types are float, bool and string.
 
-=item B<engineKnowsSAN> (default: "true")
+=item B<-engineKnowsSAN> (default: "true")
 
 The engine understands GUI moves in SAN format. This is less
 drastic than sending "feature san=1" which actually forces the GUI
@@ -335,7 +335,7 @@ Note that even if you are only listening locally
 there are still a number of options to connect remotely
 such as the xboard "gateway" option or ssh tunneling.
 
-=item B<-proxyLogin> (default "off")
+=item B<-proxyLogin> (default: "off")
 
 If this is true, icsdrone will display a login prompt
 on the proxy. User/password are derived from
