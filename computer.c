@@ -409,6 +409,11 @@ void ProcessComputerLine(char *line, char *queue)
 {
   move_t move;
   char *tmp;
+  /* some dummy variables for sscanf parsing */
+  char c;
+  int d1,d2;
+  char ss[11];
+
   logcomm("engine","icsdrone", line);
   
   if (sscanf(line, "%*s ... %15s", move) == 1 ||
@@ -550,9 +555,13 @@ void ProcessComputerLine(char *line, char *queue)
       SendToIcs("draw\n");
       runData.computerIsThinking=FALSE;
   } else if (!strncmp(line, "resign",6)) {
-    SendToIcs("resign\n");
+      SendToIcs("resign\n");
       runData.computerIsThinking=FALSE;
-  } else if (!appData.engineQuiet && !strncmp(line, "tellics ", 8)) {
+  } else if (sscanf(line,"%d-%d {%10s resigns%c",&d1,&d2,ss,&c)==4) {
+      SendToIcs("resign\n");
+      runData.computerIsThinking=FALSE;
+  } 
+  else if (!appData.engineQuiet && !strncmp(line, "tellics ", 8)) {
       SendToIcs("%s\n", line + 8);
   } else if(!appData.engineQuiet && !strncmp(line,"tellothers ",11)) {
     SendToIcs("whisper %s\n",line+11);
