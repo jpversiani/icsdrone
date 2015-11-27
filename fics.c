@@ -2311,7 +2311,7 @@ Bool ProcessGameEnd(char *line){
     if (runData.sigint) {
       InterruptComputer();
     }
-    if (runData.haveCmdResult && !strcmp(result,"*")) {
+    if (runData.haveCmdResult && strcmp(result,"*")) {
       Result(result);
     }
     NewGame();
