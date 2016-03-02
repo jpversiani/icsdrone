@@ -1552,6 +1552,7 @@ Bool ProcessIncomingMatches(char *line){
       SendToIcs("tell %s You have played me %d times in a row;  I'll wait a minute for other players to get a chance to challenge me before I accept your challenge.\n", name, runData.numGamesInSeries);
       CancelTimers();
       create_timer(&(runData.findChallengeTimer),FINDCHALLENGETIMEOUT,FindChallenge,NULL);
+      parsingIncoming=FALSE;
       return TRUE;
     } 
 
