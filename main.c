@@ -74,7 +74,7 @@ void InitRunData(){
   runData.waitingForFirstBoard=FALSE;
   runData.exitValue=0;
   runData.gameID=-1;
-  runData.moveNum=-1;
+  runData.nextMoveNum=-1;
   runData.waitingForPingID=0;
   runData.oppname=NULL;
   runData.forwarding=FALSE;

@@ -693,9 +693,13 @@ void HandleBoard(IcsBoard * icsBoard, char *moveList, Bool ignoreMove){
     SendMovesToComputer(moveList);
   }
   if(EngineToMove(icsBoard)){
-      if(runData.computerIsThinking){
-	  logme(LOG_DEBUG,"Ignoring board since the computer is thinking.");
+      //      if(runData.computerIsThinking){
+      //	  logme(LOG_DEBUG,"Ignoring board since the computer is thinking.");
+      if(runData.nextMoveNum==icsBoard->nextMoveNum){
+         logme(LOG_DEBUG,"Ignoring board since we already saw one with this move number.");
       }else{
+	  /* update state */
+	  runData.nextMoveNum=icsBoard->nextMoveNum;
 		    /* clear outstanding flag and abort alarms */
 	  CancelTimers();
 	  whitetime=100*icsBoard->whitetime;
@@ -2306,7 +2310,7 @@ Bool ProcessGameEnd(char *line){
     }
     SendMarker(DOCLEANUPS);
     runData.gameID = -1;
-    runData.moveNum = -1;
+    runData.nextMoveNum = -1;
     runData.timeOfLastGame = time(0);
     if (runData.sigint) {
       InterruptComputer();

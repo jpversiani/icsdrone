@@ -196,7 +196,7 @@ typedef struct {
   Bool  waitingForFirstBoard;
   int   exitValue;
   int   gameID;
-  int   moveNum;
+  int   nextMoveNum;
   int   waitingForPingID;
   char* oppname;
   Bool forwarding;
