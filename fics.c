@@ -2271,7 +2271,7 @@ Bool ProcessGameEnd(char *line){
        strncasecmp(handle2,runData.handle,strlen(runData.handle))){
 		       return TRUE;
        }		 
-    logme(LOG_INFO, "Detected end of game: %s", line);
+    logme(LOG_INFO, "Detected end of game.");
     {
         int mask=CONSOLE|SHORTLOG|PROXY;
         if(!appData.ownerQuiet){
