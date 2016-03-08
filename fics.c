@@ -2228,6 +2228,7 @@ Bool ProcessBoard(char *line){
 	SetupEngineOptions(&(runData.icsBoard));
 	HandleBoard(&(runData.icsBoard),NULL,TRUE);
     }
+    BoardToFen(runData.initialFen,&runData.icsBoard);
     runData.waitingForFirstBoard = FALSE;
 
     return TRUE;
@@ -2505,6 +2506,10 @@ Bool ProcessCreatePGN(char *line){
     fprintf(pgnFile,"[TimeControl \"%d+%d\"]\n",initial,increment);
     fprintf(pgnFile,"[Mode \"ICS\"]\n");
     fprintf(pgnFile,"[Result \"%s\"]\n",result);
+    if(IsShuffle(runData.chessVariant)){
+	fprintf(pgnFile,"[Setup \"1\"]\n");
+	fprintf(pgnFile,"[FEN \"%s\"]\n",runData.initialFen);
+    }
     fprintf(pgnFile,"\n");
     fprintf(pgnFile,"%s",pgnDesc);
     if((colNo+strlen(resultString)) > MAX_PGN_FILE_LINE) {

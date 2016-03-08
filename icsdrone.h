@@ -214,6 +214,7 @@ typedef struct {
   char moveList[8192];
   char last_talked_to[30+1];
   IcsBoard icsBoard;
+  char initialFen[256];
   char lineBoard[512];
   Bool waitingForMoveList;
   Bool promptOnLine;
