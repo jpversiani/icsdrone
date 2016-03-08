@@ -2506,7 +2506,13 @@ Bool ProcessCreatePGN(char *line){
     fprintf(pgnFile,"[TimeControl \"%d+%d\"]\n",initial,increment);
     fprintf(pgnFile,"[Mode \"ICS\"]\n");
     fprintf(pgnFile,"[Result \"%s\"]\n",result);
-    if(strcmp(StartFen,runData.initialFen)){
+    if(strcmp(runData.chessVariant,"normal")){
+	fprintf(pgnFile,"[Variant \"%s\"]\n",runData.chessVariant);
+    }
+    //    if(strcmp(StartFen,runData.initialFen)){
+    if(IsFicsShuffle(runData.icsVariant)){ 
+	/* Sadly this is incorrect for an adjourned game. */
+	/* We really need to figure out how to get the initial board. */
 	fprintf(pgnFile,"[Setup \"1\"]\n");
 	fprintf(pgnFile,"[FEN \"%s\"]\n",runData.initialFen);
     }
