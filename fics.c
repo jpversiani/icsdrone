@@ -2506,7 +2506,7 @@ Bool ProcessCreatePGN(char *line){
     fprintf(pgnFile,"[TimeControl \"%d+%d\"]\n",initial,increment);
     fprintf(pgnFile,"[Mode \"ICS\"]\n");
     fprintf(pgnFile,"[Result \"%s\"]\n",result);
-    if(IsShuffle(runData.chessVariant)){
+    if(!strcmp(StartFen,runData.initialFen)){
 	fprintf(pgnFile,"[Setup \"1\"]\n");
 	fprintf(pgnFile,"[FEN \"%s\"]\n",runData.initialFen);
     }
