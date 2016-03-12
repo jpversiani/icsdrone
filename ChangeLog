@@ -1,16 +1,16 @@
-0.03	
+0.03
 - Initial public release of icsdroneng.
-0.04	
-- Slight modification of configure.ac (better detection of libreadline 
+0.04
+- Slight modification of configure.ac (better detection of libreadline
 and zlib).
 - Cygwin support.
 0.05
 - Correction of some typos.
-- Short logging. 
+- Short logging.
 - More feedback in console (draw & abort requests)
 0.06
-- Noplay option. 
-- The scheduling mechanism no longer uses the alarm signal. 
+- Noplay option.
+- The scheduling mechanism no longer uses the alarm signal.
 0.08
 - New options: autoJoin, sendLogin, hardLimit, acceptDraw, autoReconnect.
 0.09
@@ -18,67 +18,67 @@ and zlib).
 0.10
 - Bugfix: End of "standings" was incorrectly detected for knockout tourney.
 0.11
-- Bugfix: Shortlog of fedora was mangled. 
-- The use of setjmp/longjmp is now compatible with the specification. 
-- Courtesy adjourn time reduced to 45 seconds. 
-- Fixed segfault which occurred when sendTimeout was set. 
-- AutoJoin is now true by default. 
-- More elaborate interface string. 
+- Bugfix: Shortlog of fedora was mangled.
+- The use of setjmp/longjmp is now compatible with the specification.
+- Courtesy adjourn time reduced to 45 seconds.
+- Fixed segfault which occurred when sendTimeout was set.
+- AutoJoin is now true by default.
+- More elaborate interface string.
 0.12
-- Added option "ownerQuiet" to suppress owner tells about game progress. 
+- Added option "ownerQuiet" to suppress owner tells about game progress.
 - Moved up the processing of sendGameStart so that tells in it
-  do not get queued and arrive after the opponent has moved (this is mainly a 
-  problem for computers running as guests). A tell in sendGameStart is often 
-  used to inform the opponent that the player is a computer. Thus it should 
-  arrive as quickly as possible (noticed by Eric Mullins). 
-0.14 
-- When running as an unregistered user feedback tells are now throttled. 
-  Of course they will arrive very slowly (just as they did before) but at least 
-  they don't get lost due to communications quota overload. 
-- Do not forward draw CLAIMS to FICS. It is useless since FICS has its own 
-  means to detect legal draws. Furthermore it is actually harmful since the 
+  do not get queued and arrive after the opponent has moved (this is mainly a
+  problem for computers running as guests). A tell in sendGameStart is often
+  used to inform the opponent that the player is a computer. Thus it should
+  arrive as quickly as possible (noticed by Eric Mullins).
+0.14
+- When running as an unregistered user feedback tells are now throttled.
+  Of course they will arrive very slowly (just as they did before) but at least
+  they don't get lost due to communications quota overload.
+- Do not forward draw CLAIMS to FICS. It is useless since FICS has its own
+  means to detect legal draws. Furthermore it is actually harmful since the
   draw claim will likely arrive after the end of the game as far as FICS is
   concerned. In a tourney where the games succeed each other very
   quickly the draw claim may be interpreted as a draw OFFER for the
   next game (this really happens).
-- Added option: feedbackCommand. Default "whisper". 
-- Bugfix: registered/unregistered detection was not correct. 
+- Added option: feedbackCommand. Default "whisper".
+- Bugfix: registered/unregistered detection was not correct.
 - Added option: engineQuiet. Suppress most engine actions. Some
-  engines are too noisy. 
+  engines are too noisy.
 - delete_timer now sets the timer to NULL.
 0.15
 - Timers have now millisecond precision.
 - No rematch after an adjourned or aborted game as it is directed to the wrong player.
-- Elimination of a number of explicit malloc's. 
+- Elimination of a number of explicit malloc's.
 0.16
-- Small bugfix in timer code (confusion between msec and usec). 
+- Small bugfix in timer code (confusion between msec and usec).
 - Do not send standings in current form to owner (too many tells).
 0.17
-- Revert change of not sending draw claims to FICS. Contrary to what 
+- Revert change of not sending draw claims to FICS. Contrary to what
   I believed FICS does not adjudicate draws by threefold repetition.
   But the race condition still remains since the opponent may claim draw
-  before our own draw claim arrives at FICS. 
+  before our own draw claim arrives at FICS.
 0.18
-- WIN32 portability fixes by Eric Mullins. 
+- WIN32 portability fixes by Eric Mullins.
 0.19
 - There is a small possibility that icsdroneng accepts a match request
   after attempting to join a tourney. In this version icsdroneng detects
   this and tries to withdraw from the tourney.
 0.20
 - FICS nowrap setting (Eric Mullins)
-- Correction of some memset's that had their parameters reversed. 
+- Correction of some memset's that had their parameters reversed.
 0.21
 - Option added (default true) to give only feedback before move.
 0.22
 - Do not join variant tourneys.
 0.23
-- Avoid accepting a new game when quitting. If the engine is playing with 
+- Avoid accepting a new game when quitting. If the engine is playing with
   noescape this would otherwise result in a lost game due to disconnection.
-- Accept sigint=1 from engine. Needed for Rookie (Marcel van Kervinck). 
-- Default "This is <engine-name>" message wasn't going anywhere on FICS, 
-  because "This" is not a command. Prefix it with whatever is set as 
+- Accept sigint=1 from engine. Needed for Rookie (Marcel van Kervinck).
+- Default "This is <engine-name>" message wasn't going anywhere on FICS,
+  because "This" is not a command. Prefix it with whatever is set as
   `feedbackCommand' (MK).
-- Function SetTimeZone() doesn't compile on FreeBSD. `timezone' is a function, 
+- Function SetTimeZone() doesn't compile on FreeBSD. `timezone' is a function,
   not a variable. Use `tm_gmtoff' instead (MK).
 - Fix bug setting timezone for UTC=0 (MK).
 - Send engine stderr to engine stdout instead to /dev/null (MK).
@@ -92,9 +92,9 @@ and zlib).
 - ICC port by Marcel van Kervinck!! There may be still a few glitches and tournaments
 do not work but playing games seems to be ok!
 0.25
-- Act as a local proxy for the remote ICS. 
+- Act as a local proxy for the remote ICS.
 - Fix for different "Creating" message for tourney at ICC (M v Kervinck).
-0.26	
+0.26
 - Enable wrapping in generated pgn file (Gautam Mani).
 - Add autogen.sh.
 - Transfer to sourceforge.
@@ -104,3 +104,15 @@ do not work but playing games seems to be ok!
 - More careful parsing of ICS promotion suffix.
 - Avoid getting stuck if mamer does not respond to the ListTourneys command.
 - Documentation fixes (Eric Mullins).
+0.29
+- Bugfix: wild/8 and wild/8a were not allowing castling.
+- Send proper iset command to allow wildcastle.
+- More feedback when resigning because of technical trouble.
+- New option -bailoutStrategy to indicate how to handle things that
+  should not happen.
+- Icsdrone now recognizes engine resigns like "0-1 {White resigns}".
+- Fix race condition in moretime handling. This was used for abuse.
+- The generated pgn now contains variant and FEN tags for variant/shuffle
+  games. These are currently incorrect for adjourned games, but so was
+  omitting them...
+- Throttling of opponent challenges was broken.

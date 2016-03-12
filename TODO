@@ -1,31 +1,11 @@
-Bugs
-====
-
-- icsdrone does not recognize white/black option in game start.
-- There is something weird with icsdrone sometimes starting without
-logging. Debug.
-
 General
 =======
 
-- Make icsdrone remember its options under autorestart (when FICS disconnects). 
-
-- Generate pgn file for running game (for pgn4web).
-
-- Implement a version of marker.c using tells (the current version works
-  well for unregistered users on FICS where tells sometimes get lost).
-- Wild support (at least FRC).
-
-
-
 - Indicate resume of adjourned game in log. 
-- Make pgn standard compliant (lines < 80 chars).
+- Make pgn standard compliant.
 - ICC does not allow setting the "interface" variable multiple times. 
   So icsdroneng cannot use this to communicate things to the user.
   Duplicate this with a finger note (this is somewhat tricky).
-- Print warning if longAlgebraicMoves is false and the engine
-  has not indicated it understands san ("feature san=1").
-
 
 Proxy
 =====
@@ -33,5 +13,3 @@ Proxy
 -Make kibitzing similar to xboard kibitzing.
 -More sane opening book moves kibitzing.
 
--Extend "write protection" also to writing to ICS 
-	(cfr "GnuCheese_restart.log").

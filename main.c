@@ -259,9 +259,9 @@ void ProcessConsoleLine(char *line, char *queue)
 }
 
 void SetInterface(){
+  char gitversion1[128];
   char *uptime=strdup(asctime(gmtime(&persistentData.startTime)));
 #ifdef GIT
-  char gitversion1[128];
   strcpy(gitversion1+1,gitversion);
   gitversion1[0]='-';
   gitversion1[17]='\0';

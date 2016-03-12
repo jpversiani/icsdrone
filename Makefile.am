@@ -1,7 +1,7 @@
 AM_CFLAGS=-Wall
 bin_PROGRAMS = icsdrone
-icsdrone_SOURCES = argparser.c computer.c eval.c ics_wrap.c main.c net.c sched.c board.c fics.c marker.c polyglot.c utils.c proxy.c icsdrone.h
-dist_doc_DATA=README README_old THANKS_old ChangeLog_old 
+icsdrone_SOURCES = argparser.c computer.c eval.c ics_wrap.c main.c net.c sched.c board.c fics.c marker.c polyglot.c utils.c proxy.c icsdrone.h eval.h
+dist_doc_DATA=README THANKS_old ChangeLog_old 
 
 man6_MANS = icsdrone.man
 
@@ -12,7 +12,7 @@ README: icsdrone.man
 	groff -t -e -mandoc -Tascii icsdrone.man| col -bx > README
 
 deb:
-	dpkg-buildpackage
+	dpkg-buildpackage -us -uc
 
 rpm:
 	make dist

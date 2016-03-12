@@ -1,3 +1,26 @@
+icsdroneng (0.29) unstable; urgency=low
+	
+  * Bugfix: wild/8 and wild/8a were not allowing castling.
+	
+  * Send proper iset command to allow wildcastle.
+	
+  * More feedback when resigning because of technical trouble.
+	
+  * New option -bailoutStrategy to indicate how to handle things that
+    should not happen.
+	
+  * Icsdrone now recognizes engine resigns like "0-1 {White resigns}".
+	
+  * Fix race condition in moretime handling. This was used for abuse.
+	
+  * The generated pgn now contains variant and FEN tags for variant/shuffle
+    games. These are currently incorrect for adjourned games, but so was
+    omitting them...
+	
+  * Throttling of opponent challenges was broken.	
+	
+ -- Michel Van den Bergh <michel.vandenbergh@uhasselt.be>  Sat, 12 Mar 2015 19:00:00 +0200	
+
 icsdroneng (0.28) unstable; urgency=low
 
   * More careful parsing of ICS promotion suffix.
