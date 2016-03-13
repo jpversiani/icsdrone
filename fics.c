@@ -995,7 +995,7 @@ Bool ProcessLogin(char *line){
       runData.icsType=ICS_ICC;
       logme(LOG_DEBUG,"We are playing on ICC.");
   }
-  if(strstr(line,"Variant-ICS")){
+  if(strstr(line,"Variant")) { // "H.G.M's Variant Chess Server" (2016-03-13)
       runData.icsType=ICS_VARIANT;
       logme(LOG_DEBUG,"We are playing on H.G. Muller's variant ICS.");
   }
