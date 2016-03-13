@@ -1,0 +1,21 @@
+
+|Todo| rematch earlier computer opponents after 15 minutes of idle time
+
+|Todo| kibitz against computers, whisper against humans
+
+|Todo| echo game results on console mode (started/finished)
+
+|Todo| blik functions…
+
+|Todo| hgm detection (smoves)
+
+|Todo| readable engine output
+
+|Todo| instructions for building
+
+"""configure en Makefile.in zijn gegegeneerde files (uit configure.ac
+en Makefile.am). Dus die zitten niet in git. Normaal zouden ze
+gegenereerd moeten worden met ./autogen.sh.  Het zou kunnen dat
+autogen.sh niet meer up to date is en dat je ook een automake
+--add-missing moet doen."""
+
