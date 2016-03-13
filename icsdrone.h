@@ -591,6 +591,7 @@ extern Bool IsAMarker P((char *));
 #define STARTFORWARDING "start"
 #define STOPFORWARDING "stop"
 #define ENDTELL   "endt"
+#define ENDCHAT   "endc"
 #define ASKLASTMOVES "askm"
 #define DOCLEANUPS "clean"
 #define ASKSTARTMOVES "asks"
