@@ -7,8 +7,6 @@
 
 |Todo| blik functions…
 
-|Todo| hgm detection (smoves)
-
 |Todo| readable engine output
 
 |Todo| instructions for building
@@ -18,4 +16,9 @@ en Makefile.am). Dus die zitten niet in git. Normaal zouden ze
 gegenereerd moeten worden met ./autogen.sh.  Het zou kunnen dat
 autogen.sh niet meer up to date is en dat je ook een automake
 --add-missing moet doen."""
+
+|Done| hgm detection (smoves)
+
+- HGM now supports "smoves -1", so the oldmoves hack is not needed any longer
+- But HGM's welcome screen has changed
 
