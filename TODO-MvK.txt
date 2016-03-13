@@ -3,8 +3,6 @@
 
 |Todo| kibitz against computers, whisper against humans
 
-|Todo| echo game results on console mode (started/finished)
-
 |Todo| blik functions…
 
 |Todo| readable engine output
@@ -16,6 +14,11 @@ en Makefile.am). Dus die zitten niet in git. Normaal zouden ze
 gegenereerd moeten worden met ./autogen.sh.  Het zou kunnen dat
 autogen.sh niet meer up to date is en dat je ook een automake
 --add-missing moet doen."""
+
+|Done| echo game results on console mode (started/finished)
+
+- Was already there.
+- What was missing is forwarding of tells/kibitz to the console. Added now.
 
 |Done| hgm detection (smoves)
 

@@ -1324,6 +1324,42 @@ Bool ProcessTells(char *line){
   return FALSE;  
 }
 
+/* Forward any chatter to the console */
+Bool ProcessChat(char *line)
+{
+  static Bool processingChat = FALSE;
+  static char tmp[8192+1];
+  char dummy;
+
+  if (!processingChat && sscanf(line, "%*s kibitzes:%c", &dummy) == 1) { // kibitzing
+    processingChat = TRUE;
+    sscanf(line, "%8192[^\n\r]", tmp);
+    SendMarker(ENDCHAT);
+    return TRUE;
+  }
+  if (!processingChat && sscanf(line, "%[^ :]:%c", tmp, &dummy) == 2) { // channels
+    char *channel = rindex(tmp, '('); // tmp can be "name(C)(64)"
+    if (channel == NULL || sscanf(channel, "(%*d%c", &dummy) != 1 || dummy != ')') {
+       return FALSE;
+    }
+    processingChat = TRUE;
+    sscanf(line, "%8192[^\n\r]", tmp);
+    SendMarker(ENDCHAT);
+    return TRUE;
+  }
+  if(!processingChat){
+    return FALSE;
+  }
+  if(line[0]=='\\'){
+    strtok(line,"\r\n");
+    strncat(tmp,line+4,8192-strlen(tmp));
+    return TRUE;
+  }
+  Feedback(CONSOLE|SHORTLOG,"%s",tmp);
+  processingChat = FALSE;
+  return FALSE;
+}
+
 Bool ProcessNotifications(char *line){
   char name[30+1];
   char dummy;
@@ -2626,6 +2662,7 @@ void ProcessIcsLine(char *line, char *queue){
   if(ProcessPings(line))goto finish;
   if(ProcessLogin(line))goto finish;
   if(ProcessTells(line))goto finish;
+  if(ProcessChat(line))goto finish;
   if(ProcessNext(line))goto finish;
   if(ProcessPending(line))goto finish;
   if(ProcessOffers(line))goto finish;
