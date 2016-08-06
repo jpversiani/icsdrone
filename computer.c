@@ -368,15 +368,15 @@ void PVFeedback(move_t move){
       }
     }
 
-    ix += snprintf(buffer+ix,N-ix,"%d.%s %s, %+0.2f, %d ply, %0.2f s, ",
+    ix += snprintf(buffer+ix,N-ix,"%d.%s %s",
               runData.nextMoveNum,
               runData.computerIsWhite ? "" : "..",
-              moveString,
-              eval_/100.0,
-              depth,
-              time_/100.0);
+              moveString);
+    ix += snprintf(buffer+ix,N-ix,", %+0.2f", eval_/100.0);
+    ix += snprintf(buffer+ix,N-ix,", %d ply", depth);
     double Mnps = time_?(100.0*nodes/time_*1e-6):0.0;
-    ix += snprintf(buffer+ix,N-ix,(Mnps >= 0.995) ? "%1.1lf Mnps" : "%1.2lf Mnps", Mnps);
+    ix += snprintf(buffer+ix,N-ix,(Mnps >= 0.995) ? ", %1.1f Mnps" : ", %1.2f Mnps", Mnps);
+    ix += snprintf(buffer+ix,N-ix,", %0.1f s", time_/100.0);
     ix += snprintf(buffer+ix,N-ix," [%s]", pv);
 
     if(appData.feedback){
