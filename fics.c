@@ -732,7 +732,7 @@ void HandleBoard(IcsBoard * icsBoard, char *moveList, Bool ignoreMove){
 	  runData.waitingForFirstBoard=FALSE;
 	  if(strcmp(bmove.move,"none")){
               char buffer[256];
-              snprintf(buffer, sizeof(buffer), "%d%s %s (book), score %d",
+              snprintf(buffer, sizeof(buffer), "%d.%s %s (book), score %d",
                 runData.nextMoveNum,
                 runData.computerIsWhite ? "" : "..",
                 bmove.move,

@@ -359,7 +359,7 @@ char *insertMoveNumbersInPV(char *pv,int plyNr){
     if (isalnum(*s) && (s==pv || !isalnum(s[-1]))){ // Word boundary
       if (isalpha(*s)){ // Next word is a move
         if ((lastNr<plyNr) && (lastNr<0 || (plyNr&1)==0)) {
-          ix+=snprintf(buffer+ix,N-ix,"%d.%s",plyNr>>1,(plyNr&1)?"..":"");
+          ix+=snprintf(buffer+ix,N-ix,"%d.%s ",plyNr>>1,(plyNr&1)?"..":"");
           lastNr=plyNr;
         }
         plyNr++;
@@ -386,7 +386,7 @@ void PVFeedback(move_t move){
     for (s=pv; *s!='\0'; s++){
       if (isalpha(*s) && (s==pv || !isalnum(s[-1]))) {
         int n=0;
-        sscanf(s, "%15s %n", moveString, &n); // This looks like a move
+        sscanf(s, "%15s %n", moveString, &n); // This looks like our move
         s += n;
         break;
       }
@@ -409,13 +409,13 @@ void PVFeedback(move_t move){
       Feedback(PROXY,"\r\n--> icsdrone: %s",buffer);
     }
 
-    if (sscanf(s,"%15s",moveString)==1) { // If there is anything after a first move
+    if (sscanf(s,"%15s",moveString)==1) { // Is there more after first move?
       s=insertMoveNumbersInPV(s, plyNr+1);
       if(appData.feedback){
-	SendToIcs("%s %s\n",getFeedbackCommand(),s);
+	SendToIcs("%s pv %s\n",getFeedbackCommand(),s);
       }
       if(appData.proxyFeedback){
-	Feedback(PROXY,"\r\n--> icsdrone: %s",s);
+	Feedback(PROXY,"\r\n--> icsdrone: pv %s",s);
       }
     }
 }

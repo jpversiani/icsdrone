@@ -1,20 +1,13 @@
 
-|Todo| rematch earlier computer opponents after 15 minutes of idle time
+|Todo| It would be nice to show book move as SAN
 
-|Todo| blik functions...
+|Todo| Rematch earlier computer opponents after 15 minutes of idle time
 
-|Todo| kibitz against computers, whisper against humans
-
-Introduce -sendComputerGame and -sendHumanGame options for that.
-
-|Todo| readable engine output
-
-This comes out of polyglot. Better fix it there.
-
-|Todo| instructions for building
+|Todo| Instructions for building
 
 Linux
 -----
+./autogen.sh
 automake --add-missing
 ./autogen.sh
 ./configure
@@ -22,9 +15,10 @@ make
 
 OSX
 --
+./autogen.sh
 automake --add-missing
 ./autogen.sh
-./configure -with-readline=no # OSX aliases editline as readline, but it is not compatible
+./configure -with-readline=no # editlin aliased as readline, but isn't compatible
 make
 --
 
@@ -33,6 +27,14 @@ en Makefile.am). Dus die zitten niet in git. Normaal zouden ze
 gegenereerd moeten worden met ./autogen.sh.  Het zou kunnen dat
 autogen.sh niet meer up to date is en dat je ook een automake
 --add-missing moet doen."""
+
+|Done| kibitz against computers, whisper against humans
+
+Done automatically when feedbackCommand not st
+
+|Done| readable engine output
+
+Done. Made output readable like Rookie/Bliep, but with full PV.
 
 |Done| echo game results on console mode (started/finished)
 
