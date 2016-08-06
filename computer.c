@@ -350,6 +350,28 @@ Bool EvalDraw(int eval){
   return FALSE;
 }
 
+// Insert move numbers in the PV where they appear missing
+void insertMoveNumbersInPV(){
+  char buffer[256]="", *s;
+  int N=sizeof(buffer), ix=0;
+  int plyNr=runData.nextMoveNum * 2 + !runData.computerIsWhite;
+  int lastNr=-1;
+  for (s=pv; *s!='\0';s++){
+    if (isalnum(*s) && (s==pv || !isalnum(s[-1]))){ // Word boundary
+      if (isalpha(*s)){ // Next word is a move
+        if ((lastNr<plyNr) && (lastNr<0 || (plyNr&1)==0)) {
+          ix+=snprintf(buffer+ix,N-ix,"%d.%s ",plyNr>>1,(plyNr&1)?"..":"");
+        }
+        plyNr++;
+      } else // Next word is a move number
+        lastNr=plyNr;
+    }
+    if (ix<N-1) buffer[ix++]=*s;
+  }
+  buffer[ix]='\0';
+  strcpy(pv, buffer);
+}
+
 void PVFeedback(move_t move){
     char buffer[1024];
     int N=sizeof(buffer), ix=0;
@@ -361,8 +383,7 @@ void PVFeedback(move_t move){
 
     // Prefer to get the first move from pv. But skip anything that doesn't start with a letter
     for (s=pv; *s!='\0'; s++){
-      if ( isalpha(*s) &&
-          (s==pv || isspace(s[-1]) || s[-1]=='.')) {
+      if (isalpha(*s) && (s==pv || !isalnum(s[-1]))) {
         sscanf(s, "%15s", moveString); // This looks like a move
         break;
       }
@@ -377,13 +398,21 @@ void PVFeedback(move_t move){
     double Mnps = time_?(100.0*nodes/time_*1e-6):0.0;
     ix += snprintf(buffer+ix,N-ix,(Mnps >= 0.995) ? ", %1.1f Mnps" : ", %1.2f Mnps", Mnps);
     ix += snprintf(buffer+ix,N-ix,", %0.1f s", time_/100.0);
-    ix += snprintf(buffer+ix,N-ix," [%s]", pv);
 
     if(appData.feedback){
-	SendToIcs("%s %s\n",getFeedbackCommand(),buffer);
+       SendToIcs("%s %s\n",getFeedbackCommand(),buffer);
     }
     if(appData.proxyFeedback){
-	Feedback(PROXY,"\r\n--> icsdrone: %s",buffer);
+      Feedback(PROXY,"\r\n--> icsdrone: %s",buffer);
+    }
+
+    insertMoveNumbersInPV();
+
+    if(appData.feedback){
+	SendToIcs("%s %s\n",getFeedbackCommand(),pv);
+    }
+    if(appData.proxyFeedback){
+	Feedback(PROXY,"\r\n--> icsdrone: %s",pv);
     }
 }
 

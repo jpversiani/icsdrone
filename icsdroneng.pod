@@ -120,10 +120,13 @@ Send info about the eval and principal variation.
 
 Give feedback info only before move.
 
-=item B<-feedbackCommand> (default: "whisper")
+=item B<-feedbackCommand> (default: "whisper" or "kibitz")
 
 The command to use to send feedback to observers. Use "kibitz" if you want your
 opponent to also see the feedback.
+
+If not set, "whisper" will be used when playing humans and "kibitz"
+when playing computers.
 
 =item B<-proxyFeedback> (default: "on")
 
