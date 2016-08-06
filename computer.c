@@ -356,6 +356,7 @@ char *insertMoveNumbersInPV(char *pv,int plyNr){
   int N=sizeof(buffer), ix=0;
   int lastNr=-1;
   for (s=pv; *s!='\0';s++){
+    s = SkipParens(s);
     if (isalnum(*s) && (s==pv || !isalnum(s[-1]))){ // Word boundary
       if (isalpha(*s)){ // Next word is a move
         if ((lastNr<plyNr) && (lastNr<0 || (plyNr&1)==0)) {
@@ -384,6 +385,7 @@ void PVFeedback(move_t move){
 
     // Prefer to get the first move from pv. But skip anything that doesn't start with a letter
     for (s=pv; *s!='\0'; s++){
+      s = SkipParens(s);
       if (isalpha(*s) && (s==pv || !isalnum(s[-1]))) {
         int n=0;
         sscanf(s, "%15s %n", moveString, &n); // This looks like our move

@@ -560,3 +560,13 @@ void* rpl_malloc (size_t n)
     n = 1;
  return malloc (n);
 }
+
+char *SkipParens(char *s)
+{
+  if (*s == '(') {
+    char *t = strchr(s+1, ')');
+    if (t != NULL) s = t;
+  }
+  return s;
+}
+
