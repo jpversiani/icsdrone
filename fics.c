@@ -731,12 +731,18 @@ void HandleBoard(IcsBoard * icsBoard, char *moveList, Bool ignoreMove){
 	  }
 	  runData.waitingForFirstBoard=FALSE;
 	  if(strcmp(bmove.move,"none")){
-	      logme(LOG_INFO,"Bookmove: %s score=%d\n",bmove.move,bmove.score);
+              char buffer[256];
+              snprintf(buffer, sizeof(buffer), "%d%s %s (book), score %d",
+                runData.nextMoveNum,
+                runData.computerIsWhite ? "" : "..",
+                bmove.move,
+                bmove.score);
+	      logme(LOG_INFO,buffer);
 	      if(appData.feedback){
-		  SendToIcs("%s Bookmove: %s score=%d\n",getFeedbackCommand(),bmove.move,bmove.score); 
+		  SendToIcs("%s %s\n",getFeedbackCommand(),buffer);
 	      }
 	      if(appData.proxyFeedback){
-		  Feedback(PROXY,"--> icsdrone: Bookmove: %s score=%d",bmove.move,bmove.score); 
+		  Feedback(PROXY,"--> icsdrone: %s",buffer);
 	      }
 	      SendToIcs("%s\n",bmove.move);
 	      SendMoveToComputer(bmove.move);
