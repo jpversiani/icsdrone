@@ -63,8 +63,6 @@ ArgList argList = {
     {"-haveCmdPing",          ArgBool,   &appData.haveCmdPing       , 0 },
     {"-loginScript",          ArgString, &appData.loginScript       , 0 },
     {"-issueRematch",         ArgBool,   &appData.issueRematch      , 1 },
-    {"-sendComputerGame",     ArgString, &appData.sendComputerGame  , 1 },
-    {"-sendHumanGame",        ArgString, &appData.sendHumanGame     , 1 },
     {"-sendGameStart",        ArgString, &appData.sendGameStart     , 1 },
     {"-acceptOnly",           ArgString, &appData.acceptOnly        , 1 },
     {"-timeseal",             ArgString, &appData.timeseal          , 0 },

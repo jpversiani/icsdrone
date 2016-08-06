@@ -76,7 +76,7 @@ void InitRunData(){
   runData.gameID=-1;
   runData.nextMoveNum=-1;
   runData.waitingForPingID=0;
-  runData.oppname=NULL;
+  runData.opponentName[0]='\0';
   runData.forwarding=FALSE;
   runData.forwardingMask=0;
   runData.loggedIn=FALSE;
@@ -183,8 +183,6 @@ AppData appData = {
     FALSE,           /* haveCmnPing */
     NULL,            /* loginScript */
     FALSE,           /* issueRematch */
-    NULL,            /* sendComputerGame */
-    NULL,            /* sendHumanGame */
     NULL,            /* sendGameStart */
     NULL,            /* acceptOnly */
     NULL,            /* timeseal */
@@ -666,7 +664,6 @@ int main(int argc, char *argv[])
     SetOption("icsHost",LOGIN,0,"%s","freechess.org");
     SetOption("program",LOGIN,0,"%s","gnuchess");
     SetOption("sendTimeout",LOGIN,0,"%s","resume");
-    SetOption("feedbackCommand",LOGIN,0,"%s","whisper");
     SetOption("tourneyFilter",LOGIN,0,"%s","ct.chess");
     SetOption("matchFilter",LOGIN,0,"%s","true");
     if (ParseArgs(argc, argv) == ERROR)

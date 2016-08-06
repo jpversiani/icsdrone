@@ -198,7 +198,7 @@ typedef struct {
   int   gameID;
   int   nextMoveNum;
   int   waitingForPingID;
-  char* oppname;
+  char opponentName[30+1];
   Bool forwarding;
   int forwardingMask;
   Bool loggedIn;
@@ -299,8 +299,6 @@ typedef struct {
     Bool  haveCmdPing;
     char* loginScript;
     Bool  issueRematch;
-    char* sendComputerGame;
-    char* sendHumanGame;
     char* sendGameStart;
     char* acceptOnly;
     char* timeseal;
@@ -433,10 +431,12 @@ extern void ProcessIcsLine P((char *, char *));
 extern void ExecCommand P((char *, int interactive, int inhibitSet));
 extern void ExecFile P((char *, int interactive, int inhibitSet));
 extern void Feedback P((int mask, char *format, ... ));
+extern char *getFeedbackCommand P((void));
 extern char *myfgets P((char *s, int size, FILE *stream));
 extern void strip_nts P((char *s, char *strip));
 void CancelTimers P(());
 extern void BailOut P((char *s));
+
 #define PINGINTERVAL 60*1000
 #define PINGWINDOW 2
 #define RECONNECTINTERVAL 30

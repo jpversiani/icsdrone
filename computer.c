@@ -350,19 +350,34 @@ Bool EvalDraw(int eval){
   return FALSE;
 }
 
-void PVFeedback(){
+void PVFeedback(move_t move){
     char feedbackBuffer[1024];
+    char moveString[15+1];
+
     if(!appData.feedback && !appData.proxyFeedback) return;
-    snprintf(feedbackBuffer,sizeof(feedbackBuffer)-1,"depth=%d score=%0.2f time=%0.2f node=%d speed=%d pv=%s",
+
+    strncpy(moveString, move, sizeof(moveString)-1);
+    // Prefer to get the first move from pv. But skip anything that doesn't start with a letter
+    for (char *s=pv; *s; s++){
+      if ( isalpha(*s) &&
+          (s==pv || isspace(s[-1]) || s[-1]=='.')) {
+        sscanf(s, "%15s", moveString); // This looks like a move
+        break;
+      }
+    }
+
+    snprintf(feedbackBuffer,sizeof(feedbackBuffer)-1,"%d.%s %s, %+0.2f, %d ply, %0.2f s, %.1f Mnps [%s]",
+              runData.nextMoveNum,
+              runData.computerIsWhite ? "" : "..",
+              moveString,
+              eval_/100.0,
               depth,
-              (eval_+0.0)/100,
-              (time_+0.0)/100,
-              nodes,
-              time_?(int)(100*(nodes+0.0)/time_):0,
+              time_/100.0,
+              time_?(100.0*nodes/time_/1e6):0.0,
               pv);
     feedbackBuffer[sizeof(feedbackBuffer)-1]='\0';
-    if(appData.feedback && appData.feedbackCommand){
-	SendToIcs("%s %s\n",appData.feedbackCommand,feedbackBuffer);
+    if(appData.feedback){
+	SendToIcs("%s %s\n",getFeedbackCommand(),feedbackBuffer);
     }
     if(appData.proxyFeedback){
 	Feedback(PROXY,"\r\n--> icsdrone: %s",feedbackBuffer);
@@ -422,7 +437,7 @@ void ProcessComputerLine(char *line, char *queue)
       runData.engineMovesPlayed++;
       runData.computerIsThinking=FALSE;
       if((appData.feedback || appData.proxyFeedback) && validKibitzSeen){
-	PVFeedback();
+	PVFeedback(move);
       }
       if(appData.resign && validKibitzSeen && eval_<RESIGN_SCORE){
 	resignScoreSeen++;
@@ -539,11 +554,6 @@ void ProcessComputerLine(char *line, char *queue)
 	logme(LOG_DEBUG,"Engine: %s.",runData.myname);
 	SetInterface();
 	SetScoreForWhite();
-	if(persistentData.firsttime){
-	  if(!appData.sendGameStart){
-              SetOption("sendGameStart",LOGIN,0,"%s This is %s", appData.feedbackCommand, runData.myname);
-	  }
-	}
       }
     }
   } else if (!strncmp(line,"1/2-1/2",7)) {
@@ -580,7 +590,7 @@ void ProcessComputerLine(char *line, char *queue)
         if(appData.scoreForWhite && !runData.computerIsWhite)eval_=-eval_;
       validKibitzSeen=1;
       if(time_>=500 && appData.feedback && !appData.feedbackOnlyFinal){
-	PVFeedback();
+	PVFeedback(move);
       }
     }
   }

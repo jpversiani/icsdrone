@@ -293,6 +293,18 @@ void Feedback(int mask,char *format,...){
   }
 }
 
+// Whisper against humans and kibitz against computers, unless specified otherwise
+char *getFeedbackCommand(){
+  if (appData.feedbackCommand){
+    return appData.feedbackCommand;
+  }
+  if (!strcmp(runData.opponentName,runData.isComputer)){
+    return "kibitz";
+  }else{
+    return "whisper";
+  }
+}
+
 void SendOptions(int all, int mask){
       int d;
       ArgTuple *a=argList;	
@@ -720,8 +732,8 @@ void HandleBoard(IcsBoard * icsBoard, char *moveList, Bool ignoreMove){
 	  runData.waitingForFirstBoard=FALSE;
 	  if(strcmp(bmove.move,"none")){
 	      logme(LOG_INFO,"Bookmove: %s score=%d\n",bmove.move,bmove.score);
-	      if(appData.feedback && appData.feedbackCommand){
-		  SendToIcs("%s Bookmove: %s score=%d\n",appData.feedbackCommand,bmove.move,bmove.score); 
+	      if(appData.feedback){
+		  SendToIcs("%s Bookmove: %s score=%d\n",getFeedbackCommand(),bmove.move,bmove.score); 
 	      }
 	      if(appData.proxyFeedback){
 		  Feedback(PROXY,"--> icsdrone: Bookmove: %s score=%d",bmove.move,bmove.score); 
@@ -2076,14 +2088,12 @@ Bool ProcessStartOfGame(char *line){
 	  names[0],ratings[0],names[1],ratings[1],rated,runData.icsVariant,time,inc);
     runData.hideFromProxy=TRUE;
     side = !strcmp(names[1], runData.handle); // 1 when handle matches Black, 0 otherwise
-    if(appData.sendComputerGame && !strcmp(names[!side], runData.isComputer)){
-        ExecCommandList(appData.sendComputerGame,0,FALSE);
-    }
-    if(appData.sendHumanGame && strcmp(names[!side], runData.isComputer)){
-        ExecCommandList(appData.sendHumanGame,0,FALSE);
-    }
+    strcpy(runData.opponentName, names[!side]);
     if(appData.sendGameStart){
         ExecCommandList(appData.sendGameStart,0,FALSE);
+    }
+    if (runData.myname[0]!='\0'){
+        SendToIcs("%s This is %s", getFeedbackCommand(), runData.myname);
     }
     {
         int mask=CONSOLE|SHORTLOG|PROXY;

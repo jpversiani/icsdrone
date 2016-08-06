@@ -224,21 +224,6 @@ Commands to send at login. Multiple commands can be separated by \n.
 
 Commands to send at start of game. Multiple commands can be separated by \n.
 
-=item B<-sendComputerGame> (default: none)
-
-Additional commands to send at start of game when playing a computer.
-Will be sent *before* any sendGameStart commands.
-Typical application is "alias whisper kibitz", so that the opponent
-operator can also see our evaluations during the game.
-Multiple commands can be separated by \n.
-
-=item B<-sendHumanGame> (default: none)
-
-Additional commands to send at start of game when playing a human.
-Will be sent *before* any sendGameStart commands.
-Typical application is "unalias whisper" if that mechanism is used in computer games.
-Multiple commands can be separated by \n.
-
 =item B<-sendGameEnd> 
 
 Commands to send at end of game. Multiple commands can be separated by \n.
