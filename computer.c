@@ -621,8 +621,10 @@ void ProcessComputerLine(char *line, char *queue)
 	     !strncmp(line, "tell", 4))) {
     SendToIcs("%s\n", line);
   } else {
+    int _depth;
     if(sscanf(line,"%d%*[ .+]%d %d %d %254[^\r\n]",
-	      &depth,&eval_,&time_,&nodes,pv)==5){
+	      &_depth,&eval_,&time_,&nodes,pv)==5){
+        depth=_depth; // can be clobbered by false info lines otherwise
         if(appData.scoreForWhite && !runData.computerIsWhite)eval_=-eval_;
       validKibitzSeen=1;
       if(time_>=500 && appData.feedback && !appData.feedbackOnlyFinal){
