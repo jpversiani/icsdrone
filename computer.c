@@ -351,14 +351,16 @@ Bool EvalDraw(int eval){
 }
 
 void PVFeedback(move_t move){
-    char feedbackBuffer[1024];
-    char moveString[15+1];
+    char buffer[1024];
+    int N=sizeof(buffer), ix=0;
+    char moveString[15+1], *s;
 
     if(!appData.feedback && !appData.proxyFeedback) return;
 
     strncpy(moveString, move, sizeof(moveString)-1);
+
     // Prefer to get the first move from pv. But skip anything that doesn't start with a letter
-    for (char *s=pv; *s; s++){
+    for (s=pv; *s!='\0'; s++){
       if ( isalpha(*s) &&
           (s==pv || isspace(s[-1]) || s[-1]=='.')) {
         sscanf(s, "%15s", moveString); // This looks like a move
@@ -366,21 +368,22 @@ void PVFeedback(move_t move){
       }
     }
 
-    snprintf(feedbackBuffer,sizeof(feedbackBuffer)-1,"%d.%s %s, %+0.2f, %d ply, %0.2f s, %.1f Mnps [%s]",
+    ix += snprintf(buffer+ix,N-ix,"%d.%s %s, %+0.2f, %d ply, %0.2f s, ",
               runData.nextMoveNum,
               runData.computerIsWhite ? "" : "..",
               moveString,
               eval_/100.0,
               depth,
-              time_/100.0,
-              time_?(100.0*nodes/time_/1e6):0.0,
-              pv);
-    feedbackBuffer[sizeof(feedbackBuffer)-1]='\0';
+              time_/100.0);
+    double Mnps = time_?(100.0*nodes/time_*1e-6):0.0;
+    ix += snprintf(buffer+ix,N-ix,(Mnps >= 0.995) ? "%1.1lf Mnps" : "%1.2lf Mnps", Mnps);
+    ix += snprintf(buffer+ix,N-ix," [%s]", pv);
+
     if(appData.feedback){
-	SendToIcs("%s %s\n",getFeedbackCommand(),feedbackBuffer);
+	SendToIcs("%s %s\n",getFeedbackCommand(),buffer);
     }
     if(appData.proxyFeedback){
-	Feedback(PROXY,"\r\n--> icsdrone: %s",feedbackBuffer);
+	Feedback(PROXY,"\r\n--> icsdrone: %s",buffer);
     }
 }
 
