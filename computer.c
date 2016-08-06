@@ -350,14 +350,13 @@ Bool EvalDraw(int eval){
   return FALSE;
 }
 
-static int trackLevel(int c, int level)
-{
+static int trackNesting(int c, int nesting){
     static char stack[9];
-    if (level<9 && c=='(') stack[level++]=')';
-    if (level<9 && c=='[') stack[level++]=']';
-    if (level<9 && c=='{') stack[level++]='}';
-    if (level>0 && c==stack[level-1]) level--;
-    return level;
+    if (nesting<9 && c=='(') stack[nesting++]=')';
+    if (nesting<9 && c=='[') stack[nesting++]=']';
+    if (nesting<9 && c=='{') stack[nesting++]='}';
+    if (nesting>0 && c==stack[nesting-1]) nesting--;
+    return nesting;
 }
 
 #define isMoveChar(c) (isalpha(c) || isdigit(c) || c=='-' || c=='=') // Try to be lax
@@ -366,10 +365,10 @@ char *insertMoveNumbersInPV(char *pv,int plyNr){
   static char buffer[256]="", *s;
   int N=sizeof(buffer), ix=0;
   int lastNr=-1;
-  int level=0;
+  int nesting=0;
   for (s=pv; *s!='\0';s++){
-    level=trackLevel(*s,level);
-    if (level==0 && isalnum(*s) && (s==pv || !isMoveChar(s[-1]))){ // Word boundary
+    nesting=trackNesting(*s,nesting);
+    if (nesting==0 && isalnum(*s) && (s==pv || !isMoveChar(s[-1]))){ // Word boundary
       if (isalpha(*s)){ // Next word is a move
         if ((lastNr<plyNr) && (lastNr<0 || (plyNr&1)==0)) {
           ix+=snprintf(buffer+ix,N-ix,"%d.%s ",plyNr>>1,(plyNr&1)?"..":"");
@@ -396,12 +395,12 @@ void PVFeedback(move_t move){
     strncpy(moveString, move, sizeof(moveString)-1); // Fallback in case of empty PV
 
     // Prefer to get the first move from pv. But skip anything that doesn't start with a letter
-    int level=0;
+    int nesting=0;
     for (s=pv; *s!='\0'; s++){
-      level=trackLevel(*s, level);
-      if (level==0 && isalpha(*s) && (s==pv || !isMoveChar(s[-1]))) {
+      nesting=trackNesting(*s, nesting);
+      if (nesting==0 && isalpha(*s) && (s==pv || !isMoveChar(s[-1]))) {
         int n=0;
-        sscanf(s, "%15s %n", moveString, &n); // This looks like our move
+        sscanf(s, "%15[^ .,]%*[ .,]%n", moveString, &n); // Grab move without punctuation, if any
         s += n; // Advance for remainder of PV (see below)
         break;
       }
