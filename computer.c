@@ -351,10 +351,9 @@ Bool EvalDraw(int eval){
 }
 
 // Insert move numbers in the PV where they appear missing
-void insertMoveNumbersInPV(){
-  char buffer[256]="", *s;
+char *insertMoveNumbersInPV(char *pv,int plyNr){
+  static char buffer[256]="", *s;
   int N=sizeof(buffer), ix=0;
-  int plyNr=runData.nextMoveNum * 2 + !runData.computerIsWhite;
   int lastNr=-1;
   for (s=pv; *s!='\0';s++){
     if (isalnum(*s) && (s==pv || !isalnum(s[-1]))){ // Word boundary
@@ -370,13 +369,14 @@ void insertMoveNumbersInPV(){
     if (ix<N-1) buffer[ix++]=*s;
   }
   buffer[ix]='\0';
-  strcpy(pv, buffer);
+  return buffer;
 }
 
 void PVFeedback(move_t move){
     char buffer[1024];
     int N=sizeof(buffer), ix=0;
     char moveString[15+1], *s;
+    int plyNr=runData.nextMoveNum * 2 + !runData.computerIsWhite;
 
     if(!appData.feedback && !appData.proxyFeedback) return;
 
@@ -385,14 +385,16 @@ void PVFeedback(move_t move){
     // Prefer to get the first move from pv. But skip anything that doesn't start with a letter
     for (s=pv; *s!='\0'; s++){
       if (isalpha(*s) && (s==pv || !isalnum(s[-1]))) {
-        sscanf(s, "%15s", moveString); // This looks like a move
+        int n=0;
+        sscanf(s, "%15s %n", moveString, &n); // This looks like a move
+        s += n;
         break;
       }
     }
 
     ix += snprintf(buffer+ix,N-ix,"%d.%s %s",
-              runData.nextMoveNum,
-              runData.computerIsWhite ? "" : "..",
+              plyNr>>1,
+              (plyNr&1)==0 ? "" : "..",
               moveString);
     ix += snprintf(buffer+ix,N-ix,", %+0.2f", eval_/100.0);
     ix += snprintf(buffer+ix,N-ix,", %d ply", depth);
@@ -407,13 +409,14 @@ void PVFeedback(move_t move){
       Feedback(PROXY,"\r\n--> icsdrone: %s",buffer);
     }
 
-    insertMoveNumbersInPV();
-
-    if(appData.feedback){
-	SendToIcs("%s %s\n",getFeedbackCommand(),pv);
-    }
-    if(appData.proxyFeedback){
-	Feedback(PROXY,"\r\n--> icsdrone: %s",pv);
+    if (sscanf(s,"%15s",moveString)==1) { // If there is anything after a first move
+      s=insertMoveNumbersInPV(s, plyNr+1);
+      if(appData.feedback){
+	SendToIcs("%s %s\n",getFeedbackCommand(),s);
+      }
+      if(appData.proxyFeedback){
+	Feedback(PROXY,"\r\n--> icsdrone: %s",s);
+      }
     }
 }
 
