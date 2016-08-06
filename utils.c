@@ -565,7 +565,15 @@ char *SkipParens(char *s)
 {
   if (*s == '(') {
     char *t = strchr(s+1, ')');
-    if (t != NULL) s = t;
+    if (t != NULL) return t;
+  }
+  if (*s == '{') {
+    char *t = strchr(s+1, '}');
+    if (t != NULL) return t;
+  }
+  if (*s == '[') {
+    char *t = strchr(s+1, ']');
+    if (t != NULL) return t;
   }
   return s;
 }
