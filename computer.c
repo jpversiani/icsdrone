@@ -350,14 +350,26 @@ Bool EvalDraw(int eval){
   return FALSE;
 }
 
+static int trackLevel(int c, int level)
+{
+    static char stack[9];
+    if (level<9 && c=='(') stack[level++]=')';
+    if (level<9 && c=='[') stack[level++]=']';
+    if (level<9 && c=='{') stack[level++]='}';
+    if (level>0 && c==stack[level-1]) level--;
+    return level;
+}
+
+#define isMoveChar(c) (isalpha(c) || isdigit(c) || c=='-' || c=='=') // Try to be lax
 // Insert move numbers in the PV where they appear missing
 char *insertMoveNumbersInPV(char *pv,int plyNr){
   static char buffer[256]="", *s;
   int N=sizeof(buffer), ix=0;
   int lastNr=-1;
+  int level=0;
   for (s=pv; *s!='\0';s++){
-    s = SkipParens(s);
-    if (isalnum(*s) && (s==pv || !isalnum(s[-1]))){ // Word boundary
+    level=trackLevel(*s,level);
+    if (level==0 && isalnum(*s) && (s==pv || !isMoveChar(s[-1]))){ // Word boundary
       if (isalpha(*s)){ // Next word is a move
         if ((lastNr<plyNr) && (lastNr<0 || (plyNr&1)==0)) {
           ix+=snprintf(buffer+ix,N-ix,"%d.%s ",plyNr>>1,(plyNr&1)?"..":"");
@@ -381,15 +393,16 @@ void PVFeedback(move_t move){
 
     if(!appData.feedback && !appData.proxyFeedback) return;
 
-    strncpy(moveString, move, sizeof(moveString)-1);
+    strncpy(moveString, move, sizeof(moveString)-1); // Fallback in case of empty PV
 
     // Prefer to get the first move from pv. But skip anything that doesn't start with a letter
+    int level=0;
     for (s=pv; *s!='\0'; s++){
-      s = SkipParens(s);
-      if (isalpha(*s) && (s==pv || !isalnum(s[-1]))) {
+      level=trackLevel(*s, level);
+      if (level==0 && isalpha(*s) && (s==pv || !isMoveChar(s[-1]))) {
         int n=0;
         sscanf(s, "%15s %n", moveString, &n); // This looks like our move
-        s += n;
+        s += n; // Advance for remainder of PV (see below)
         break;
       }
     }

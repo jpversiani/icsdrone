@@ -561,20 +561,3 @@ void* rpl_malloc (size_t n)
  return malloc (n);
 }
 
-char *SkipParens(char *s)
-{
-  if (*s == '(') {
-    char *t = strchr(s+1, ')');
-    if (t != NULL) return t;
-  }
-  if (*s == '{') {
-    char *t = strchr(s+1, '}');
-    if (t != NULL) return t;
-  }
-  if (*s == '[') {
-    char *t = strchr(s+1, ']');
-    if (t != NULL) return t;
-  }
-  return s;
-}
-

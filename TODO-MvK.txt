@@ -1,4 +1,10 @@
 
+Bliep(1695)(C) kibitzes: pv 14... Na4 15. Bd4 O-16. O 16. Ne5 17. Rac8 17. Ndf3 18. Bd5 18. Rac1 19. Ne4 19. Rfd1 20. Rfd8 20. Rxc8 21. Rxc8
+
+- Count things that are moves
+- Insert move numbers if they aren't there yet
+- Don't touch anything else
+
 |Todo| It would be nice to show book move as SAN
 
 |Todo| Rematch earlier computer opponents after 15 minutes of idle time
