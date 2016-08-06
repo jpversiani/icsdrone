@@ -361,6 +361,7 @@ void insertMoveNumbersInPV(){
       if (isalpha(*s)){ // Next word is a move
         if ((lastNr<plyNr) && (lastNr<0 || (plyNr&1)==0)) {
           ix+=snprintf(buffer+ix,N-ix,"%d.%s",plyNr>>1,(plyNr&1)?"..":"");
+          lastNr=plyNr;
         }
         plyNr++;
       } else // Next word is a move number
