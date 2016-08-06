@@ -360,7 +360,7 @@ void insertMoveNumbersInPV(){
     if (isalnum(*s) && (s==pv || !isalnum(s[-1]))){ // Word boundary
       if (isalpha(*s)){ // Next word is a move
         if ((lastNr<plyNr) && (lastNr<0 || (plyNr&1)==0)) {
-          ix+=snprintf(buffer+ix,N-ix,"%d.%s ",plyNr>>1,(plyNr&1)?"..":"");
+          ix+=snprintf(buffer+ix,N-ix,"%d.%s",plyNr>>1,(plyNr&1)?"..":"");
         }
         plyNr++;
       } else // Next word is a move number
