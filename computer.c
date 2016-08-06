@@ -541,7 +541,7 @@ void ProcessComputerLine(char *line, char *queue)
 	SetScoreForWhite();
 	if(persistentData.firsttime){
 	  if(!appData.sendGameStart){
-        SetOption("sendGameStart",LOGIN,0,"%s This is %s", appData.feedbackCommand, runData.myname);
+              SetOption("sendGameStart",LOGIN,0,"%s This is %s", appData.feedbackCommand, runData.myname);
 	  }
 	}
       }

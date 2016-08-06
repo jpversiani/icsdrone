@@ -86,6 +86,7 @@ void InitRunData(){
   runData.sigint=FALSE;
   runData.computerReady=FALSE;
   runData.lastPlayer[0]='\0';
+  runData.isComputer[0]='\0';
   runData.numGamesInSeries=0;
   runData.timeOfLastGame=0;
   runData.loginCount=0;
@@ -182,6 +183,8 @@ AppData appData = {
     FALSE,           /* haveCmnPing */
     NULL,            /* loginScript */
     FALSE,           /* issueRematch */
+    NULL,            /* sendComputerGame */
+    NULL,            /* sendHumanGame */
     NULL,            /* sendGameStart */
     NULL,            /* acceptOnly */
     NULL,            /* timeseal */
@@ -644,8 +647,6 @@ void Daemonize(){
       close (fd);
   }
 }
-
-
 
 int main(int argc, char *argv[]) 
 {

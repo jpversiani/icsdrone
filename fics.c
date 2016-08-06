@@ -1492,9 +1492,10 @@ Bool ProcessIncomingMatches(char *line){
   static int win;
   static int draw;
   static int loss;
-  static int computer;
   static int parsingIncoming=FALSE; 
   char *line1;
+  char isComputer[30+1];
+  char dummy;
   int ret;
   value_t value[1];
 
@@ -1505,7 +1506,6 @@ Bool ProcessIncomingMatches(char *line){
       win=0;
       draw=0;
       loss=0;
-      computer=FALSE;
   }
   /*
    *  Accept incoming matches
@@ -1594,6 +1594,15 @@ Bool ProcessIncomingMatches(char *line){
 
     return TRUE;
   }
+
+  // Always recognize computers. Not just in "Challenging:", but also "Issuing:"
+  // (for example after a manual match or rematch command from operator)
+  if (sscanf(line, "--** %30s is a computer%c", isComputer, &dummy)==2 ||
+      sscanf(line, "%30s is in the computer lis%c", isComputer, &dummy)==2 /*ICC*/) {
+     strcpy(runData.isComputer, isComputer);
+     return TRUE;
+  }
+
   if(parsingIncoming){
       switch(runData.icsType){
       case ICS_ICC:
@@ -1608,10 +1617,6 @@ Bool ProcessIncomingMatches(char *line){
 			     &win,&draw,&loss)==3){
 	      return TRUE;
 	  }
-      }
-      if(strstr(line,"computer")){
-	  computer=TRUE;
-	  return TRUE;
       }
       if(strstr(line,"accept") && strstr(line,"decline")){
 	  parsingIncoming=FALSE;
@@ -1630,7 +1635,7 @@ Bool ProcessIncomingMatches(char *line){
 			      win,
 			      draw,
 			      loss,
-			      computer);
+			      !strcmp(name, runData.isComputer));
 	      logme(LOG_DEBUG,"Executing matchFilter command: \"%s\"",appData.matchFilter);
 	      ret=eval(value,"%s",appData.matchFilter);
 	      logme(LOG_DEBUG,"Error code=%d\n",ret);
@@ -2035,7 +2040,8 @@ Bool ProcessFlaggedOpponent(char *line){
 }
 
 Bool ProcessStartOfGame(char *line){
-  char name[30+1],name2[30+1],rating[30+1],rating2[30+1];
+  char names[2][30+1], ratings[2][30+1];
+  int side;
   char rated[30+1];
   char color[30+1];
   int time, inc;
@@ -2046,29 +2052,36 @@ Bool ProcessStartOfGame(char *line){
    */
   if ((sscanf(line, 
 	     "Creating: %30s (%30[^)]) %30s (%30[^)]) %30s %30s %d %d", 
-	     name, 
-	     rating, 
-	     name2, 
-	     rating2, 
+	     names[0],
+	     ratings[0],
+	     names[1],
+	     ratings[1],
 	     rated, 
 	     runData.icsVariant, 
 	     &time, 
 	     &inc) == 8)
    || (sscanf(line, 
 	     "Creating: %30s (%30[^)]) [%30[^]]] %30s (%30[^)]) %30s %30s %d %d", 
-	     name, 
-	     rating, 
+	     names[0],
+	     ratings[0],
 	     color, 
-	     name2, 
-	     rating2, 
+	     names[1],
+	     ratings[1],
 	     rated, 
 	     runData.icsVariant, 
 	     &time, 
 	     &inc) == 9)
    ) {
     logme(LOG_DEBUG, "Detected start of game: [%s] (%s) vs [%s] (%s) [%s] [%s] %d %d", 
-	  name, rating, name2, rating2,rated,runData.icsVariant,time,inc);
+	  names[0],ratings[0],names[1],ratings[1],rated,runData.icsVariant,time,inc);
     runData.hideFromProxy=TRUE;
+    side = !strcmp(names[1], runData.handle); // 1 when handle matches Black, 0 otherwise
+    if(appData.sendComputerGame && !strcmp(names[!side], runData.isComputer)){
+        ExecCommandList(appData.sendComputerGame,0,FALSE);
+    }
+    if(appData.sendHumanGame && strcmp(names[!side], runData.isComputer)){
+        ExecCommandList(appData.sendHumanGame,0,FALSE);
+    }
     if(appData.sendGameStart){
         ExecCommandList(appData.sendGameStart,0,FALSE);
     }
@@ -2079,21 +2092,22 @@ Bool ProcessStartOfGame(char *line){
         }
         if(!runData.inTourney){
             Feedback(mask,"%s %s vs %s %s %s %s %d %d started.", 
-                     name, rating, name2, rating2,rated,runData.icsVariant,time,inc);
+                     names[0],ratings[0],names[1],ratings[1],rated,runData.icsVariant,time,inc);
         }else{
             Feedback(mask,
                      "%s %s vs %s %s %s %s %d %d started (tourney #%d).", 
-                     name, rating, name2, rating2,rated,runData.icsVariant,time,inc,
+                     names[0],ratings[0],names[1],ratings[1],rated,runData.icsVariant,time,inc,
                      runData.currentTourney);
         }
     }
     /* update our state */
     runData.inGame=TRUE;
     /* send opponent name and ratings to computer */
-    if (!strcmp(name, runData.handle)) {
-	SendToComputer("name %s\n", name2);
-	SendToComputer("rating %d %d\n", atoi(rating), atoi(rating2));
+    SendToComputer("name %s\n", names[!side]);
+    if (!strcmp(names[!side], runData.isComputer)){
+        SendToComputer("computer\n"); // Some engines alter their playing style when they receive this command.
     }
+    SendToComputer("rating %d %d\n", atoi(ratings[side]), atoi(ratings[!side]));
     /* send variant to computer */
     strcpy(runData.chessVariant,"normal");
     runData.noCastle=FALSE;
@@ -2124,10 +2138,6 @@ Bool ProcessStartOfGame(char *line){
     }
     logme(LOG_DEBUG,"Chess variant is now set to \"%s\"",runData.chessVariant);
     runData.useMoveList=UseMoveList();
-    if (!strcmp(name2, runData.handle)) {
-	SendToComputer("name %s\n", name);
-	SendToComputer("rating %d %d\n", atoi(rating2), atoi(rating));
-    }
     if(runData.useMoveList){
 	/* reset movelist and ask for the moves */
 	runData.moveList[0] = '\0';

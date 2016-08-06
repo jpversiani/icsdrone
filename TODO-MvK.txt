@@ -1,13 +1,32 @@
 
 |Todo| rematch earlier computer opponents after 15 minutes of idle time
 
+|Todo| blik functions...
+
 |Todo| kibitz against computers, whisper against humans
 
-|Todo| blik functions…
+Introduce -sendComputerGame and -sendHumanGame options for that.
 
 |Todo| readable engine output
 
+This comes out of polyglot. Better fix it there.
+
 |Todo| instructions for building
+
+Linux
+-----
+automake --add-missing
+./autogen.sh
+./configure
+make
+
+OSX
+--
+automake --add-missing
+./autogen.sh
+./configure -with-readline=no # OSX aliases editline as readline, but it is not compatible
+make
+--
 
 """configure en Makefile.in zijn gegegeneerde files (uit configure.ac
 en Makefile.am). Dus die zitten niet in git. Normaal zouden ze
