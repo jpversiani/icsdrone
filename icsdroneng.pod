@@ -247,7 +247,8 @@ offer from the same opponent. 0 means disable.
 
 =item B<-issueRematch> (default: "off")
 
-Send "rematch" at end of the game.
+Send "rematch" at end of the game. If the last opponent was a computer,
+repeat after every 15 minutes of idle time.
 
 =item B<-acceptOnly> 
 

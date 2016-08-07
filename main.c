@@ -113,6 +113,7 @@ void InitRunData(){
   runData.abortTimer=NULL;
   runData.flagTimer=NULL;
   runData.courtesyAdjournTimer=NULL;
+  runData.rematchIdleComputerTimer=NULL;
   runData.pingTimer=NULL;
   runData.clearStateTimer=NULL;
   runData.timestring=NULL;

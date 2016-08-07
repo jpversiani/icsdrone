@@ -71,12 +71,41 @@ void InternalIcsCommand(char *command){
     SendMarker(STOPINTERNAL);
 }
 
+Bool InList(char *list, char *item){
+        /*
+         * Hacky code. Wait for proper string handling.
+         */
+    char *p;
+    Bool match=TRUE;
+    char *delimiters=" ,";
+    if((p=strstr(list,item))){
+        if((p>list) && (!strchr(delimiters,*(p-1)))){
+            match=FALSE;
+        }else if((p+strlen(item)<list+strlen(list))&&
+                 (!strchr(delimiters,*(p+strlen(item))))){
+            match=FALSE;
+        }
+    }else{
+        match=FALSE;
+    }
+    return match;
+}
+
+Bool IsNoPlay(char *s){
+    if(appData.noplay){
+        return InList(appData.noplay,s);
+    }else{
+        return FALSE;
+    }
+}
+
 void CancelTimers(){
   delete_timer(&runData.idleTimeoutTimer);
   delete_timer(&runData.findChallengeTimer);
   delete_timer(&runData.flagTimer);
   delete_timer(&runData.abortTimer);
   delete_timer(&runData.courtesyAdjournTimer);
+  delete_timer(&runData.rematchIdleComputerTimer);
 }
 
 void HandleTellQueue(void *s){
@@ -111,6 +140,17 @@ void IdleTimeout(void *data)
                  IdleTimeout,NULL);
 }
 
+/* For rematching our last computer opponent after each x minutes of idle time */
+void RematchIdleComputer(void *data)
+{
+    if (!IsNoPlay(runData.lastPlayer)){
+      SendToIcs("rematch\n");
+      create_timer(&runData.rematchIdleComputerTimer,
+                   REMATCHIDLECOMPUTERTIMEOUT,
+                   RematchIdleComputer,NULL);
+   }
+}
+
 /* For limitRematches code */
 void FindChallenge(void *data){
     
@@ -124,6 +164,14 @@ void FindChallenge(void *data){
 	create_timer(&(runData.idleTimeoutTimer),IDLETIMEOUT,
 		     IdleTimeout,
 		     NULL);
+      }
+      /* Be more persistent in issueing rematch if the last opponent is a computer */
+      if (appData.issueRematch &&
+          !strcmp(runData.lastPlayer, runData.isComputer) &&
+          !runData.lastGameWasAbortOrAdjourn){
+            create_timer(&runData.rematchIdleComputerTimer,
+                 REMATCHIDLECOMPUTERTIMEOUT,
+                 RematchIdleComputer,NULL);
       }
     }
 }
@@ -616,34 +664,6 @@ void ExecCommandList(char * command, int mask, int inhibitSet){
         }
     }
     free(command_cc);
-}
-
-Bool InList(char *list, char *item){
-        /*
-         * Hacky code. Wait for proper string handling.
-         */
-    char *p;
-    Bool match=TRUE;
-    char *delimiters=" ,";
-    if((p=strstr(list,item))){
-        if((p>list) && (!strchr(delimiters,*(p-1)))){
-            match=FALSE;
-        }else if((p+strlen(item)<list+strlen(list))&&
-                 (!strchr(delimiters,*(p+strlen(item))))){
-            match=FALSE;
-        }
-    }else{
-        match=FALSE;
-    }
-    return match;
-}
-
-Bool IsNoPlay(char *s){
-    if(appData.noplay){
-        return InList(appData.noplay,s);
-    }else{
-        return FALSE;
-    }
 }
 
 void ClearState(void *data){

@@ -236,6 +236,7 @@ typedef struct {
   event_t abortTimer;
   event_t flagTimer;
   event_t courtesyAdjournTimer;
+  event_t rematchIdleComputerTimer;
   event_t pingTimer;
   event_t clearStateTimer;  
   char *timestring;
@@ -444,6 +445,7 @@ extern void BailOut P((char *s));
 #define IDLETIMEOUT 600*1000
 #define ABORTTIMEOUT 60*1000
 #define FINDCHALLENGETIMEOUT 60*1000
+#define REMATCHIDLECOMPUTERTIMEOUT 15*60*1000
 #define CLEARSTATETIMEOUT    10*1000
 
 /*
