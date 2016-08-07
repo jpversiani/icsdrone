@@ -18,9 +18,10 @@ struct event_list_entry{
 
 static event_list_t event_list=NULL;
 
-event_t new_event(struct timeval time, void (*handler)(void *data), void *data){
+event_t new_event(const char *name, struct timeval time, void (*handler)(void *data), void *data){
     event_t event;
     event=(event_t) malloc(sizeof *event);
+    event->name=name;
     event->time=time;
     event->handler=handler;
     event->data=data;
@@ -115,7 +116,8 @@ void remove_event(event_t event){
 
 
 
-void create_timer(event_t *timer, 
+void create_timer(const char *name, /* for debugging, should a static string */
+                 event_t *timer,
                   int time, /* in msec */
                   void (*handler)(void *), 
                   void *data){
@@ -127,16 +129,17 @@ void create_timer(event_t *timer,
         delete_timer(timer);
     }
     gettimeofday(&tv,NULL);
-    event=new_event(time_add(tv,time),handler,data);
+    logme(LOG_DEBUG,"Creating timer: %s", name);
+    event=new_event(name,time_add(tv,time),handler,data);
     insert_event(event);
     *timer=event;
 }
 
 void delete_timer(event_t *timer){
     if(!(*timer)){
-      logme(LOG_DEBUG,"Deleting NULL timer. Ignoring.");
       return;
     }
+    logme(LOG_DEBUG,"Deleting timer: %s", (*timer)->name);
     remove_event(*timer);
     free(*timer);
     *timer=NULL;

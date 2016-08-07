@@ -115,7 +115,7 @@ void HandleTellQueue(void *s){
         *p='\0';
         SendToIcs("%s\n",runData.tellQueue);
         memmove(runData.tellQueue,p+1,strlen(p+1)+1);
-        create_timer(&(runData.tellTimer),2000,HandleTellQueue,NULL);
+        create_timer("HandleTellQueue",&runData.tellTimer,2000,HandleTellQueue,NULL);
     }else{
         logme(LOG_DEBUG,"No tells left. Stopping tell timer.");
         delete_timer(&runData.tellTimer);
@@ -135,7 +135,7 @@ void IdleTimeout(void *data)
         free(p);
     }
     CancelTimers();
-    create_timer(&(runData.idleTimeoutTimer),
+    create_timer("IdleTimeout",&runData.idleTimeoutTimer,
                  IDLETIMEOUT,
                  IdleTimeout,NULL);
 }
@@ -145,7 +145,7 @@ void RematchIdleComputer(void *data)
 {
     if (!IsNoPlay(runData.lastPlayer)){
       SendToIcs("rematch\n");
-      create_timer(&runData.rematchIdleComputerTimer,
+      create_timer("RematchIdleComputer",&runData.rematchIdleComputerTimer,
                    REMATCHIDLECOMPUTERTIMEOUT,
                    RematchIdleComputer,NULL);
    }
@@ -161,15 +161,18 @@ void FindChallenge(void *data){
     if(!runData.inGame && !runData.inTourney){ /* for safety */
       if (appData.sendTimeout) {
 	CancelTimers();
-	create_timer(&(runData.idleTimeoutTimer),IDLETIMEOUT,
+	create_timer("IdleTimeout",&runData.idleTimeoutTimer,IDLETIMEOUT,
 		     IdleTimeout,
 		     NULL);
       }
       /* Be more persistent in issueing rematch if the last opponent is a computer */
+      logme(LOG_DEBUG,"appData.issueRematch %d\n", appData.issueRematch);
+      logme(LOG_DEBUG,"runData.lastPlayer '%s'\n", runData.lastPlayer);
+      logme(LOG_DEBUG,"runData.isComputer '%s'\n", runData.isComputer);
       if (appData.issueRematch &&
           !strcmp(runData.lastPlayer, runData.isComputer) &&
           !runData.lastGameWasAbortOrAdjourn){
-            create_timer(&runData.rematchIdleComputerTimer,
+            create_timer("RematchIdleComputer",&runData.rematchIdleComputerTimer,
                  REMATCHIDLECOMPUTERTIMEOUT,
                  RematchIdleComputer,NULL);
       }
@@ -283,7 +286,7 @@ void Feedback(int mask,char *format,...){
             }
             if(!runData.tellTimer){
                 logme(LOG_DEBUG,"Tell timer is not running. Starting it.");
-                create_timer(&(runData.tellTimer),2000,HandleTellQueue,NULL);
+                create_timer("HandleTellQueue",&runData.tellTimer,2000,HandleTellQueue,NULL);
             }
         }
     } else {
@@ -680,7 +683,7 @@ void GetTourney(){
      (!appData.acceptOnly || appData.acceptOnly[0]=='\0')){
       runData.parsingListTourneys=TRUE;
       SendToIcs("td ListTourneys -j\n");
-      create_timer(&(runData.clearStateTimer),
+      create_timer("ClearState",&runData.clearStateTimer,
 		  CLEARSTATETIMEOUT,
 		  ClearState,
 		  NULL);  
@@ -703,7 +706,7 @@ void HandleBoard(IcsBoard * icsBoard, char *moveList, Bool ignoreMove){
     logme(LOG_INFO,"Setting up automatic abort in 60 seconds.");
     CancelTimers();
     if(!runData.inTourney){
-      create_timer(&(runData.abortTimer),ABORTTIMEOUT,Abort,NULL);
+      create_timer("Abort",&runData.abortTimer,ABORTTIMEOUT,Abort,NULL);
     }else{
       logme(LOG_DEBUG,"Not setting up abort timer as we are in a tourney.");
     }
@@ -717,7 +720,7 @@ void HandleBoard(IcsBoard * icsBoard, char *moveList, Bool ignoreMove){
     } else {
       logme(LOG_INFO,"Setting up flag in %d seconds.", flagtime+1);
       CancelTimers();
-      create_timer(&(runData.flagTimer),(flagtime+1)*1000,Flag,NULL);
+      create_timer("Flag",&runData.flagTimer,(flagtime+1)*1000,Flag,NULL);
     }
   }
   if(moveList){
@@ -1097,7 +1100,7 @@ Bool ProcessLogin(char *line){
     Feedback(CONSOLE|OWNER|SHORTLOG|PROXY,"%s logged in.",runData.handle);
     CancelTimers();
     if (appData.sendTimeout) {
-      create_timer(&(runData.idleTimeoutTimer),
+      create_timer("IdleTimeout",&runData.idleTimeoutTimer,
 		   IDLETIMEOUT,
 		   IdleTimeout,
 		   NULL);
@@ -1623,7 +1626,7 @@ Bool ProcessIncomingMatches(char *line){
 	time(0) - runData.timeOfLastGame < 60) {
       SendToIcs("tell %s You have played me %d times in a row;  I'll wait a minute for other players to get a chance to challenge me before I accept your challenge.\n", name, runData.numGamesInSeries);
       CancelTimers();
-      create_timer(&(runData.findChallengeTimer),FINDCHALLENGETIMEOUT,FindChallenge,NULL);
+      create_timer("FindChallange",&runData.findChallengeTimer,FINDCHALLENGETIMEOUT,FindChallenge,NULL);
       parsingIncoming=FALSE;
       return TRUE;
     } 
@@ -1958,7 +1961,7 @@ Bool ProcessTourneyNotifications(char *line){
     if(!runData.inGame){  /* for safety */
       CancelTimers();
       if (appData.sendTimeout) {
-          create_timer(&(runData.idleTimeoutTimer),
+          create_timer("IdleTimeout",&runData.idleTimeoutTimer,
 		     IDLETIMEOUT,
 		     IdleTimeout,
 		     NULL);
@@ -2066,7 +2069,7 @@ Bool ProcessFlaggedOpponent(char *line){
   if (!strncasecmp(line, "Opponent is not out of time.", 28) || 
      !strncasecmp(line,  "Your opponent is not out of time.",33)) {
     CancelTimers();
-    create_timer(&(runData.courtesyAdjournTimer),
+    create_timer("CourtesyAdjourn",&runData.courtesyAdjournTimer,
                  COURTESYADJOURNINTERVAL,
                  CourtesyAdjourn,
                  NULL);
@@ -2660,7 +2663,7 @@ Bool ProcessCleanUps(char *line){
 	if(!runData.inGame && !runData.inTourney){ /* for safety */
 	  CancelTimers();
 	  if (appData.sendTimeout) {
-	    create_timer(&(runData.idleTimeoutTimer),
+	    create_timer("IdleTimeout",&runData.idleTimeoutTimer,
 			 IDLETIMEOUT,
 			 IdleTimeout,
 			 NULL);

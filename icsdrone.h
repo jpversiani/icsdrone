@@ -135,6 +135,7 @@ typedef enum {ICS_ICC, ICS_FICS, ICS_VARIANT, ICS_GENERIC} IcsType;
 typedef struct event *event_t;
 
 struct event {
+  const char *name; /* for debugging, should be a static string */
   struct timeval time;
   void *data;
   void (*handler)(void *data);
@@ -358,7 +359,8 @@ extern AppData         appData;
  * Scheduling
  */
 
-void create_timer P((event_t *timer,
+void create_timer P((const char *name, /* for debugging, should be a static string */
+                     event_t *timer,
                      int time, 
                      void (*handler)(void *), 
                      void *data));

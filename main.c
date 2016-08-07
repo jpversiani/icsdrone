@@ -617,7 +617,7 @@ void SendPing(void *data){
   if(runData.pingCounter>=PINGWINDOW){
     ExitOn(EXIT_QUITRESTART,"Too many pings missed.");
   }
-  create_timer(&(runData.pingTimer),PINGINTERVAL,SendPing,NULL);
+  create_timer("SendPing",&runData.pingTimer,PINGINTERVAL,SendPing,NULL);
 }
 
 void Daemonize(){
@@ -691,7 +691,7 @@ int main(int argc, char *argv[])
                 setupterm((char *)0, 1, (int *)0);
 #endif
                 srandom(time(NULL));
-                create_timer(&(runData.pingTimer),PINGINTERVAL,SendPing,NULL);
+                create_timer("SendPing",&runData.pingTimer,PINGINTERVAL,SendPing,NULL);
                     /* this code must be cleaned up */
                 if(appData.loginScript){
                     fp = fopen(appData.loginScript, "r");

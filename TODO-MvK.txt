@@ -1,4 +1,11 @@
 
+|Todo| Clang warning
+
+main.c:783:29: warning: address of array 'runData.passwd' will always evaluate to 'true'
+      [-Wpointer-bool-conversion]
+                if(!runData.passwd || runData.passwd[0]=='\0'){
+                   ~~~~~~~~~^~~~~~
+
 |Todo| Rematch earlier computer opponents after 15 minutes of idle time
 
 |Todo| Instructions for building
