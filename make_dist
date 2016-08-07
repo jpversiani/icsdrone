@@ -1,4 +1,4 @@
-VERSION=0.29x
+VERSION=0.29-mvk
 NAME=icsdroneng
 # VERSION appears in
 # configure.ac
