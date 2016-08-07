@@ -134,7 +134,7 @@ void IdleTimeout(void *data)
         free(p);
     }
     if (appData.issueRematch &&
-        !runData.lastGameWasInTourney
+        !runData.lastGameWasInTourney &&
         !strcmp(runData.lastPlayer, runData.lastComputer) &&
         !IsNoPlay(runData.lastPlayer)){
       SendToIcs("rematch\n");
