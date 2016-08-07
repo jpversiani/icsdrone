@@ -209,7 +209,7 @@ typedef struct {
   Bool sigint;
   Bool computerReady;
   char lastPlayer[30+1];
-  char isComputer[30+1];
+  char lastComputer[30+1];
   int  numGamesInSeries;
   time_t timeOfLastGame;
   int loginCount;

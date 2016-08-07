@@ -124,12 +124,10 @@ void create_timer(const char *name, /* for debugging, should a static string */
     event_t event;
     struct timeval tv;
     if(*timer){
-        logme(LOG_DEBUG,"Creating timer over non-NULL pointer."
-              "Calling \"delete_timer\".");
         delete_timer(timer);
     }
     gettimeofday(&tv,NULL);
-    logme(LOG_DEBUG,"Creating timer: %s", name);
+    logme(LOG_DEBUG,"Creating timer: %s T+%0.3fs", name, time*1e-3);
     event=new_event(name,time_add(tv,time),handler,data);
     insert_event(event);
     *timer=event;

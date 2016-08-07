@@ -86,7 +86,7 @@ void InitRunData(){
   runData.sigint=FALSE;
   runData.computerReady=FALSE;
   runData.lastPlayer[0]='\0';
-  runData.isComputer[0]='\0';
+  runData.lastComputer[0]='\0';
   runData.numGamesInSeries=0;
   runData.timeOfLastGame=0;
   runData.loginCount=0;

@@ -134,7 +134,6 @@ void IdleTimeout(void *data)
         SendToIcs("%s\n",p);
         free(p);
     }
-    CancelTimers();
     create_timer("IdleTimeout",&runData.idleTimeoutTimer,
                  IDLETIMEOUT,
                  IdleTimeout,NULL);
@@ -160,21 +159,9 @@ void FindChallenge(void *data){
     /* In case there are no pendings left, we'll want to have the timeout handler setup */
     if(!runData.inGame && !runData.inTourney){ /* for safety */
       if (appData.sendTimeout) {
-	CancelTimers();
 	create_timer("IdleTimeout",&runData.idleTimeoutTimer,IDLETIMEOUT,
 		     IdleTimeout,
 		     NULL);
-      }
-      /* Be more persistent in issueing rematch if the last opponent is a computer */
-      logme(LOG_DEBUG,"appData.issueRematch %d\n", appData.issueRematch);
-      logme(LOG_DEBUG,"runData.lastPlayer '%s'\n", runData.lastPlayer);
-      logme(LOG_DEBUG,"runData.isComputer '%s'\n", runData.isComputer);
-      if (appData.issueRematch &&
-          !strcmp(runData.lastPlayer, runData.isComputer) &&
-          !runData.lastGameWasAbortOrAdjourn){
-            create_timer("RematchIdleComputer",&runData.rematchIdleComputerTimer,
-                 REMATCHIDLECOMPUTERTIMEOUT,
-                 RematchIdleComputer,NULL);
       }
     }
 }
@@ -349,7 +336,7 @@ char *getFeedbackCommand(){
   if (appData.feedbackCommand){
     return appData.feedbackCommand;
   }
-  if (!strcmp(runData.opponentName,runData.isComputer)){
+  if (!strcmp(runData.opponentName,runData.lastComputer)){
     return "kibitz";
   }else{
     return "whisper";
@@ -1625,7 +1612,6 @@ Bool ProcessIncomingMatches(char *line){
 	runData.numGamesInSeries > appData.limitRematches &&
 	time(0) - runData.timeOfLastGame < 60) {
       SendToIcs("tell %s You have played me %d times in a row;  I'll wait a minute for other players to get a chance to challenge me before I accept your challenge.\n", name, runData.numGamesInSeries);
-      CancelTimers();
       create_timer("FindChallange",&runData.findChallengeTimer,FINDCHALLENGETIMEOUT,FindChallenge,NULL);
       parsingIncoming=FALSE;
       return TRUE;
@@ -1640,7 +1626,7 @@ Bool ProcessIncomingMatches(char *line){
   // (for example after a manual match or rematch command from operator)
   if (sscanf(line, "--** %30s is a computer%c", isComputer, &dummy)==2 ||
       sscanf(line, "%30s is in the computer lis%c", isComputer, &dummy)==2 /*ICC*/) {
-     strcpy(runData.isComputer, isComputer);
+     strcpy(runData.lastComputer, isComputer);
      return TRUE;
   }
 
@@ -1676,7 +1662,7 @@ Bool ProcessIncomingMatches(char *line){
 			      win,
 			      draw,
 			      loss,
-			      !strcmp(name, runData.isComputer));
+			      !strcmp(name, runData.lastComputer));
 	      logme(LOG_DEBUG,"Executing matchFilter command: \"%s\"",appData.matchFilter);
 	      ret=eval(value,"%s",appData.matchFilter);
 	      logme(LOG_DEBUG,"Error code=%d\n",ret);
@@ -1995,7 +1981,6 @@ Bool ProcessTourneyNotifications(char *line){
   /* Last line of result of "td ListTourneys -j" */
   if(runData.parsingListTourneys && !strncmp(line,":Listed:",8)){
     runData.parsingListTourneys=FALSE;
-    logme(LOG_DEBUG,"Deleting clearStateTimer.");
     delete_timer(&(runData.clearStateTimer));
     hideFromProxy=FALSE;
     runData.hideFromProxy=TRUE;
@@ -2143,7 +2128,7 @@ Bool ProcessStartOfGame(char *line){
     runData.inGame=TRUE;
     /* send opponent name and ratings to computer */
     SendToComputer("name %s\n", names[!side]);
-    if (!strcmp(names[!side], runData.isComputer)){
+    if (!strcmp(names[!side], runData.lastComputer)){
         SendToComputer("computer\n"); // Some engines alter their playing style when they receive this command.
     }
     SendToComputer("rating %d %d\n", atoi(ratings[side]), atoi(ratings[!side]));
@@ -2651,15 +2636,7 @@ Bool ProcessCleanUps(char *line){
 					       runData.lastPlayer)) &&
 	  (!appData.limitRematches || 
 	   (runData.numGamesInSeries <= appData.limitRematches))){
-              /*
-               * A rematch after an aborted game is directed to some
-               * earlier player which might be on our no play list.
-               */
-        if(!IsNoPlay(runData.lastPlayer) && !runData.lastGameWasAbortOrAdjourn){
-          SendToIcs("rematch\n");
-        }else{
-           logme(LOG_DEBUG,"No rematch. Last player is on our noplay list");
-        }
+
 	if(!runData.inGame && !runData.inTourney){ /* for safety */
 	  CancelTimers();
 	  if (appData.sendTimeout) {
@@ -2669,6 +2646,23 @@ Bool ProcessCleanUps(char *line){
 			 NULL);
 	  } 
 	}
+        /*
+         * A rematch after an aborted game is directed to some
+         * earlier player which might be on our no play list.
+         */
+        if(IsNoPlay(runData.lastPlayer)){
+           logme(LOG_DEBUG,"No rematch. Last player is on our noplay list");
+        }else if (runData.lastGameWasAbortOrAdjourn){
+           logme(LOG_DEBUG,"No rematch. Last game was aborted or adjourend");
+        }else{
+          SendToIcs("rematch\n");
+          /* Be more persistent when rematching a computer */
+          if (!strcmp(runData.lastPlayer, runData.lastComputer)){
+                create_timer("RematchIdleComputer",&runData.rematchIdleComputerTimer,
+                     REMATCHIDLECOMPUTERTIMEOUT,
+                     RematchIdleComputer,NULL);
+          }
+        }
       }
     }else{
       runData.numGamesInSeries=0;
