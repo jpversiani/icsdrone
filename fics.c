@@ -105,7 +105,6 @@ void CancelTimers(){
   delete_timer(&runData.flagTimer);
   delete_timer(&runData.abortTimer);
   delete_timer(&runData.courtesyAdjournTimer);
-  delete_timer(&runData.rematchIdleComputerTimer);
 }
 
 void HandleTellQueue(void *s){
@@ -134,20 +133,15 @@ void IdleTimeout(void *data)
         SendToIcs("%s\n",p);
         free(p);
     }
+    if (appData.issueRematch &&
+        !runData.lastGameWasInTourney
+        !strcmp(runData.lastPlayer, runData.lastComputer) &&
+        !IsNoPlay(runData.lastPlayer)){
+      SendToIcs("rematch\n");
+    }
     create_timer("IdleTimeout",&runData.idleTimeoutTimer,
                  IDLETIMEOUT,
                  IdleTimeout,NULL);
-}
-
-/* For rematching our last computer opponent after each x minutes of idle time */
-void RematchIdleComputer(void *data)
-{
-    if (!IsNoPlay(runData.lastPlayer)){
-      SendToIcs("rematch\n");
-      create_timer("RematchIdleComputer",&runData.rematchIdleComputerTimer,
-                   REMATCHIDLECOMPUTERTIMEOUT,
-                   RematchIdleComputer,NULL);
-   }
 }
 
 /* For limitRematches code */
@@ -2637,15 +2631,6 @@ Bool ProcessCleanUps(char *line){
 	  (!appData.limitRematches || 
 	   (runData.numGamesInSeries <= appData.limitRematches))){
 
-	if(!runData.inGame && !runData.inTourney){ /* for safety */
-	  CancelTimers();
-	  if (appData.sendTimeout) {
-	    create_timer("IdleTimeout",&runData.idleTimeoutTimer,
-			 IDLETIMEOUT,
-			 IdleTimeout,
-			 NULL);
-	  } 
-	}
         /*
          * A rematch after an aborted game is directed to some
          * earlier player which might be on our no play list.
@@ -2656,13 +2641,16 @@ Bool ProcessCleanUps(char *line){
            logme(LOG_DEBUG,"No rematch. Last game was aborted or adjourend");
         }else{
           SendToIcs("rematch\n");
-          /* Be more persistent when rematching a computer */
-          if (!strcmp(runData.lastPlayer, runData.lastComputer)){
-                create_timer("RematchIdleComputer",&runData.rematchIdleComputerTimer,
-                     REMATCHIDLECOMPUTERTIMEOUT,
-                     RematchIdleComputer,NULL);
-          }
         }
+	if(!runData.inGame && !runData.inTourney){ /* for safety */
+	  CancelTimers();
+	  if (appData.sendTimeout) {
+	    create_timer("IdleTimeout",&runData.idleTimeoutTimer,
+			 IDLETIMEOUT,
+			 IdleTimeout,
+			 NULL);
+	  } 
+	}
       }
     }else{
       runData.numGamesInSeries=0;
