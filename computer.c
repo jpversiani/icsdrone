@@ -412,9 +412,11 @@ void PVFeedback(move_t move){
               moveString);
     ix += snprintf(buffer+ix,N-ix,", %+0.2f", eval_/100.0);
     ix += snprintf(buffer+ix,N-ix,", %d ply", depth);
-    double Mnps = time_?(100.0*nodes/time_*1e-6):0.0;
-    ix += snprintf(buffer+ix,N-ix,(Mnps >= 0.995) ? ", %1.1f Mnps" : ", %1.2f Mnps", Mnps);
-    ix += snprintf(buffer+ix,N-ix,", %0.1f s", time_/100.0);
+    if (time_ > 0) {
+      double Mnps = 100.0*nodes/time_*1e-6;
+      ix += snprintf(buffer+ix,N-ix,(Mnps >= 0.995) ? ", %1.1f Mnps" : ", %1.2f Mnps", Mnps);
+      ix += snprintf(buffer+ix,N-ix,", %0.1f s", time_/100.0);
+    }
 
     if(appData.feedback){
        SendToIcs("%s %s\n",getFeedbackCommand(),buffer);

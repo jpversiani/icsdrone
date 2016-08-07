@@ -1,9 +1,10 @@
 
-|Todo| It would be nice to show book move as SAN
-
 |Todo| Rematch earlier computer opponents after 15 minutes of idle time
 
 |Todo| Instructions for building
+
+The current instructions are impossible to understand.
+Basically you have to type this:
 
 Linux
 -----
@@ -27,6 +28,11 @@ en Makefile.am). Dus die zitten niet in git. Normaal zouden ze
 gegenereerd moeten worden met ./autogen.sh.  Het zou kunnen dat
 autogen.sh niet meer up to date is en dat je ook een automake
 --add-missing moet doen."""
+
+|Todo| It would be nice to show book move as SAN
+
+This needs a lot of code for just a small feature.
+
 
 |Done| kibitz against computers, whisper against humans
 
