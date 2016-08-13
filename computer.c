@@ -365,7 +365,7 @@ char *insertMoveNumbersInPV(char *pv,int plyNr){
   static char buffer[256]="", *s;
   int N=sizeof(buffer), ix=0;
   int lastNr=appData.insertMoveNumbers?-1:99999/*disable*/;
-  char space=appData.compactFeedback?"":" ";
+  char *space=appData.compactFeedback?"":" ";
   int nesting=0;
   for (s=pv; *s!='\0';s++){
     nesting=trackNesting(*s,nesting);
