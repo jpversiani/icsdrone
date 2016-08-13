@@ -365,13 +365,14 @@ char *insertMoveNumbersInPV(char *pv,int plyNr){
   static char buffer[256]="", *s;
   int N=sizeof(buffer), ix=0;
   int lastNr=appData.insertMoveNumbers?-1:99999/*disable*/;
+  char space=appData.compactFeedback?"":" ";
   int nesting=0;
   for (s=pv; *s!='\0';s++){
     nesting=trackNesting(*s,nesting);
     if (nesting==0 && isalnum(*s) && (s==pv || !isMoveChar(s[-1]))){ // Word boundary
       if (isalpha(*s)){ // Next word is a move
         if ((lastNr<plyNr) && (lastNr<0 || (plyNr&1)==0)) {
-          ix+=snprintf(buffer+ix,N-ix,"%d.%s ",plyNr>>1,(plyNr&1)?"..":"");
+          ix+=snprintf(buffer+ix,N-ix,"%d.%s%s",plyNr>>1,(plyNr&1)?"..":"",space);
           lastNr=plyNr;
         }
         plyNr++;
@@ -400,7 +401,7 @@ void PVFeedback(move_t move){
       ix += snprintf(buffer+ix,N-ix,"%+0.2f/%d %s", eval_/100.0,depth,s);
       if (time_ > 0) {
         double Mnps = 100.0*nodes/time_*1e-6;
-        ix += snprintf(buffer+ix,N-ix,(Mnps >= 0.995) ? " {%1.1f Mnps}" : " {%1.2f Mnps}", Mnps);
+        ix += snprintf(buffer+ix,N-ix,(Mnps >= 0.995) ? " (%1.1f Mnps)" : " (%1.2f Mnps)", Mnps);
       }
       if(appData.feedback) SendToIcs("%s %s\n",getFeedbackCommand(),buffer);
       if(appData.proxyFeedback) Feedback(PROXY,"\r\n--> icsdrone: %s",buffer);
