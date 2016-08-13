@@ -73,6 +73,8 @@ ArgList argList = {
     {"-logAppend",            ArgBool,   &appData.logAppend         , 0 },
     {"-feedback",             ArgBool,   &appData.feedback          , 1 },
     {"-feedbackOnlyFinal",    ArgBool,   &appData.feedbackOnlyFinal , 1 },
+    {"-compactFeedback",      ArgBool,   &appData.compactFeedback   , 0 },
+    {"-insertMoveNumbers",    ArgBool,   &appData.insertMoveNumbers , 1 },
     {"-proxyFeedback",        ArgBool,   &appData.proxyFeedback     , 1 },
     {"-dontReuseEngine",      ArgBool,   &appData.dontReuseEngine   , 0 },
     {"-nice",                 ArgInt,    &appData.nice              , 0 },

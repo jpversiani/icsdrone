@@ -120,6 +120,14 @@ Send info about the eval and principal variation.
 
 Give feedback info only before move.
 
+=item B<-compactFeedback> (default: "off")
+
+Give feedback on a single line as "<score>/<depth> <pv> ... [ <speed> ]"
+
+=item B<-insertMoveNumbers> (default: "on")
+
+Automatically insert any missing move numbers into principal variation.
+
 =item B<-feedbackCommand> (default: "whisper" or "kibitz")
 
 The command to use to send feedback to observers. Use "kibitz" if you want your

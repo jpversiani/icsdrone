@@ -310,6 +310,8 @@ typedef struct {
     Bool logAppend;
     Bool feedback;
     Bool feedbackOnlyFinal;
+    Bool compactFeedback;
+    Bool insertMoveNumbers;
     Bool proxyFeedback;
     Bool dontReuseEngine;
     int nice;

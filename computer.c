@@ -364,7 +364,7 @@ static int trackNesting(int c, int nesting){
 char *insertMoveNumbersInPV(char *pv,int plyNr){
   static char buffer[256]="", *s;
   int N=sizeof(buffer), ix=0;
-  int lastNr=-1;
+  int lastNr=appData.insertMoveNumbers?-1:99999/*disable*/;
   int nesting=0;
   for (s=pv; *s!='\0';s++){
     nesting=trackNesting(*s,nesting);
@@ -394,6 +394,19 @@ void PVFeedback(move_t move){
 
     strncpy(moveString, move, sizeof(moveString)-1); // Fallback in case of empty PV
 
+    // Compact feedback: "<score>/<depth> <pv> ... [ {<speed>} ]"
+    if (appData.compactFeedback){
+      s=insertMoveNumbersInPV(pv, plyNr);
+      ix += snprintf(buffer+ix,N-ix,"%+0.2f/%d %s", eval_/100.0,depth,s);
+      if (time_ > 0) {
+        double Mnps = 100.0*nodes/time_*1e-6;
+        ix += snprintf(buffer+ix,N-ix,(Mnps >= 0.995) ? " {%1.1f Mnps}" : " {%1.2f Mnps}", Mnps);
+      }
+      if(appData.feedback) SendToIcs("%s %s\n",getFeedbackCommand(),buffer);
+      if(appData.proxyFeedback) Feedback(PROXY,"\r\n--> icsdrone: %s",buffer);
+      return;
+    }
+
     // Prefer to get the first move from pv. But skip anything that doesn't start with a letter
     int nesting=0;
     for (s=pv; *s!='\0'; s++){
@@ -406,10 +419,8 @@ void PVFeedback(move_t move){
       }
     }
 
-    ix += snprintf(buffer+ix,N-ix,"%d.%s %s",
-              plyNr>>1,
-              (plyNr&1)==0 ? "" : "..",
-              moveString);
+    // First line: <moveNumber> <move>, <score>, <depth> [, <speed>, <time> ]
+    ix += snprintf(buffer+ix,N-ix,"%d.%s %s", plyNr>>1, (plyNr&1)==0 ? "" : "..", moveString);
     ix += snprintf(buffer+ix,N-ix,", %+0.2f", eval_/100.0);
     ix += snprintf(buffer+ix,N-ix,", %d ply", depth);
     if (time_ > 0) {
@@ -425,6 +436,7 @@ void PVFeedback(move_t move){
       Feedback(PROXY,"\r\n--> icsdrone: %s",buffer);
     }
 
+    // Second line: <pv> ...
     if (sscanf(s,"%15s",moveString)==1) { // Is there more after first move?
       s=insertMoveNumbersInPV(s, plyNr+1);
       if(appData.feedback){

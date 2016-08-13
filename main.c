@@ -193,6 +193,8 @@ AppData appData = {
     FALSE,           /* logAppend */
     FALSE,           /* feedback */
     TRUE,            /* feedbackOnlyFinal */
+    FALSE,           /* compactFeedback */
+    TRUE,            /* insertMoveNumbers */
     TRUE,            /* proxyFeedback */
     TRUE,            /* dontReuseEngine */
 #ifdef __CYGWIN__
